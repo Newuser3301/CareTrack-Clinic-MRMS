@@ -11,6 +11,7 @@ const diagnosisRoutes = require('./routes/diagnosisRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
 const { seedDatabase } = require('./seed/seedAdmin');
+const User = require('./models/User');
 
 dotenv.config();
 
@@ -20,6 +21,11 @@ const startServer = async () => {
   if (process.env.SEED_DEMO_DATA === 'true') {
     await seedDatabase({ reset: false });
   }
+
+  await User.updateOne(
+    { email: 'admin@caretrack.com', name: 'Zarina Abdullaeva' },
+    { $set: { name: 'newuser4584' } }
+  );
 };
 
 const app = express();
