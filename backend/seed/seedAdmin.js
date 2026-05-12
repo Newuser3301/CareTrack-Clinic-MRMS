@@ -97,15 +97,25 @@ const diagnosisDate = (index, offset = 0) => {
   return date;
 };
 
-const seed = async () => {
-  await connectDB();
+const seedDatabase = async ({ reset = true, connect = false } = {}) => {
+  if (connect) await connectDB();
 
-  await Promise.all([
-    User.deleteMany({}),
-    Doctor.deleteMany({}),
-    Patient.deleteMany({}),
-    Diagnosis.deleteMany({})
-  ]);
+  if (!reset) {
+    const existingUsers = await User.countDocuments();
+    if (existingUsers > 0) {
+      console.log('Seed skipped: database already contains users');
+      return { skipped: true };
+    }
+  }
+
+  if (reset) {
+    await Promise.all([
+      User.deleteMany({}),
+      Doctor.deleteMany({}),
+      Patient.deleteMany({}),
+      Diagnosis.deleteMany({})
+    ]);
+  }
 
   const createdUsers = await Promise.all(users.map((user) => User.create(user)));
   const clinicalUsers = createdUsers.filter((user) => ['admin', 'clinician'].includes(user.role));
@@ -157,10 +167,22 @@ const seed = async () => {
   console.log('Admin: admin@caretrack.com / Admin12345');
   console.log('Clinician: clinician@caretrack.com / Clinician12345');
   console.log('Receptionist: reception@caretrack.com / Reception12345');
-  process.exit(0);
+  return {
+    skipped: false,
+    users: createdUsers.length,
+    doctors: doctors.length,
+    patients: patients.length,
+    diagnoses: diagnoses.length
+  };
 };
 
-seed().catch((error) => {
-  console.error(error);
-  process.exit(1);
-});
+if (require.main === module) {
+  seedDatabase({ reset: true, connect: true })
+    .then(() => process.exit(0))
+    .catch((error) => {
+      console.error(error);
+      process.exit(1);
+    });
+}
+
+module.exports = { seedDatabase };

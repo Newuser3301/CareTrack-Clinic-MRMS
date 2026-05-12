@@ -317,9 +317,12 @@ MONGO_URI=mongodb+srv://<username>:<password>@<cluster-url>/caretrack_mrms?retry
 JWT_SECRET=<long-random-secret>
 JWT_EXPIRES_IN=7d
 FRONTEND_URL=https://<your-single-render-service>.onrender.com
+SEED_DEMO_DATA=true
 ```
 
 In this Docker setup, the frontend uses `/api` as a same-origin API base URL, so `VITE_API_URL` is not required.
+
+`SEED_DEMO_DATA=true` is useful on Render Free, where service shell access may not be available. On startup, the app checks whether users already exist. If the database is empty, it creates demo users, doctors, patients, and diagnoses. If users already exist, it skips seeding and does not delete existing data.
 
 After the first deploy, open:
 
@@ -333,13 +336,13 @@ The API health check will be available at:
 https://<your-single-render-service>.onrender.com/api/health
 ```
 
-To load demo data into the production MongoDB database, run this once from the Render service shell:
+If shell access is available, demo data can also be loaded manually from the Render service shell:
 
 ```bash
 npm run seed
 ```
 
-Do not run the seed command on a production database that already contains real clinic data, because it deletes and recreates demo users, doctors, patients, and diagnoses.
+Do not run the manual seed command on a production database that already contains real clinic data, because it deletes and recreates demo users, doctors, patients, and diagnoses.
 
 ### Optional Two-Service Blueprint
 

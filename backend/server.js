@@ -10,9 +10,17 @@ const patientRoutes = require('./routes/patientRoutes');
 const diagnosisRoutes = require('./routes/diagnosisRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
+const { seedDatabase } = require('./seed/seedAdmin');
 
 dotenv.config();
-connectDB();
+
+const startServer = async () => {
+  await connectDB();
+
+  if (process.env.SEED_DEMO_DATA === 'true') {
+    await seedDatabase({ reset: false });
+  }
+};
 
 const app = express();
 const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:5173')
@@ -67,6 +75,13 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+startServer()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  })
+  .catch((error) => {
+    console.error(`Server startup failed: ${error.message}`);
+    process.exit(1);
+  });
