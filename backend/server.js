@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const path = require('path');
 const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
@@ -49,6 +50,17 @@ app.use('/api/doctors', doctorRoutes);
 app.use('/api/patients', patientRoutes);
 app.use('/api/diagnoses', diagnosisRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+
+const frontendBuildPath = path.join(__dirname, 'public');
+
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(frontendBuildPath));
+
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api')) return next();
+    return res.sendFile(path.join(frontendBuildPath, 'index.html'));
+  });
+}
 
 app.use(notFound);
 app.use(errorHandler);

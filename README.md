@@ -297,6 +297,52 @@ For production or a hosted database, replace `MONGO_URI` with a MongoDB Atlas co
 
 ## Render Deployment
 
+Recommended production option: deploy this project as one Docker web service. The Dockerfile builds the React frontend, copies it into the Express backend, and serves both the UI and API from the same Render URL.
+
+Single Docker Web Service:
+
+```text
+Service Type: Web Service
+Runtime: Docker
+Root Directory: leave empty
+Dockerfile Path: ./Dockerfile
+Health Check Path: /api/health
+```
+
+Environment variables:
+
+```env
+NODE_ENV=production
+MONGO_URI=mongodb+srv://<username>:<password>@<cluster-url>/caretrack_mrms?retryWrites=true&w=majority
+JWT_SECRET=<long-random-secret>
+JWT_EXPIRES_IN=7d
+FRONTEND_URL=https://<your-single-render-service>.onrender.com
+```
+
+In this Docker setup, the frontend uses `/api` as a same-origin API base URL, so `VITE_API_URL` is not required.
+
+After the first deploy, open:
+
+```text
+https://<your-single-render-service>.onrender.com
+```
+
+The API health check will be available at:
+
+```text
+https://<your-single-render-service>.onrender.com/api/health
+```
+
+To load demo data into the production MongoDB database, run this once from the Render service shell:
+
+```bash
+npm run seed
+```
+
+Do not run the seed command on a production database that already contains real clinic data, because it deletes and recreates demo users, doctors, patients, and diagnoses.
+
+### Optional Two-Service Blueprint
+
 The repository includes a Render Blueprint in `render.yaml` for two services:
 
 - `caretrack-mrms-api`: Node/Express backend web service
