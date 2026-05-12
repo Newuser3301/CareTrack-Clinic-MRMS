@@ -31,7 +31,7 @@ app.use(
 );
 app.use(express.json());
 
-app.get('/', (req, res) => {
+app.get('/api', (req, res) => {
   res.json({ message: 'CareTrack MRMS API is running' });
 });
 
