@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
-import { Activity } from 'lucide-react';
+import { Activity, LogIn } from 'lucide-react';
 import Button from '../components/Button';
 import Input from '../components/Input';
 import { useAuth } from '../context/AuthContext';
@@ -85,6 +85,7 @@ const Login = () => {
           <Input label="Email" type="email" autoComplete="email" value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} />
           <Input label="Password" type="password" autoComplete="current-password" value={form.password} onChange={(event) => setForm({ ...form, password: event.target.value })} />
           <Button type="submit" className="w-full" disabled={loading}>
+            <LogIn size={16} />
             {loading ? 'Signing in...' : 'Sign in'}
           </Button>
         </form>

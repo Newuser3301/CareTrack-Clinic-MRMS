@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Save, X } from 'lucide-react';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
 import Select from '../../components/Select';
@@ -25,8 +26,8 @@ const UserForm = ({ initialData, onSubmit, onCancel, loading }) => {
         { value: 'receptionist', label: 'Receptionist' }
       ]} required />
       <div className="flex justify-end gap-3 md:col-span-2">
-        <Button variant="secondary" onClick={onCancel}>Cancel</Button>
-        <Button type="submit" disabled={loading}>{loading ? 'Saving...' : 'Save user'}</Button>
+        <Button variant="secondary" onClick={onCancel}><X size={16} />Cancel</Button>
+        <Button type="submit" disabled={loading}><Save size={16} />{loading ? 'Saving...' : 'Save user'}</Button>
       </div>
     </form>
   );

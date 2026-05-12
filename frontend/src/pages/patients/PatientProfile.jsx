@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { ArrowLeft, Plus } from 'lucide-react';
 import api from '../../api/axios';
 import Badge from '../../components/Badge';
 import Button from '../../components/Button';
@@ -31,8 +32,8 @@ const PatientProfile = () => {
           <p className="text-sm text-slate-500">Patient profile and linked medical records.</p>
         </div>
         <div className="flex gap-2">
-          {permissions.canCreateDiagnosis(user?.role) && <Link to={`/diagnoses?patient=${patient._id}`}><Button>Add diagnosis</Button></Link>}
-          <Link to="/patients"><Button variant="secondary">Back</Button></Link>
+          {permissions.canCreateDiagnosis(user?.role) && <Link to={`/diagnoses?patient=${patient._id}`}><Button><Plus size={16} />Add diagnosis</Button></Link>}
+          <Link to="/patients"><Button variant="secondary"><ArrowLeft size={16} />Back</Button></Link>
         </div>
       </div>
       <section className="grid gap-4 rounded-lg border border-slate-200 bg-white p-5 md:grid-cols-2">

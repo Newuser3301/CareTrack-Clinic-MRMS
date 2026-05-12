@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Save, X } from 'lucide-react';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
 
@@ -27,8 +28,8 @@ const DoctorForm = ({ initialData, onSubmit, onCancel, loading }) => {
       <Input label="Email" type="email" value={form.email} onChange={(event) => update('email', event.target.value)} required />
       <Input label="Availability" value={form.availability} onChange={(event) => update('availability', event.target.value)} required />
       <div className="flex justify-end gap-3 md:col-span-2">
-        <Button variant="secondary" onClick={onCancel}>Cancel</Button>
-        <Button type="submit" disabled={loading}>{loading ? 'Saving...' : 'Save doctor'}</Button>
+        <Button variant="secondary" onClick={onCancel}><X size={16} />Cancel</Button>
+        <Button type="submit" disabled={loading}><Save size={16} />{loading ? 'Saving...' : 'Save doctor'}</Button>
       </div>
     </form>
   );

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 import api from '../../api/axios';
 import Button from '../../components/Button';
 import Loader from '../../components/Loader';
@@ -24,7 +25,7 @@ const DoctorDetails = () => {
           <h1 className="text-2xl font-bold text-slate-900">{doctor.fullName}</h1>
           <p className="text-sm text-slate-500">{doctor.specialty} · {doctor.department}</p>
         </div>
-        <Link to="/doctors"><Button variant="secondary">Back</Button></Link>
+        <Link to="/doctors"><Button variant="secondary"><ArrowLeft size={16} />Back</Button></Link>
       </div>
       <section className="grid gap-4 rounded-lg border border-slate-200 bg-white p-5 md:grid-cols-2">
         <p><span className="font-semibold">Phone:</span> {doctor.phone}</p>

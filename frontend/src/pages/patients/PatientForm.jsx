@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Save, X } from 'lucide-react';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
 import Select from '../../components/Select';
@@ -50,8 +51,8 @@ const PatientForm = ({ initialData, doctors, canChangeDoctor = true, onSubmit, o
       />
       <Input className="md:col-span-2" label="Emergency contact" value={form.emergencyContact} onChange={(event) => update('emergencyContact', event.target.value)} required />
       <div className="flex justify-end gap-3 md:col-span-2">
-        <Button variant="secondary" onClick={onCancel}>Cancel</Button>
-        <Button type="submit" disabled={loading}>{loading ? 'Saving...' : 'Save patient'}</Button>
+        <Button variant="secondary" onClick={onCancel}><X size={16} />Cancel</Button>
+        <Button type="submit" disabled={loading}><Save size={16} />{loading ? 'Saving...' : 'Save patient'}</Button>
       </div>
     </form>
   );
