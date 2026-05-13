@@ -24,7 +24,7 @@ const startServer = async () => {
 
   await User.updateOne(
     { email: 'admin@caretrack.com', name: 'Zarina Abdullaeva' },
-    { $set: { name: 'newuser4584' } }
+    { $set: { name: 'Islomiddin Habibullayev' } }
   );
 };
 
