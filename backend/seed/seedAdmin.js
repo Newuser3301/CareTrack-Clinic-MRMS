@@ -8,7 +8,7 @@ const Diagnosis = require('../models/Diagnosis');
 dotenv.config();
 
 const users = [
-  { name: 'newuser4584', email: 'admin@caretrack.com', password: 'Admin12345', role: 'admin' },
+  { name: 'Islomiddin Habibullayev', email: 'admin@caretrack.com', password: 'Admin12345', role: 'admin' },
   { name: 'Dr. Sherzod Karimov', email: 'clinician@caretrack.com', password: 'Clinician12345', role: 'clinician' },
   { name: 'Mohira Valieva', email: 'reception@caretrack.com', password: 'Reception12345', role: 'receptionist' },
   { name: 'Dr. Nodir Akramov', email: 'nodir.akramov@caretrack.com', password: 'Clinician12345', role: 'clinician' },
