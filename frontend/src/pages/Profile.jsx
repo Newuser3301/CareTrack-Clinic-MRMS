@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
   Activity,
+  AlertTriangle,
   CalendarDays,
-  CheckCircle2,
   ClipboardList,
-  Clock3,
   HeartPulse,
+  MapPin,
+  Phone,
   ShieldCheck,
   Stethoscope,
   UserRound,
@@ -18,25 +19,29 @@ import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { permissions, roleLabel } from '../utils/permissions';
 
-const Metric = ({ label, value, icon: Icon }) => (
-  <div className="flex items-center gap-3">
-    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-primary-700 shadow-sm">
-      <Icon size={16} />
-    </div>
-    <div>
-      <p className="text-2xl font-bold text-slate-950">{value}</p>
-      <p className="text-xs font-medium text-slate-500">{label}</p>
+const StatCard = ({ label, value, helper, icon: Icon, tone }) => (
+  <div className="rounded-[1.35rem] border border-white/70 bg-white/80 p-5 shadow-panel">
+    <div className="flex items-start justify-between gap-4">
+      <div>
+        <p className="text-sm font-semibold text-slate-500">{label}</p>
+        <p className="mt-2 text-3xl font-bold text-slate-950">{value}</p>
+        {helper && <p className="mt-1 text-xs font-medium text-slate-500">{helper}</p>}
+      </div>
+      <div className={`flex h-11 w-11 items-center justify-center rounded-2xl ${tone}`}>
+        <Icon size={20} />
+      </div>
     </div>
   </div>
 );
 
-const Pill = ({ label, value, tone = 'bg-primary-700' }) => (
-  <div>
-    <p className="mb-1 text-xs font-medium text-slate-500">{label}</p>
-    <div className="h-9 overflow-hidden rounded-full bg-white/80">
-      <div className={`flex h-full items-center rounded-full px-4 text-sm font-bold text-white ${tone}`} style={{ width: `${value}%` }}>
-        {value}%
-      </div>
+const InfoRow = ({ icon: Icon, label, value }) => (
+  <div className="flex items-start gap-3 rounded-2xl bg-slate-50 px-4 py-3">
+    <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white text-primary-700 shadow-sm">
+      <Icon size={16} />
+    </div>
+    <div className="min-w-0">
+      <p className="text-xs font-bold uppercase text-slate-400">{label}</p>
+      <p className="text-sm font-semibold text-slate-800">{value}</p>
     </div>
   </div>
 );
@@ -49,6 +54,8 @@ const initials = (name = '') =>
     .map((part) => part[0])
     .join('')
     .toUpperCase();
+
+const formatDate = (value) => (value ? new Date(value).toLocaleDateString() : '-');
 
 const Profile = () => {
   const { user } = useAuth();
@@ -78,154 +85,163 @@ const Profile = () => {
     };
 
     loadProfile();
-  }, [user?.role]);
+  }, [t, user?.role]);
 
-  const profileRecord = useMemo(() => {
-    if (user?.role === 'patient') return data.patients[0];
-    if (user?.role === 'doctor') return data.doctors[0];
-    return null;
-  }, [data.doctors, data.patients, user?.role]);
+  const patientRecord = user?.role === 'patient' ? data.patients[0] : null;
+  const doctorRecord = user?.role === 'doctor' ? data.doctors[0] : null;
+  const visiblePatients = useMemo(
+    () => (user?.role === 'patient' ? data.patients.filter(Boolean) : data.patients.slice(0, 8)),
+    [data.patients, user?.role]
+  );
+  const recentDiagnoses = data.diagnoses.slice(0, 8);
+  const riskDiagnoses = data.diagnoses.filter((diagnosis) => ['high', 'critical'].includes(diagnosis.severity)).slice(0, 5);
 
   if (error) return <div className="rounded-md bg-red-50 p-4 text-red-700">{error}</div>;
   if (!data.stats) return <Loader />;
 
-  const primaryPatients = data.patients.slice(0, 5);
-  const primaryDiagnoses = data.diagnoses.slice(0, 5);
-  const completion = data.stats.totalPatients ? Math.round((data.stats.diagnosedPatients / data.stats.totalPatients) * 100) : 0;
-  const riskPercent = data.stats.totalDiagnoses ? Math.round((data.stats.severeDiagnoses / data.stats.totalDiagnoses) * 100) : 0;
+  const profileTitle = patientRecord?.fullName || doctorRecord?.fullName || user?.name;
+  const summaryStats = user?.role === 'patient'
+    ? [
+        { label: t('dashboard.diagnoses'), value: data.stats.totalDiagnoses, helper: t('profile.careSummary'), icon: ClipboardList, tone: 'bg-cyan-50 text-cyan-700' },
+        { label: t('profile.primaryDoctor'), value: data.stats.totalDoctors, helper: t('dashboard.activeProviders'), icon: Stethoscope, tone: 'bg-blue-50 text-blue-700' },
+        { label: t('profile.riskCases'), value: data.stats.severeDiagnoses, helper: t('profile.priorityWatch'), icon: AlertTriangle, tone: 'bg-amber-50 text-amber-700' },
+        { label: t('dashboard.monthlyDiagnoses'), value: data.stats.diagnosesThisMonth, helper: t('dashboard.diagnosedThisMonth'), icon: HeartPulse, tone: 'bg-rose-50 text-rose-700' }
+      ]
+    : [
+        { label: t('dashboard.patients'), value: data.stats.totalPatients, helper: t('profile.patientRoster'), icon: UserRound, tone: 'bg-green-50 text-green-700' },
+        { label: t('dashboard.diagnoses'), value: data.stats.totalDiagnoses, helper: t('profile.careSummary'), icon: ClipboardList, tone: 'bg-cyan-50 text-cyan-700' },
+        { label: t('profile.riskCases'), value: data.stats.severeDiagnoses, helper: t('profile.priorityWatch'), icon: AlertTriangle, tone: 'bg-amber-50 text-amber-700' },
+        { label: t('dashboard.users'), value: data.stats.totalUsers, helper: t('dashboard.systemAccounts'), icon: Users, tone: 'bg-slate-100 text-slate-700' }
+      ];
 
   return (
-    <div className="mx-auto max-w-7xl rounded-[2rem] bg-white/35 p-4 shadow-soft ring-1 ring-white/80 lg:p-6">
-      <div className="rounded-[1.5rem] bg-gradient-to-br from-cyan-50 via-white/65 to-sky-100 p-4 lg:p-6">
-        <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-start">
-          <div>
-            <Badge tone={user?.role}>{t(`roles.${user?.role}`, roleLabel(user?.role))}</Badge>
-            <h1 className="mt-4 text-4xl font-bold tracking-normal text-slate-950">{t('profile.welcome')}, {user?.name}</h1>
-            <p className="mt-2 max-w-2xl text-sm text-slate-500">
-              {t('profile.subtitle')}
-            </p>
-          </div>
-          <div className="grid grid-cols-3 gap-5 rounded-[1.5rem] bg-white/70 p-4 shadow-panel">
-            <Metric label={t('dashboard.patients')} value={data.stats.totalPatients} icon={UserRound} />
-            <Metric label={t('dashboard.diagnoses')} value={data.stats.totalDiagnoses} icon={ClipboardList} />
-            <Metric label={t('dashboard.users')} value={data.stats.totalUsers} icon={Users} />
-          </div>
-        </div>
-
-        <div className="mt-6 grid gap-3 lg:grid-cols-[1fr_1fr_1fr_0.9fr]">
-          <Pill label={t('profile.coverage')} value={completion} tone="bg-primary-700" />
-          <Pill label={t('profile.monthlyActivity')} value={Math.min(100, data.stats.diagnosesThisMonth * 12)} tone="bg-cyan-600" />
-          <Pill label={t('profile.riskAttention')} value={riskPercent} tone="bg-amber-500" />
-          <div>
-            <p className="mb-1 text-xs font-medium text-slate-500">{t('profile.systemHealth')}</p>
-            <div className="flex h-9 items-center justify-center rounded-full bg-white text-sm font-bold text-green-700">
-              <ShieldCheck size={16} className="mr-2" />
-              {t('profile.protected')}
+    <div className="mx-auto max-w-7xl space-y-6">
+      <section className="rounded-[1.75rem] border border-white/70 bg-white/80 p-6 shadow-panel">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+          <div className="flex items-start gap-4">
+            <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-[1.75rem] bg-gradient-to-br from-cyan-500 to-primary-700 text-2xl font-black text-white shadow-panel">
+              {initials(profileTitle)}
+            </div>
+            <div>
+              <Badge tone={user?.role}>{t(`roles.${user?.role}`, roleLabel(user?.role))}</Badge>
+              <h1 className="mt-4 text-3xl font-bold text-slate-950">{profileTitle}</h1>
+              <p className="mt-2 max-w-2xl text-sm text-slate-500">{t('profile.subtitle')}</p>
             </div>
           </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <InfoRow icon={Activity} label={t('common.role')} value={t(`roles.${user?.role}`, roleLabel(user?.role))} />
+            <InfoRow icon={Phone} label={t('common.email')} value={user?.email} />
+            {(doctorRecord?.phone || patientRecord?.phone) && <InfoRow icon={Phone} label={t('common.phone')} value={doctorRecord?.phone || patientRecord?.phone} />}
+            {doctorRecord?.department && <InfoRow icon={ShieldCheck} label={t('profile.department')} value={doctorRecord.department} />}
+            {doctorRecord?.availability && <InfoRow icon={CalendarDays} label={t('forms.availability')} value={doctorRecord.availability} />}
+            {patientRecord?.assignedDoctor?.fullName && <InfoRow icon={Stethoscope} label={t('profile.primaryDoctor')} value={patientRecord.assignedDoctor.fullName} />}
+            {patientRecord?.address && <InfoRow icon={MapPin} label={t('common.address')} value={patientRecord.address} />}
+            {patientRecord?.emergencyContact && <InfoRow icon={Users} label={t('forms.emergencyContact')} value={patientRecord.emergencyContact} />}
+          </div>
         </div>
+      </section>
 
-        <div className="mt-6 grid gap-4 xl:grid-cols-[1.1fr_0.9fr_0.9fr]">
-          <section className="overflow-hidden rounded-[1.35rem] bg-white/80 shadow-panel">
-            <div className="grid min-h-64 sm:grid-cols-[0.9fr_1.1fr]">
-              <div className="flex flex-col justify-end bg-gradient-to-br from-cyan-200 via-blue-200 to-slate-300 p-5">
-                <div className="mb-6 flex h-28 w-28 items-center justify-center rounded-full bg-white/80 text-4xl font-bold text-slate-900 shadow-sm">
-                  {initials(user?.name)}
-                </div>
-                <p className="text-xl font-bold text-slate-950">{profileRecord?.fullName || user?.name}</p>
-                <p className="text-sm font-medium text-slate-600">{user?.email}</p>
-              </div>
-              <div className="space-y-4 p-5">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-lg font-bold text-slate-950">{t('profile.accountProfile')}</h2>
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-600">
-                    <Activity size={16} />
+      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {summaryStats.map((item) => (
+          <StatCard key={item.label} {...item} />
+        ))}
+      </section>
+
+      <section className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
+        <div className="rounded-[1.5rem] border border-white/70 bg-white/80 p-5 shadow-panel">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-bold text-slate-950">{t('profile.recentDiagnoses')}</h2>
+              <p className="text-sm text-slate-500">{t('profile.careSummary')}</p>
+            </div>
+            <ClipboardList className="text-cyan-700" size={20} />
+          </div>
+          <div className="mt-5 space-y-3">
+            {recentDiagnoses.map((diagnosis) => (
+              <div key={diagnosis._id} className="rounded-2xl bg-slate-50 p-4">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <p className="font-semibold text-slate-950">{diagnosis.icdCode} · {diagnosis.description}</p>
+                    <p className="mt-1 text-sm text-slate-500">
+                      {diagnosis.patient?.fullName || profileTitle} · {formatDate(diagnosis.diagnosedDate)}
+                    </p>
                   </div>
+                  <Badge tone={diagnosis.severity}>{diagnosis.severity}</Badge>
                 </div>
-                <div className="grid gap-3 text-sm">
-                  <p><span className="font-semibold text-slate-500">{t('common.role')}:</span> {t(`roles.${user?.role}`, roleLabel(user?.role))}</p>
-                  {profileRecord?.specialty && <p><span className="font-semibold text-slate-500">{t('profile.specialty')}:</span> {profileRecord.specialty}</p>}
-                  {profileRecord?.department && <p><span className="font-semibold text-slate-500">{t('profile.department')}:</span> {profileRecord.department}</p>}
-                  {profileRecord?.phone && <p><span className="font-semibold text-slate-500">{t('common.phone')}:</span> {profileRecord.phone}</p>}
-                  {profileRecord?.assignedDoctor && (
-                    <p><span className="font-semibold text-slate-500">{t('dashboard.doctors')}:</span> {profileRecord.assignedDoctor?.fullName}</p>
-                  )}
-                </div>
+                {diagnosis.notes && <p className="mt-3 text-sm text-slate-600">{diagnosis.notes}</p>}
               </div>
-            </div>
-          </section>
-
-          <section className="rounded-[1.35rem] bg-white/80 p-5 shadow-panel">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-bold text-slate-950">{t('profile.progress')}</h2>
-              <HeartPulse className="text-primary-600" size={20} />
-            </div>
-            <p className="mt-2 text-4xl font-bold text-slate-950">{data.stats.diagnosesThisMonth}</p>
-            <p className="text-sm text-slate-500">{t('profile.diagnosesThisMonth')}</p>
-            <div className="mt-6 flex h-32 items-end justify-between gap-2">
-              {[35, 62, 48, 74, 58, 86, 40].map((height, index) => (
-                <div key={index} className="flex flex-1 flex-col items-center gap-2">
-                  <div className="w-full rounded-full bg-primary-600" style={{ height: `${height}%` }} />
-                  <span className="text-xs text-slate-400">{['S', 'M', 'T', 'W', 'T', 'F', 'S'][index]}</span>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <section className="rounded-[1.35rem] bg-white/80 p-5 shadow-panel">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-bold text-slate-950">{t('profile.timeTracker')}</h2>
-              <Clock3 className="text-cyan-600" size={20} />
-            </div>
-            <div className="mx-auto mt-5 flex h-40 w-40 items-center justify-center rounded-full border-[14px] border-cyan-100 border-r-primary-600 border-t-primary-600">
-              <div className="text-center">
-                <p className="text-3xl font-bold text-slate-950">{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
-                <p className="text-xs font-medium text-slate-500">{t('profile.session')}</p>
-              </div>
-            </div>
-          </section>
+            ))}
+            {!recentDiagnoses.length && <p className="text-sm text-slate-500">{t('profile.noDiagnoses')}</p>}
+          </div>
         </div>
 
-        <div className="mt-4 grid gap-4 xl:grid-cols-[1fr_0.7fr]">
-          <section className="rounded-[1.35rem] bg-white/80 p-5 shadow-panel">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-bold text-slate-950">{t('profile.assignedRecords')}</h2>
-              <CalendarDays className="text-slate-500" size={20} />
+        <div className="rounded-[1.5rem] border border-white/70 bg-white/80 p-5 shadow-panel">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-bold text-slate-950">{t('profile.patientRoster')}</h2>
+              <p className="text-sm text-slate-500">{t('profile.assignedRecords')}</p>
             </div>
-            <div className="mt-5 grid gap-3 md:grid-cols-5">
-              {primaryPatients.map((patient) => (
-                <div key={patient._id} className="rounded-xl bg-slate-50 p-3">
+            <UserRound className="text-green-700" size={20} />
+          </div>
+          <div className="mt-5 space-y-3">
+            {visiblePatients.map((patient) => (
+              <div key={patient._id} className="rounded-2xl bg-slate-50 p-4">
+                <div className="flex flex-wrap items-center justify-between gap-2">
                   <p className="font-semibold text-slate-950">{patient.fullName}</p>
-                  <p className="mt-1 text-xs text-slate-500">{patient.assignedDoctor?.fullName || 'No doctor'}</p>
+                  <p className="text-xs font-semibold uppercase text-slate-400">{patient.gender}</p>
                 </div>
-              ))}
-              {!primaryPatients.length && <p className="text-sm text-slate-500 md:col-span-5">{t('profile.noPatients')}</p>}
-            </div>
-          </section>
-
-          <section className="rounded-[1.35rem] bg-slate-950 p-5 text-white shadow-sm">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-bold">{t('profile.clinicalTasks')}</h2>
-              <p className="text-3xl font-bold">{primaryDiagnoses.length}/{data.stats.totalDiagnoses || 0}</p>
-            </div>
-            <div className="mt-5 space-y-3">
-              {primaryDiagnoses.map((diagnosis) => (
-                <div key={diagnosis._id} className="flex items-center gap-3 rounded-xl bg-white/10 p-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10">
-                    <Stethoscope size={16} />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold">{diagnosis.icdCode} · {diagnosis.patient?.fullName || 'Patient'}</p>
-                    <p className="truncate text-xs text-slate-300">{diagnosis.description}</p>
-                  </div>
-                  <CheckCircle2 className="text-primary-500" size={18} />
+                <div className="mt-3 grid gap-2 text-sm text-slate-600 sm:grid-cols-2">
+                  <span>{t('common.phone')}: {patient.phone}</span>
+                  <span>{t('common.date')}: {formatDate(patient.dateOfBirth)}</span>
+                  {patient.assignedDoctor?.fullName && <span>{t('profile.primaryDoctor')}: {patient.assignedDoctor.fullName}</span>}
+                  {patient.emergencyContact && <span>{t('forms.emergencyContact')}: {patient.emergencyContact}</span>}
                 </div>
-              ))}
-              {!primaryDiagnoses.length && <p className="text-sm text-slate-300">{t('profile.noDiagnoses')}</p>}
-            </div>
-          </section>
+              </div>
+            ))}
+            {!visiblePatients.length && <p className="text-sm text-slate-500">{t('profile.noPatients')}</p>}
+          </div>
         </div>
-      </div>
+      </section>
+
+      <section className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
+        <div className="rounded-[1.5rem] border border-white/70 bg-white/80 p-5 shadow-panel">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-bold text-slate-950">{t('profile.priorityWatch')}</h2>
+              <p className="text-sm text-slate-500">{t('profile.riskCases')}</p>
+            </div>
+            <AlertTriangle className="text-amber-600" size={20} />
+          </div>
+          <div className="mt-5 space-y-3">
+            {riskDiagnoses.map((diagnosis) => (
+              <div key={diagnosis._id} className="rounded-2xl border border-amber-100 bg-amber-50/70 p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="font-semibold text-slate-950">{diagnosis.patient?.fullName || profileTitle}</p>
+                  <Badge tone={diagnosis.severity}>{diagnosis.severity}</Badge>
+                </div>
+                <p className="mt-2 text-sm text-slate-600">{diagnosis.icdCode} · {diagnosis.description}</p>
+              </div>
+            ))}
+            {!riskDiagnoses.length && <p className="text-sm text-slate-500">{t('dashboard.noRisk')}</p>}
+          </div>
+        </div>
+
+        <div className="rounded-[1.5rem] border border-white/70 bg-white/80 p-5 shadow-panel">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-bold text-slate-950">{t('profile.systemHealth')}</h2>
+              <p className="text-sm text-slate-500">{t('profile.careSummary')}</p>
+            </div>
+            <ShieldCheck className="text-green-600" size={20} />
+          </div>
+          <div className="mt-5 grid gap-4 md:grid-cols-2">
+            <InfoRow icon={HeartPulse} label={t('dashboard.monthlyDiagnoses')} value={`${data.stats.diagnosesThisMonth}`} />
+            <InfoRow icon={CalendarDays} label={t('dashboard.todayDiagnoses')} value={`${data.stats.diagnosesToday}`} />
+            <InfoRow icon={AlertTriangle} label={t('dashboard.highCritical')} value={`${data.stats.severeDiagnoses}`} />
+            <InfoRow icon={ShieldCheck} label={t('dashboard.diagnosisCoverage')} value={`${data.stats.diagnosedPatients}/${data.stats.totalPatients}`} />
+          </div>
+        </div>
+      </section>
     </div>
   );
 };

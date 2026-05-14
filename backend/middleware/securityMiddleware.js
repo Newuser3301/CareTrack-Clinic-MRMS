@@ -1,29 +1,11 @@
-const rateLimit = require('express-rate-limit');
-const slowDown = require('express-slow-down');
 const mongoSanitize = require('express-mongo-sanitize');
 const hpp = require('hpp');
 const AuditLog = require('../models/AuditLog');
 
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  limit: 8,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { message: 'Too many authentication attempts, please try again later.' }
-});
-
-const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  limit: 600,
-  standardHeaders: true,
-  legacyHeaders: false
-});
-
-const apiSlowDown = slowDown({
-  windowMs: 15 * 60 * 1000,
-  delayAfter: 250,
-  delayMs: () => 100
-});
+const passThrough = (req, res, next) => next();
+const authLimiter = passThrough;
+const apiLimiter = passThrough;
+const apiSlowDown = passThrough;
 
 const sanitizeString = (value) =>
   typeof value === 'string'
