@@ -1,3 +1,5 @@
+const { resolveSuperAdminConfig } = require('../utils/bootstrapSuperAdmin');
+
 const validateEnv = () => {
   const required = ['MONGO_URI', 'JWT_SECRET', 'FRONTEND_URL'];
   const missing = required.filter((key) => !process.env[key]);
@@ -16,6 +18,8 @@ const validateEnv = () => {
       throw new Error('Production FRONTEND_URL must use trusted HTTPS origins, not localhost or http://');
     }
   }
+
+  resolveSuperAdminConfig(process.env);
 };
 
 module.exports = validateEnv;

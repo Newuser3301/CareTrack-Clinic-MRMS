@@ -17,6 +17,12 @@ services:
         value: 7d
       - key: FRONTEND_URL
         value: https://caretrack-mrms.onrender.com
+      - key: SUPER_ADMIN_NAME
+        value: Super Admin
+      - key: SUPER_ADMIN_EMAIL
+        sync: false
+      - key: SUPER_ADMIN_PASSWORD
+        sync: false
 
   - type: web
     name: caretrack-mrms

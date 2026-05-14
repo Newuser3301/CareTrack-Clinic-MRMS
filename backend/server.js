@@ -14,6 +14,7 @@ const diagnosisRoutes = require('./routes/diagnosisRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
 const { seedDatabase } = require('./seed/seedAdmin');
+const { bootstrapSuperAdmin } = require('./utils/bootstrapSuperAdmin');
 const {
   apiLimiter,
   apiSlowDown,
@@ -30,11 +31,15 @@ validateEnv();
 
 const startServer = async () => {
   await connectDB();
+  const superAdminResult = await bootstrapSuperAdmin();
+
+  if (!superAdminResult.skipped) {
+    console.log(`Super admin ${superAdminResult.action}: ${superAdminResult.email}`);
+  }
 
   if (process.env.SEED_DEMO_DATA === 'true') {
     await seedDatabase({ reset: false });
   }
-
 };
 
 const app = express();

@@ -340,6 +340,8 @@ Seeddan keyin quyidagi accountlar mavjud bo'ladi.
 
 IMPORTANT: Agar database eski seed bilan yaratilgan bo'lsa, yangi strong password policy sababli demo parollar ishlashi uchun `npm run seed` qayta bajarilishi kerak.
 
+Productionda super admin loginini demo seedga bog'lamaslik uchun `SUPER_ADMIN_EMAIL` va `SUPER_ADMIN_PASSWORD` env variablelari berilishi mumkin. Server startup paytida shu account yaratiladi yoki mavjud super admin paroli yangilanadi.
+
 == Project Structure
 
 [source,text]
@@ -729,6 +731,9 @@ SMTP_USER=
 SMTP_PASS=
 MAIL_FROM=CareTrack Clinic <no-reply@caretrack.local>
 FRONTEND_URL=http://localhost:5173
+SUPER_ADMIN_NAME=Super Admin
+SUPER_ADMIN_EMAIL=
+SUPER_ADMIN_PASSWORD=
 NODE_ENV=development
 ENFORCE_HTTPS=true
 SEED_DEMO_DATA=false
@@ -774,6 +779,12 @@ SEED_DEMO_DATA=false
 
 | `FRONTEND_URL`
 | CORS allowlist. Bir nechta origin comma bilan yoziladi.
+
+| `SUPER_ADMIN_NAME`
+| Startupda bootstrap qilinadigan super admin display name
+
+| `SUPER_ADMIN_EMAIL`, `SUPER_ADMIN_PASSWORD`
+| Ikkalasi birga berilsa server startupda super admin account yaratadi yoki parolini yangilaydi
 
 | `NODE_ENV`
 | `development` yoki `production`
@@ -1450,4 +1461,3 @@ Real klinika production muhitida ishlatishdan oldin quyidagilar zarur:
 * encrypted medical notes
 * Uzbek/English/Russian UI
 * production-style setup and deployment configuration
-

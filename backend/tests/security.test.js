@@ -3,6 +3,7 @@ const assert = require('node:assert/strict');
 const { validatePassword } = require('../utils/passwordPolicy');
 const { isSuperAdmin, isAdmin, isSystemManager } = require('../utils/rbac');
 const validateEnv = require('../config/validateEnv');
+const { resolveSuperAdminConfig } = require('../utils/bootstrapSuperAdmin');
 
 test('password policy rejects weak passwords', () => {
   assert.equal(validatePassword('Admin12345'), false);
@@ -35,5 +36,19 @@ test('production env validation rejects insecure frontend origins', () => {
   Object.entries(previous).forEach(([key, value]) => {
     if (value === undefined) delete process.env[key];
     else process.env[key] = value;
+  });
+});
+
+test('super admin env config requires email and password together', () => {
+  assert.equal(resolveSuperAdminConfig({}), null);
+  assert.throws(() => resolveSuperAdminConfig({ SUPER_ADMIN_EMAIL: 'admin@example.com' }), /must be provided together/);
+  assert.deepEqual(resolveSuperAdminConfig({
+    SUPER_ADMIN_EMAIL: ' Admin@Example.com ',
+    SUPER_ADMIN_PASSWORD: 'StrongPass123!',
+    SUPER_ADMIN_NAME: 'System Owner'
+  }), {
+    email: 'admin@example.com',
+    password: 'StrongPass123!',
+    name: 'System Owner'
   });
 });
