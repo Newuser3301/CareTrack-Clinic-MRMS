@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const RefreshSession = require('../models/RefreshSession');
 
 const resolveSuperAdminConfig = (env = process.env) => {
   const email = env.SUPER_ADMIN_EMAIL?.trim().toLowerCase();
@@ -22,28 +23,45 @@ const bootstrapSuperAdmin = async (env = process.env) => {
 
   const existingByEmail = await User.findOne({ email: config.email }).select('+password');
   const existingSuperAdmin = existingByEmail ? null : await User.findOne({ role: 'super_admin' }).select('+password');
-  const user = existingByEmail || existingSuperAdmin;
+  let primaryUser = existingByEmail || existingSuperAdmin;
+  let action = 'updated';
 
-  if (user) {
-    user.name = config.name;
-    user.email = config.email;
-    user.password = config.password;
-    user.role = 'super_admin';
-    user.failedLoginAttempts = 0;
-    user.lockUntil = undefined;
-    await user.save();
-
-    return { skipped: false, action: 'updated', userId: user._id.toString(), email: user.email };
+  if (primaryUser) {
+    primaryUser.name = config.name;
+    primaryUser.email = config.email;
+    primaryUser.password = config.password;
+    primaryUser.role = 'super_admin';
+    primaryUser.failedLoginAttempts = 0;
+    primaryUser.lockUntil = undefined;
+    await primaryUser.save();
+  } else {
+    primaryUser = await User.create({
+      name: config.name,
+      email: config.email,
+      password: config.password,
+      role: 'super_admin'
+    });
+    action = 'created';
   }
 
-  const created = await User.create({
-    name: config.name,
-    email: config.email,
-    password: config.password,
-    role: 'super_admin'
-  });
+  const obsoleteAccounts = await User.find({
+    _id: { $ne: primaryUser._id },
+    role: { $in: ['super_admin', 'admin'] }
+  }).select('_id');
 
-  return { skipped: false, action: 'created', userId: created._id.toString(), email: created.email };
+  if (obsoleteAccounts.length) {
+    const obsoleteIds = obsoleteAccounts.map((account) => account._id);
+    await RefreshSession.updateMany({ user: { $in: obsoleteIds }, revokedAt: { $exists: false } }, { $set: { revokedAt: new Date() } });
+    await User.deleteMany({ _id: { $in: obsoleteIds } });
+  }
+
+  return {
+    skipped: false,
+    action,
+    userId: primaryUser._id.toString(),
+    email: primaryUser.email,
+    removedSystemAccounts: obsoleteAccounts.length
+  };
 };
 
 module.exports = { resolveSuperAdminConfig, bootstrapSuperAdmin };

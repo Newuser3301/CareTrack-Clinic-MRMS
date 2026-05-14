@@ -16,10 +16,14 @@ const encryptText = (value) => {
 
 const decryptText = (value) => {
   if (!value || !String(value).startsWith('enc:')) return value;
-  const [, ivHex, tagHex, encryptedHex] = String(value).split(':');
-  const decipher = crypto.createDecipheriv('aes-256-gcm', getKey(), Buffer.from(ivHex, 'hex'));
-  decipher.setAuthTag(Buffer.from(tagHex, 'hex'));
-  return Buffer.concat([decipher.update(Buffer.from(encryptedHex, 'hex')), decipher.final()]).toString('utf8');
+  try {
+    const [, ivHex, tagHex, encryptedHex] = String(value).split(':');
+    const decipher = crypto.createDecipheriv('aes-256-gcm', getKey(), Buffer.from(ivHex, 'hex'));
+    decipher.setAuthTag(Buffer.from(tagHex, 'hex'));
+    return Buffer.concat([decipher.update(Buffer.from(encryptedHex, 'hex')), decipher.final()]).toString('utf8');
+  } catch {
+    return '[Secure note unavailable]';
+  }
 };
 
 module.exports = { encryptText, decryptText };

@@ -7,6 +7,7 @@ const Diagnosis = require('../models/Diagnosis');
 const RefreshSession = require('../models/RefreshSession');
 const RevokedToken = require('../models/RevokedToken');
 const AuditLog = require('../models/AuditLog');
+const { bootstrapSuperAdmin } = require('../utils/bootstrapSuperAdmin');
 
 dotenv.config();
 
@@ -151,17 +152,8 @@ const seedDatabase = async ({ reset = true, connect = false } = {}) => {
     ]);
   }
 
-  const superAdmin = await User.create({
-    name: 'Islomiddin Habibullayev',
-    email: 'superadmin@caretrack.com',
-    password: 'SuperAdmin12345!',
-    role: 'super_admin'
-  });
-
-  const admins = await User.create([
-    { name: 'Zarina Abdullaeva', email: 'admin@caretrack.com', password: 'Admin12345!', role: 'admin' },
-    { name: 'Kamoliddin Rasulov', email: 'operations.admin@caretrack.com', password: 'Admin12345!', role: 'admin' }
-  ]);
+  const superAdminResult = await bootstrapSuperAdmin();
+  const superAdmin = superAdminResult.skipped ? null : await User.findById(superAdminResult.userId);
 
   const doctors = [];
   for (const [fullName, specialty, department, phone, email, availability] of doctorProfiles) {
@@ -188,7 +180,7 @@ const seedDatabase = async ({ reset = true, connect = false } = {}) => {
     );
   }
 
-  const diagnosisCreators = [superAdmin, ...admins, ...(await User.find({ role: 'doctor' }))];
+  const diagnosisCreators = [superAdmin, ...(await User.find({ role: 'doctor' }))].filter(Boolean);
   const diagnoses = [];
 
   patients.forEach((patient, index) => {
@@ -235,8 +227,11 @@ const seedDatabase = async ({ reset = true, connect = false } = {}) => {
 
   console.log('Seed complete');
   console.log(`Users: ${totalUsers}, Doctors: ${doctors.length}, Patients: ${patients.length}, Diagnoses: ${diagnoses.length}`);
-  console.log('Super Admin: superadmin@caretrack.com / SuperAdmin12345!');
-  console.log('Admin: admin@caretrack.com / Admin12345!');
+  if (superAdmin) {
+    console.log(`System Admin: ${superAdmin.email} / [env password]`);
+  } else {
+    console.log('System Admin: not created because SUPER_ADMIN_EMAIL and SUPER_ADMIN_PASSWORD are missing');
+  }
   console.log(`Doctor: ${doctorProfiles[0][4]} / Doctor12345!`);
   console.log(`Patient: ${patientProfiles[0][4]} / Patient12345!`);
 
