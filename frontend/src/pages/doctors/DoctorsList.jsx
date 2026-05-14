@@ -110,7 +110,10 @@ const DoctorsList = () => {
       </div>
       {loading ? <Loader /> : (
         <Table
-          columns={columns}
+          columns={[
+            { ...columns[0], render: (row) => <Link to={`/doctors/${row._id}`} className="text-primary-700 hover:underline">{row.fullName}</Link> },
+            ...columns.slice(1)
+          ]}
           data={doctors}
           renderActions={(doctor) => (
             <div className="flex justify-end gap-2">

@@ -2,6 +2,7 @@ const express = require('express');
 const { body } = require('express-validator');
 const {
   getUsers,
+  getUserById,
   createUser,
   updateUser,
   deleteUser,
@@ -63,6 +64,6 @@ router.post(
   createPatientAccount
 );
 
-router.route('/:id').put(userValidation, updateUser).delete(deleteUser);
+router.route('/:id').get(getUserById).put(userValidation, updateUser).delete(deleteUser);
 
 module.exports = router;

@@ -102,10 +102,10 @@ const PatientsList = () => {
       {loading ? <Loader /> : (
         <Table
           columns={[
-            { key: 'fullName', label: 'Name' },
+            { key: 'fullName', label: 'Name', render: (row) => <Link to={`/patients/${row._id}`} className="text-primary-700 hover:underline">{row.fullName}</Link> },
             { key: 'phone', label: 'Phone' },
             { key: 'gender', label: 'Gender' },
-            { key: 'assignedDoctor', label: 'Doctor', render: (row) => row.assignedDoctor?.fullName || '-' },
+            { key: 'assignedDoctor', label: 'Doctor', render: (row) => row.assignedDoctor ? <Link to={`/doctors/${row.assignedDoctor._id}`} className="text-primary-700 hover:underline">{row.assignedDoctor.fullName}</Link> : '-' },
             { key: 'createdAt', label: 'Created', render: (row) => new Date(row.createdAt).toLocaleDateString() }
           ]}
           data={patients}

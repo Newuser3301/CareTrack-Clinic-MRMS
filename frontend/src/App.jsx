@@ -11,6 +11,7 @@ import PatientsList from './pages/patients/PatientsList';
 import PatientProfile from './pages/patients/PatientProfile';
 import DiagnosesList from './pages/diagnoses/DiagnosesList';
 import UsersList from './pages/users/UsersList';
+import UserDetails from './pages/users/UserDetails';
 import NotFound from './pages/NotFound';
 import Forbidden from './pages/Forbidden';
 
@@ -36,6 +37,7 @@ const App = () => (
         </Route>
         <Route element={<RoleRoute allowedRoles={['super_admin', 'admin']} />}>
           <Route path="users" element={<UsersList />} />
+          <Route path="users/:id" element={<UserDetails />} />
         </Route>
         <Route path="forbidden" element={<Forbidden />} />
       </Route>

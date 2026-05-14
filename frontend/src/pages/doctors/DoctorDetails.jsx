@@ -37,7 +37,7 @@ const DoctorDetails = () => {
       </section>
       <Table
         columns={[
-          { key: 'fullName', label: t('dashboard.patients') },
+          { key: 'fullName', label: t('dashboard.patients'), render: (row) => <Link to={`/patients/${row._id}`} className="text-primary-700 hover:underline">{row.fullName}</Link> },
           { key: 'phone', label: t('common.phone') },
           { key: 'gender', label: t('common.gender') }
         ]}

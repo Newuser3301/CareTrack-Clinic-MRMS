@@ -30,14 +30,12 @@ const UserForm = ({ initialData, currentRole, onSubmit, onCancel, loading }) => 
           minLength={12}
           value={form.password}
           onChange={(event) => update('password', event.target.value)}
-          helper={!initialData ? t('forms.passwordSuggestionHelp') : undefined}
+          helper={initialData ? t('forms.passwordAdminAccessHelp') : t('forms.passwordSuggestionHelp')}
           required={!initialData}
         />
-        {!initialData && (
-          <div className="flex justify-end">
-            <Button variant="ghost" className="min-h-10 px-3" onClick={suggestPassword}><RefreshCw size={16} />{t('forms.refreshSuggestedPassword')}</Button>
-          </div>
-        )}
+        <div className="flex justify-end">
+          <Button variant="ghost" className="min-h-10 px-3" onClick={suggestPassword}><RefreshCw size={16} />{t('forms.refreshSuggestedPassword')}</Button>
+        </div>
       </div>
       <Select
         label={t('common.role')}

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import api from '../../api/axios';
 import Badge from '../../components/Badge';
 import Button from '../../components/Button';
@@ -78,7 +79,7 @@ const UsersList = () => {
       {loading ? <Loader /> : (
         <Table
           columns={[
-            { key: 'name', label: t('common.name') },
+            { key: 'name', label: t('common.name'), render: (row) => <Link to={`/users/${row._id}`} className="text-primary-700 hover:underline">{row.name}</Link> },
             { key: 'email', label: t('common.email') },
             { key: 'role', label: t('common.role'), render: (row) => <Badge tone={row.role}>{t(`roles.${row.role}`, roleLabel(row.role))}</Badge> },
             { key: 'createdAt', label: t('common.created'), render: (row) => new Date(row.createdAt).toLocaleDateString() }

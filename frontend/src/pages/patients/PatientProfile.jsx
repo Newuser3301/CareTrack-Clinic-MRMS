@@ -46,7 +46,7 @@ const PatientProfile = () => {
       <section className="rounded-lg border border-slate-200 bg-white p-5">
         <h2 className="font-semibold text-slate-900">Assigned Doctor</h2>
         <div className="mt-3 grid gap-3 md:grid-cols-3">
-          <p>{patient.assignedDoctor?.fullName}</p>
+          <p>{patient.assignedDoctor?._id ? <Link to={`/doctors/${patient.assignedDoctor._id}`} className="text-primary-700 hover:underline">{patient.assignedDoctor.fullName}</Link> : '-'}</p>
           <p>{patient.assignedDoctor?.specialty}</p>
           <p>{patient.assignedDoctor?.department}</p>
         </div>

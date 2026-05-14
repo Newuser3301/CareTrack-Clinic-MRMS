@@ -16,6 +16,35 @@ const handleValidation = (req, res, next) => {
   return true;
 };
 
+const getUserById = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      res.status(404);
+      throw new Error('User not found');
+    }
+
+    if (isAdmin(req.user) && !['doctor', 'patient'].includes(user.role)) {
+      res.status(403);
+      throw new Error('Admins cannot view admin or super admin accounts');
+    }
+
+    const response = { user };
+
+    if (user.role === 'doctor') {
+      response.profile = await Doctor.findOne({ user: user._id });
+    }
+
+    if (user.role === 'patient') {
+      response.profile = await Patient.findOne({ user: user._id }).populate('assignedDoctor', 'fullName specialty department');
+    }
+
+    res.json(response);
+  } catch (error) {
+    next(error);
+  }
+};
+
 const getUsers = async (req, res, next) => {
   try {
     const filter = isSuperAdmin(req.user) ? {} : { role: { $in: ['doctor', 'patient'] } };
@@ -148,4 +177,4 @@ const createPatientAccount = (req, res, next) => {
   return createUser(req, res, next);
 };
 
-module.exports = { getUsers, createUser, updateUser, deleteUser, createAdmin, createDoctorAccount, createPatientAccount };
+module.exports = { getUsers, getUserById, createUser, updateUser, deleteUser, createAdmin, createDoctorAccount, createPatientAccount };
