@@ -10,11 +10,13 @@ import Modal from '../../components/Modal';
 import SearchBar from '../../components/SearchBar';
 import Table from '../../components/Table';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { permissions } from '../../utils/permissions';
 import DoctorForm from './DoctorForm';
 
 const DoctorsList = () => {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const role = user?.role;
   const [doctors, setDoctors] = useState([]);
   const [search, setSearch] = useState('');
@@ -40,7 +42,7 @@ const DoctorsList = () => {
       });
       setDoctors(data);
     } catch (err) {
-      setError(err.response?.data?.message || 'Unable to load doctors.');
+      setError(err.response?.data?.message || t('common.loadingError'));
     } finally {
       setLoading(false);
     }
@@ -90,15 +92,15 @@ const DoctorsList = () => {
     <div className="space-y-5">
       <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Doctors</h1>
-          <p className="text-sm text-slate-500">Search and manage clinic providers.</p>
+          <h1 className="text-2xl font-bold text-slate-900">{t('pages.doctorsTitle')}</h1>
+          <p className="text-sm text-slate-500">{t('pages.doctorsSubtitle')}</p>
         </div>
-        {permissions.canCreateDoctor(role) && <Button onClick={() => setModal({ open: true, doctor: null })}><Plus size={16} />New doctor</Button>}
+        {permissions.canCreateDoctor(role) && <Button onClick={() => setModal({ open: true, doctor: null })}><Plus size={16} />{t('pages.newDoctor')}</Button>}
       </div>
       {error && <div className="rounded-md bg-red-50 p-3 text-sm text-red-700">{error}</div>}
       <div className="grid gap-3 md:grid-cols-4">
         <div className="md:col-span-2">
-          <SearchBar value={search} onChange={setSearch} placeholder="Search doctors by name, specialty, department, phone..." />
+          <SearchBar value={search} onChange={setSearch} placeholder={`${t('common.search')}...`} />
         </div>
         <Input label="Specialty" value={specialty} onChange={(event) => setSpecialty(event.target.value)} placeholder="Cardiology" />
         <Input label="Department" value={department} onChange={(event) => setDepartment(event.target.value)} placeholder="Heart Care" />
@@ -119,7 +121,7 @@ const DoctorsList = () => {
           )}
         />
       )}
-      <Modal open={modal.open} title={modal.doctor ? 'Edit doctor' : 'Create doctor'} onClose={() => setModal({ open: false, doctor: null })}>
+      <Modal open={modal.open} title={modal.doctor ? t('pages.doctorsTitle') : t('pages.newDoctor')} onClose={() => setModal({ open: false, doctor: null })}>
         <DoctorForm initialData={modal.doctor} onSubmit={saveDoctor} loading={saving} onCancel={() => setModal({ open: false, doctor: null })} />
       </Modal>
       <ConfirmDialog open={!!confirm} message={`Delete ${confirm?.fullName}?`} onCancel={() => setConfirm(null)} onConfirm={deleteDoctor} loading={saving} />

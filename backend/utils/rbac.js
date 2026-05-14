@@ -1,0 +1,65 @@
+const Doctor = require('../models/Doctor');
+const Patient = require('../models/Patient');
+
+const SYSTEM_ROLES = ['super_admin', 'admin'];
+
+const isSuperAdmin = (user) => user?.role === 'super_admin';
+const isAdmin = (user) => user?.role === 'admin';
+const isSystemManager = (user) => SYSTEM_ROLES.includes(user?.role);
+
+const forbid = (res, message = 'Forbidden: insufficient permissions') => {
+  res.status(403);
+  throw new Error(message);
+};
+
+const getDoctorProfile = (userId) => Doctor.findOne({ user: userId });
+const getPatientProfile = (userId) => Patient.findOne({ user: userId });
+
+const getVisiblePatientFilter = async (req, baseFilter = {}) => {
+  if (isSystemManager(req.user)) return baseFilter;
+
+  if (req.user.role === 'doctor') {
+    const doctor = await getDoctorProfile(req.user._id);
+    if (!doctor) return { ...baseFilter, _id: null };
+    return { ...baseFilter, assignedDoctor: doctor._id };
+  }
+
+  if (req.user.role === 'patient') {
+    const patient = await getPatientProfile(req.user._id);
+    if (!patient) return { ...baseFilter, _id: null };
+    return { ...baseFilter, _id: patient._id };
+  }
+
+  return { ...baseFilter, _id: null };
+};
+
+const ensurePatientAccess = async (req, patient, res, { write = false } = {}) => {
+  if (isSystemManager(req.user)) return;
+
+  if (req.user.role === 'doctor') {
+    const doctor = await getDoctorProfile(req.user._id);
+    if (doctor && patient.assignedDoctor?.toString() === doctor._id.toString()) return;
+  }
+
+  if (!write && req.user.role === 'patient' && patient.user?.toString() === req.user._id.toString()) return;
+
+  forbid(res);
+};
+
+const ensureDiagnosisAccess = async (req, diagnosis, res, { write = false } = {}) => {
+  const patient = diagnosis.patient;
+  if (!patient || !patient.assignedDoctor) forbid(res);
+  await ensurePatientAccess(req, patient, res, { write });
+};
+
+module.exports = {
+  isSuperAdmin,
+  isAdmin,
+  isSystemManager,
+  forbid,
+  getDoctorProfile,
+  getPatientProfile,
+  getVisiblePatientFilter,
+  ensurePatientAccess,
+  ensureDiagnosisAccess
+};

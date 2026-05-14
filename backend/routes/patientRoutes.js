@@ -10,6 +10,8 @@ const {
 } = require('../controllers/patientController');
 const { protect } = require('../middleware/authMiddleware');
 const { authorize } = require('../middleware/roleMiddleware');
+const { canAccessPatient } = require('../middleware/ownershipMiddleware');
+const { passwordPolicyMessage, validatePassword } = require('../utils/passwordPolicy');
 
 const router = express.Router();
 
@@ -18,24 +20,33 @@ const patientValidation = [
   body('dateOfBirth').isISO8601().withMessage('Valid date of birth is required'),
   body('gender').isIn(['female', 'male', 'other']).withMessage('Invalid gender'),
   body('phone').trim().notEmpty().withMessage('Phone is required'),
+  body('email').isEmail().withMessage('Valid email is required').normalizeEmail(),
   body('address').trim().notEmpty().withMessage('Address is required'),
   body('assignedDoctor').isMongoId().withMessage('Valid assigned doctor is required'),
   body('emergencyContact').trim().notEmpty().withMessage('Emergency contact is required')
+];
+const createPatientValidation = [
+  ...patientValidation,
+  body('password').custom(validatePassword).withMessage(passwordPolicyMessage)
+];
+const updatePatientValidation = [
+  ...patientValidation,
+  body('password').optional({ checkFalsy: true }).custom(validatePassword).withMessage(passwordPolicyMessage)
 ];
 
 router.use(protect);
 
 router
   .route('/')
-  .get(authorize('admin', 'clinician', 'receptionist'), getPatients)
-  .post(authorize('admin', 'receptionist'), patientValidation, createPatient);
+  .get(authorize('super_admin', 'admin', 'doctor', 'patient'), getPatients)
+  .post(authorize('super_admin', 'admin'), createPatientValidation, createPatient);
 
-router.get('/:id/profile', authorize('admin', 'clinician', 'receptionist'), getPatientProfile);
+router.get('/:id/profile', authorize('super_admin', 'admin', 'doctor', 'patient'), canAccessPatient(), getPatientProfile);
 
 router
   .route('/:id')
-  .get(authorize('admin', 'clinician', 'receptionist'), getPatientById)
-  .put(authorize('admin', 'clinician'), patientValidation, updatePatient)
-  .delete(authorize('admin'), deletePatient);
+  .get(authorize('super_admin', 'admin', 'doctor', 'patient'), canAccessPatient(), getPatientById)
+  .put(authorize('super_admin', 'admin', 'doctor'), canAccessPatient({ write: true }), updatePatientValidation, updatePatient)
+  .delete(authorize('super_admin', 'admin'), deletePatient);
 
 module.exports = router;

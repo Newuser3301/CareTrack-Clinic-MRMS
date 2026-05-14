@@ -3,9 +3,10 @@ import { Activity, AlertTriangle, CalendarDays, ClipboardList, ShieldCheck, Stet
 import api from '../api/axios';
 import Badge from '../components/Badge';
 import Loader from '../components/Loader';
+import { useLanguage } from '../context/LanguageContext';
 
 const StatCard = ({ label, value, helper, icon: Icon, tone }) => (
-  <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+  <div className="rounded-[1.5rem] border border-white/70 bg-white/80 p-5 shadow-panel">
     <div className="flex items-start justify-between gap-4">
       <div>
         <p className="text-sm font-medium text-slate-500">{label}</p>
@@ -38,12 +39,13 @@ const ProgressRow = ({ label, value, max, tone = 'bg-primary-600', helper }) => 
 const Dashboard = () => {
   const [stats, setStats] = useState(null);
   const [error, setError] = useState('');
+  const { t } = useLanguage();
 
   useEffect(() => {
     api
       .get('/dashboard/stats')
       .then(({ data }) => setStats(data))
-      .catch((err) => setError(err.response?.data?.message || 'Unable to load dashboard.'));
+      .catch((err) => setError(err.response?.data?.message || t('common.loadingError')));
   }, []);
 
   const severityMap = useMemo(() => {
@@ -64,22 +66,22 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="rounded-[1.75rem] border border-white/70 bg-white/75 p-6 shadow-panel">
         <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
           <div>
             <p className="text-sm font-semibold uppercase tracking-wide text-primary-600">CareTrack Clinic</p>
-            <h1 className="mt-1 text-3xl font-bold text-slate-950">Clinical Operations Dashboard</h1>
+            <h1 className="mt-1 text-3xl font-bold text-slate-950">{t('dashboard.title')}</h1>
             <p className="mt-2 max-w-3xl text-sm text-slate-500">
-              Live overview of provider capacity, patient registrations, diagnosis activity, risk cases, and clinic workload.
+              {t('dashboard.subtitle')}
             </p>
           </div>
           <div className="grid grid-cols-2 gap-3 sm:flex">
             <div className="rounded-md bg-red-50 px-4 py-3">
-              <p className="text-xs font-semibold uppercase text-red-600">Critical</p>
+              <p className="text-xs font-semibold uppercase text-red-600">{t('dashboard.critical')}</p>
               <p className="text-2xl font-bold text-red-700">{stats.criticalDiagnoses}</p>
             </div>
             <div className="rounded-md bg-amber-50 px-4 py-3">
-              <p className="text-xs font-semibold uppercase text-amber-700">High + Critical</p>
+              <p className="text-xs font-semibold uppercase text-amber-700">{t('dashboard.highCritical')}</p>
               <p className="text-2xl font-bold text-amber-700">{stats.severeDiagnoses}</p>
             </div>
           </div>
@@ -87,25 +89,25 @@ const Dashboard = () => {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="Doctors" value={stats.totalDoctors} helper="Active providers" icon={Stethoscope} tone="bg-blue-50 text-blue-700" />
-        <StatCard label="Patients" value={stats.totalPatients} helper="Registered records" icon={UserRound} tone="bg-green-50 text-green-700" />
-        <StatCard label="Diagnoses" value={stats.totalDiagnoses} helper="Linked clinical entries" icon={ClipboardList} tone="bg-cyan-50 text-cyan-700" />
-        <StatCard label="Users" value={stats.totalUsers} helper="System accounts" icon={Users} tone="bg-slate-100 text-slate-700" />
+        <StatCard label={t('dashboard.doctors')} value={stats.totalDoctors} helper={t('dashboard.activeProviders')} icon={Stethoscope} tone="bg-blue-50 text-blue-700" />
+        <StatCard label={t('dashboard.patients')} value={stats.totalPatients} helper={t('dashboard.registeredRecords')} icon={UserRound} tone="bg-green-50 text-green-700" />
+        <StatCard label={t('dashboard.diagnoses')} value={stats.totalDiagnoses} helper={t('dashboard.linkedEntries')} icon={ClipboardList} tone="bg-cyan-50 text-cyan-700" />
+        <StatCard label={t('dashboard.users')} value={stats.totalUsers} helper={t('dashboard.systemAccounts')} icon={Users} tone="bg-slate-100 text-slate-700" />
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="New Patients" value={stats.newPatientsThisMonth} helper="Registered this month" icon={UserPlus} tone="bg-violet-50 text-violet-700" />
-        <StatCard label="Today's Diagnoses" value={stats.diagnosesToday} helper="Diagnosed today" icon={CalendarDays} tone="bg-indigo-50 text-indigo-700" />
-        <StatCard label="Monthly Diagnoses" value={stats.diagnosesThisMonth} helper="Diagnosed this month" icon={Activity} tone="bg-teal-50 text-teal-700" />
-        <StatCard label="Diagnosis Coverage" value={`${stats.diagnosedPatients}/${stats.totalPatients}`} helper={`${stats.patientsWithoutDiagnoses} patients without diagnoses`} icon={TrendingUp} tone="bg-rose-50 text-rose-700" />
+        <StatCard label={t('dashboard.newPatients')} value={stats.newPatientsThisMonth} helper={t('dashboard.registeredThisMonth')} icon={UserPlus} tone="bg-violet-50 text-violet-700" />
+        <StatCard label={t('dashboard.todayDiagnoses')} value={stats.diagnosesToday} helper={t('dashboard.diagnosedToday')} icon={CalendarDays} tone="bg-indigo-50 text-indigo-700" />
+        <StatCard label={t('dashboard.monthlyDiagnoses')} value={stats.diagnosesThisMonth} helper={t('dashboard.diagnosedThisMonth')} icon={Activity} tone="bg-teal-50 text-teal-700" />
+        <StatCard label={t('dashboard.diagnosisCoverage')} value={`${stats.diagnosedPatients}/${stats.totalPatients}`} helper={`${stats.patientsWithoutDiagnoses} ${t('dashboard.patientsWithoutDiagnoses')}`} icon={TrendingUp} tone="bg-rose-50 text-rose-700" />
       </div>
 
       <div className="grid gap-6 xl:grid-cols-3">
-        <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm xl:col-span-2">
+        <section className="rounded-[1.5rem] border border-white/70 bg-white/80 p-5 shadow-panel xl:col-span-2">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="font-semibold text-slate-950">Diagnosis Severity</h2>
-              <p className="text-sm text-slate-500">Current distribution across all diagnosis records.</p>
+              <h2 className="font-semibold text-slate-950">{t('dashboard.diagnosisSeverity')}</h2>
+              <p className="text-sm text-slate-500">{t('dashboard.severitySubtitle')}</p>
             </div>
             <ShieldCheck className="text-green-600" size={22} />
           </div>
@@ -128,11 +130,11 @@ const Dashboard = () => {
           </div>
         </section>
 
-        <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+        <section className="rounded-[1.5rem] border border-white/70 bg-white/80 p-5 shadow-panel">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="font-semibold text-slate-950">Risk Watch</h2>
-              <p className="text-sm text-slate-500">Cases needing close attention.</p>
+              <h2 className="font-semibold text-slate-950">{t('dashboard.riskWatch')}</h2>
+              <p className="text-sm text-slate-500">{t('dashboard.riskSubtitle')}</p>
             </div>
             <AlertTriangle className="text-amber-600" size={22} />
           </div>
@@ -147,15 +149,15 @@ const Dashboard = () => {
                   <p className="mt-1 text-xs text-slate-400">{new Date(diagnosis.diagnosedDate).toLocaleDateString()}</p>
                 </div>
               ))}
-            {!stats.riskDiagnoses.length && <p className="text-sm text-slate-500">No critical or high-risk diagnoses recorded.</p>}
+            {!stats.riskDiagnoses.length && <p className="text-sm text-slate-500">{t('dashboard.noRisk')}</p>}
           </div>
         </section>
       </div>
 
       <div className="grid gap-6 xl:grid-cols-3">
-        <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-          <h2 className="font-semibold text-slate-950">Diagnosis Trend</h2>
-          <p className="text-sm text-slate-500">Monthly diagnosis volume from live records.</p>
+        <section className="rounded-[1.5rem] border border-white/70 bg-white/80 p-5 shadow-panel">
+          <h2 className="font-semibold text-slate-950">{t('dashboard.diagnosisTrend')}</h2>
+          <p className="text-sm text-slate-500">{t('dashboard.trendSubtitle')}</p>
           <div className="mt-5 space-y-4">
             {stats.monthlyDiagnosisTrend.map((item) => (
               <ProgressRow key={`${item._id.year}-${item._id.month}`} label={monthLabel(item)} value={item.count} max={maxMonthlyTrend} helper={`${item.count} records`} tone="bg-cyan-600" />
@@ -164,8 +166,8 @@ const Dashboard = () => {
           </div>
         </section>
 
-        <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-          <h2 className="font-semibold text-slate-950">Department Workload</h2>
+        <section className="rounded-[1.5rem] border border-white/70 bg-white/80 p-5 shadow-panel">
+          <h2 className="font-semibold text-slate-950">{t('dashboard.departmentWorkload')}</h2>
           <div className="mt-5 space-y-4">
             {stats.departmentLoad.map((item) => (
               <ProgressRow key={item._id} label={item._id} value={item.count} max={maxDepartment} helper={`${item.count} patients`} />
@@ -173,8 +175,8 @@ const Dashboard = () => {
           </div>
         </section>
 
-        <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-          <h2 className="font-semibold text-slate-950">Doctor Patient Load</h2>
+        <section className="rounded-[1.5rem] border border-white/70 bg-white/80 p-5 shadow-panel">
+          <h2 className="font-semibold text-slate-950">{t('dashboard.doctorPatientLoad')}</h2>
           <p className="text-sm text-slate-500">Average {stats.averageDiagnosesPerPatient} diagnoses per patient.</p>
           <div className="mt-5 space-y-4">
             {stats.doctorLoad.map((item) => (
@@ -185,8 +187,8 @@ const Dashboard = () => {
       </div>
 
       <div className="grid gap-6 xl:grid-cols-2">
-        <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-          <h2 className="font-semibold text-slate-950">Recent Patients</h2>
+        <section className="rounded-[1.5rem] border border-white/70 bg-white/80 p-5 shadow-panel">
+          <h2 className="font-semibold text-slate-950">{t('dashboard.recentPatients')}</h2>
           <div className="mt-4 space-y-3">
             {stats.recentPatients.map((patient) => (
               <div key={patient._id} className="flex items-center justify-between gap-4 rounded-md bg-slate-50 p-3">
@@ -201,8 +203,8 @@ const Dashboard = () => {
             ))}
           </div>
         </section>
-        <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-          <h2 className="font-semibold text-slate-950">Recent Diagnoses</h2>
+        <section className="rounded-[1.5rem] border border-white/70 bg-white/80 p-5 shadow-panel">
+          <h2 className="font-semibold text-slate-950">{t('dashboard.recentDiagnoses')}</h2>
           <div className="mt-4 space-y-3">
             {stats.recentDiagnoses.map((diagnosis) => (
               <div key={diagnosis._id} className="flex items-center justify-between gap-4 rounded-md bg-slate-50 p-3">

@@ -10,11 +10,13 @@ import SearchBar from '../../components/SearchBar';
 import Select from '../../components/Select';
 import Table from '../../components/Table';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { permissions } from '../../utils/permissions';
 import PatientForm from './PatientForm';
 
 const PatientsList = () => {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const role = user?.role;
   const [patients, setPatients] = useState([]);
   const [doctors, setDoctors] = useState([]);
@@ -36,7 +38,7 @@ const PatientsList = () => {
       setPatients(patientsRes.data);
       setDoctors(doctorsRes.data);
     } catch (err) {
-      setError(err.response?.data?.message || 'Unable to load patients.');
+      setError(err.response?.data?.message || t('common.loadingError'));
     } finally {
       setLoading(false);
     }
@@ -78,15 +80,15 @@ const PatientsList = () => {
     <div className="space-y-5">
       <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Patients</h1>
-          <p className="text-sm text-slate-500">Register patients and manage doctor assignments.</p>
+          <h1 className="text-2xl font-bold text-slate-900">{t('pages.patientsTitle')}</h1>
+          <p className="text-sm text-slate-500">{t('pages.patientsSubtitle')}</p>
         </div>
-        {permissions.canCreatePatient(role) && <Button onClick={() => setModal({ open: true, patient: null })}><Plus size={16} />New patient</Button>}
+        {permissions.canCreatePatient(role) && <Button onClick={() => setModal({ open: true, patient: null })}><Plus size={16} />{t('pages.newPatient')}</Button>}
       </div>
       {error && <div className="rounded-md bg-red-50 p-3 text-sm text-red-700">{error}</div>}
       <div className="grid gap-3 md:grid-cols-3">
         <div className="md:col-span-2">
-          <SearchBar value={search} onChange={setSearch} placeholder="Search patients by name or phone..." />
+          <SearchBar value={search} onChange={setSearch} placeholder={`${t('common.search')}...`} />
         </div>
         {permissions.canChangePatientDoctor(role) && (
           <Select
@@ -116,7 +118,7 @@ const PatientsList = () => {
           )}
         />
       )}
-      <Modal open={modal.open} title={modal.patient ? 'Edit patient' : 'Create patient'} onClose={() => setModal({ open: false, patient: null })}>
+      <Modal open={modal.open} title={modal.patient ? t('pages.patientsTitle') : t('pages.newPatient')} onClose={() => setModal({ open: false, patient: null })}>
         <PatientForm
           initialData={modal.patient}
           doctors={permissions.canChangePatientDoctor(role) ? doctors : modal.patient?.assignedDoctor ? [modal.patient.assignedDoctor] : []}

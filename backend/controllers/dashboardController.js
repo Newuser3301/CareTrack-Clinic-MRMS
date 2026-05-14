@@ -2,6 +2,7 @@ const Doctor = require('../models/Doctor');
 const Patient = require('../models/Patient');
 const Diagnosis = require('../models/Diagnosis');
 const User = require('../models/User');
+const { getVisiblePatientFilter, isSystemManager } = require('../utils/rbac');
 
 const getDashboardStats = async (req, res, next) => {
   try {
@@ -10,6 +11,15 @@ const getDashboardStats = async (req, res, next) => {
     const startOfTomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1);
+    const patientFilter = await getVisiblePatientFilter(req);
+    const visiblePatientIds = await Patient.find(patientFilter).distinct('_id');
+    const diagnosisFilter = { patient: { $in: visiblePatientIds } };
+    const userFilter = isSystemManager(req.user) ? {} : { _id: req.user._id };
+    const currentPatient = req.user.role === 'patient' ? await Patient.findOne({ user: req.user._id }) : null;
+    const currentDoctor = req.user.role === 'doctor' ? await Doctor.findOne({ user: req.user._id }) : null;
+    const doctorFilter = isSystemManager(req.user)
+      ? {}
+      : { _id: currentDoctor?._id || currentPatient?.assignedDoctor || null };
 
     const [
       totalDoctors,
@@ -32,16 +42,17 @@ const getDashboardStats = async (req, res, next) => {
       roleBreakdown
     ] =
       await Promise.all([
-        Doctor.countDocuments(),
-        Patient.countDocuments(),
-        Diagnosis.countDocuments(),
-        User.countDocuments(),
-        Patient.countDocuments({ createdAt: { $gte: startOfMonth } }),
-        Diagnosis.countDocuments({ diagnosedDate: { $gte: startOfToday, $lt: startOfTomorrow } }),
-        Diagnosis.countDocuments({ diagnosedDate: { $gte: startOfMonth } }),
-        Diagnosis.countDocuments({ severity: 'critical' }),
-        Diagnosis.countDocuments({ severity: 'high' }),
+        Doctor.countDocuments(doctorFilter),
+        Patient.countDocuments(patientFilter),
+        Diagnosis.countDocuments(diagnosisFilter),
+        User.countDocuments(userFilter),
+        Patient.countDocuments({ ...patientFilter, createdAt: { $gte: startOfMonth } }),
+        Diagnosis.countDocuments({ ...diagnosisFilter, diagnosedDate: { $gte: startOfToday, $lt: startOfTomorrow } }),
+        Diagnosis.countDocuments({ ...diagnosisFilter, diagnosedDate: { $gte: startOfMonth } }),
+        Diagnosis.countDocuments({ ...diagnosisFilter, severity: 'critical' }),
+        Diagnosis.countDocuments({ ...diagnosisFilter, severity: 'high' }),
         Patient.aggregate([
+          { $match: patientFilter },
           {
             $lookup: {
               from: 'diagnoses',
@@ -53,19 +64,20 @@ const getDashboardStats = async (req, res, next) => {
           { $match: { diagnoses: { $size: 0 } } },
           { $count: 'count' }
         ]),
-        Patient.find().populate('assignedDoctor', 'fullName specialty department').sort({ createdAt: -1 }).limit(6),
-        Diagnosis.find()
+        Patient.find(patientFilter).populate('assignedDoctor', 'fullName specialty department').sort({ createdAt: -1 }).limit(6),
+        Diagnosis.find(diagnosisFilter)
           .populate('patient', 'fullName')
           .populate('createdBy', 'name')
           .sort({ diagnosedDate: -1, createdAt: -1 })
           .limit(6),
-        Diagnosis.find({ severity: { $in: ['critical', 'high'] } })
+        Diagnosis.find({ ...diagnosisFilter, severity: { $in: ['critical', 'high'] } })
           .populate('patient', 'fullName phone')
           .populate('createdBy', 'name')
           .sort({ diagnosedDate: -1, createdAt: -1 })
           .limit(6),
-        Diagnosis.aggregate([{ $group: { _id: '$severity', count: { $sum: 1 } } }, { $sort: { count: -1 } }]),
+        Diagnosis.aggregate([{ $match: diagnosisFilter }, { $group: { _id: '$severity', count: { $sum: 1 } } }, { $sort: { count: -1 } }]),
         Patient.aggregate([
+          { $match: patientFilter },
           {
             $lookup: {
               from: 'doctors',
@@ -80,6 +92,7 @@ const getDashboardStats = async (req, res, next) => {
           { $limit: 6 }
         ]),
         Patient.aggregate([
+          { $match: patientFilter },
           {
             $lookup: {
               from: 'doctors',
@@ -94,7 +107,7 @@ const getDashboardStats = async (req, res, next) => {
           { $limit: 5 }
         ]),
         Diagnosis.aggregate([
-          { $match: { diagnosedDate: { $gte: sixMonthsAgo } } },
+          { $match: { ...diagnosisFilter, diagnosedDate: { $gte: sixMonthsAgo } } },
           {
             $group: {
               _id: { year: { $year: '$diagnosedDate' }, month: { $month: '$diagnosedDate' } },
@@ -104,6 +117,7 @@ const getDashboardStats = async (req, res, next) => {
           { $sort: { '_id.year': 1, '_id.month': 1 } }
         ]),
         User.aggregate([
+          { $match: userFilter },
           { $group: { _id: '$role', count: { $sum: 1 } } },
           { $sort: { count: -1 } }
         ])

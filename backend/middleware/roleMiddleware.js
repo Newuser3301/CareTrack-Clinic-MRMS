@@ -9,4 +9,13 @@ const authorize = (...roles) => {
   };
 };
 
-module.exports = { authorize };
+const blockSuperAdminMutation = (req, res, next) => {
+  if (req.user?.role !== 'super_admin' && req.body?.role === 'super_admin') {
+    res.status(403);
+    return next(new Error('Only Super Admin can assign the super_admin role'));
+  }
+
+  return next();
+};
+
+module.exports = { authorize, blockSuperAdminMutation };

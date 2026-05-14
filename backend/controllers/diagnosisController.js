@@ -1,5 +1,7 @@
 const { validationResult } = require('express-validator');
 const Diagnosis = require('../models/Diagnosis');
+const Patient = require('../models/Patient');
+const { ensureDiagnosisAccess, ensurePatientAccess, getVisiblePatientFilter, isSystemManager } = require('../utils/rbac');
 
 const handleValidation = (req, res, next) => {
   const errors = validationResult(req);
@@ -26,12 +28,19 @@ const buildDiagnosisFilter = (query) => {
 };
 
 const populateDiagnosis = (query) =>
-  query.populate('patient', 'fullName phone assignedDoctor').populate('createdBy', 'name role');
+  query.populate('patient', 'fullName phone assignedDoctor user').populate('createdBy', 'name role');
 
 const getDiagnoses = async (req, res, next) => {
   try {
+    const visiblePatients = await getVisiblePatientFilter(req);
+    const patientIds = await Patient.find(visiblePatients).distinct('_id');
+    const filter = { ...buildDiagnosisFilter(req.query), patient: { $in: patientIds } };
+    if (req.query.patient && patientIds.map((id) => id.toString()).includes(req.query.patient)) {
+      filter.patient = req.query.patient;
+    }
+
     const diagnoses = await populateDiagnosis(
-      Diagnosis.find(buildDiagnosisFilter(req.query)).sort({ diagnosedDate: -1 })
+      Diagnosis.find(filter).sort({ diagnosedDate: -1 })
     );
     res.json(diagnoses);
   } catch (error) {
@@ -46,6 +55,7 @@ const getDiagnosisById = async (req, res, next) => {
       res.status(404);
       throw new Error('Diagnosis not found');
     }
+    await ensureDiagnosisAccess(req, diagnosis, res);
     res.json(diagnosis);
   } catch (error) {
     next(error);
@@ -56,9 +66,16 @@ const createDiagnosis = async (req, res, next) => {
   if (!handleValidation(req, res, next)) return;
 
   try {
+    const patient = await Patient.findById(req.body.patient);
+    if (!patient) {
+      res.status(404);
+      throw new Error('Patient not found');
+    }
+    await ensurePatientAccess(req, patient, res, { write: true });
+
     const diagnosis = await Diagnosis.create({ ...req.body, createdBy: req.user._id });
     const populated = await diagnosis.populate([
-      { path: 'patient', select: 'fullName phone assignedDoctor' },
+        { path: 'patient', select: 'fullName phone assignedDoctor user' },
       { path: 'createdBy', select: 'name role' }
     ]);
     res.status(201).json(populated);
@@ -71,13 +88,25 @@ const updateDiagnosis = async (req, res, next) => {
   if (!handleValidation(req, res, next)) return;
 
   try {
-    const diagnosis = await populateDiagnosis(
-      Diagnosis.findByIdAndUpdate(req.params.id, req.body, {
-        new: true,
-        runValidators: true
-      })
-    );
+    const existing = await Diagnosis.findById(req.params.id).populate('patient');
+    if (!existing) {
+      res.status(404);
+      throw new Error('Diagnosis not found');
+    }
+    await ensureDiagnosisAccess(req, existing, res, { write: true });
 
+    if (req.body.patient && req.body.patient !== existing.patient._id.toString()) {
+      const newPatient = await Patient.findById(req.body.patient);
+      if (!newPatient) {
+        res.status(404);
+        throw new Error('Patient not found');
+      }
+      await ensurePatientAccess(req, newPatient, res, { write: true });
+    }
+
+    Object.assign(existing, req.body);
+    await existing.save();
+    const diagnosis = await populateDiagnosis(Diagnosis.findById(existing._id));
     if (!diagnosis) {
       res.status(404);
       throw new Error('Diagnosis not found');
@@ -91,6 +120,11 @@ const updateDiagnosis = async (req, res, next) => {
 
 const deleteDiagnosis = async (req, res, next) => {
   try {
+    if (!isSystemManager(req.user)) {
+      res.status(403);
+      throw new Error('Forbidden: insufficient permissions');
+    }
+
     const diagnosis = await Diagnosis.findByIdAndDelete(req.params.id);
     if (!diagnosis) {
       res.status(404);
@@ -105,6 +139,13 @@ const deleteDiagnosis = async (req, res, next) => {
 
 const getDiagnosesByPatient = async (req, res, next) => {
   try {
+    const patient = await Patient.findById(req.params.patientId);
+    if (!patient) {
+      res.status(404);
+      throw new Error('Patient not found');
+    }
+    await ensurePatientAccess(req, patient, res);
+
     const diagnoses = await populateDiagnosis(
       Diagnosis.find({ patient: req.params.patientId }).sort({ diagnosedDate: -1 })
     );

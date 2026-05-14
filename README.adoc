@@ -1,0 +1,1453 @@
+= CareTrack Clinic MRMS
+:toc: left
+:toclevels: 4
+:sectnums:
+:icons: font
+:source-highlighter: rouge
+:project-name: CareTrack Clinic MRMS
+:frontend-url: http://localhost:5173
+:backend-url: http://localhost:5000
+:api-url: http://localhost:5000/api
+:database-name: caretrack_mrms
+
+== Umumiy Ma'lumot
+
+{project-name} - xususiy klinika uchun ishlab chiqilgan full-stack Medical Records Management System.
+Tizim shifokorlar, bemorlar, tashxislar, foydalanuvchi accountlari, klinika statistikasi, role-based access control va xavfsiz authentication jarayonlarini bitta web platformada boshqaradi.
+
+Loyiha BTEC Full Stack Development assignment ssenariysi asosida yaratilgan: CareTrack Clinic qog'oz yozuvlar va alohida spreadsheetlardan voz kechib, markazlashgan web-based MRMS tizimiga o'tadi.
+
+=== Asosiy Maqsad
+
+CareTrack Clinic MRMS quyidagi muammolarni hal qiladi:
+
+* bemor yozuvlarini markazlashtirish
+* shifokor-bemor bog'lanishini aniq yuritish
+* tashxis tarixini klinik record sifatida saqlash
+* har bir inson uchun login account yaratish
+* Super Admin, Admin, Doctor va Patient rollariga mos ruxsatlarni qo'llash
+* klinika faoliyatini dashboard orqali ko'rish
+* medical data access va mutationlarni audit log orqali kuzatish
+
+=== Hozirgi Holat
+
+Ilova lokal muhitda ishga tushadigan holatda.
+
+[cols="1,2", options="header"]
+|===
+| Qism
+| Qiymat
+
+| Frontend
+| `{frontend-url}`
+
+| Backend API
+| `{api-url}`
+
+| Health endpoint
+| `{backend-url}/api/health`
+
+| Database
+| MongoDB, default local URI: `mongodb://127.0.0.1:27017/{database-name}`
+
+| Default UI language
+| Uzbek (`uz`)
+
+| Qo'shimcha tillar
+| English (`en`), Russian (`ru`)
+|===
+
+=== Seed Demo Data
+
+Seed script quyidagi demo ma'lumotlarni yaratadi:
+
+* 18 users
+* 5 doctors
+* 10 patients
+* 15 diagnosis records
+* 1 super admin
+* 2 admins
+* doctor accountlari
+* patient accountlari
+
+== Technology Stack
+
+=== Frontend
+
+[cols="1,2", options="header"]
+|===
+| Texnologiya
+| Vazifasi
+
+| React
+| Component-based frontend UI
+
+| Vite
+| Development server va production build
+
+| Tailwind CSS
+| Utility-first styling
+
+| React Router
+| Client-side routing va protected routes
+
+| Axios
+| API client, cookie-based auth requests
+
+| Lucide React
+| UI iconlar
+|===
+
+=== Backend
+
+[cols="1,2", options="header"]
+|===
+| Texnologiya
+| Vazifasi
+
+| Node.js
+| JavaScript runtime
+
+| Express.js
+| REST API framework
+
+| MongoDB
+| NoSQL database
+
+| Mongoose
+| ODM, schema, validation, relationshiplar
+
+| JWT
+| Access token authentication
+
+| HTTP-only cookies
+| Browserda tokenni xavfsiz saqlash
+
+| bcryptjs
+| Password hashing
+
+| express-validator
+| Request validation
+
+| helmet
+| Security HTTP headers
+
+| express-rate-limit
+| Rate limiting va brute-force protection
+
+| express-mongo-sanitize
+| NoSQL injection himoyasi
+
+| hpp
+| HTTP parameter pollution himoyasi
+
+| nodemailer
+| Password reset email yuborish
+|===
+
+== Asosiy Funksiyalar
+
+=== Account System
+
+Tizimdagi har bir inson login accountga ega:
+
+* Super Admin
+* Admin
+* Doctor
+* Patient
+
+Har bir account quyidagilarni saqlaydi:
+
+* `name`
+* `email`
+* `password`
+* `role`
+
+Passwordlar `bcrypt` bilan hash qilinadi.
+Login jarayoni JWT access token va refresh session asosida ishlaydi.
+
+=== Medical Records Management
+
+Tizim quyidagilarni boshqaradi:
+
+* doctors
+* patients
+* diagnoses
+* users
+* dashboard statistics
+* account profile pages
+* patient profile and diagnosis history
+* role-specific visible records
+
+=== Multi-language UI
+
+Frontend uch tilda ishlaydi:
+
+[cols="1,1,2", options="header"]
+|===
+| Kod
+| Til
+| Izoh
+
+| `uz`
+| O'zbek
+| Default til
+
+| `en`
+| English
+| Qo'shimcha til
+
+| `ru`
+| Russian
+| Qo'shimcha til
+|===
+
+Tanlangan til browser `localStorage` ichida `caretrackLanguage` nomi bilan saqlanadi.
+Til almashtirgich login sahifada va authenticated layout navbarida mavjud.
+
+== Roles and Permissions
+
+=== Role Ro'yxati
+
+Tizimdagi role enum:
+
+[source,text]
+----
+super_admin
+admin
+doctor
+patient
+----
+
+=== Super Admin
+
+Super Admin eng yuqori ruxsat darajasiga ega.
+
+Ruxsatlar:
+
+* full dashboard access
+* admins CRUD
+* doctors CRUD
+* patients CRUD
+* diagnoses CRUD
+* all users management
+* role assignment
+* all records visibility
+* `super_admin` role berish
+
+Cheklov:
+
+* Agar doctor bir yoki bir nechta patientga assigned bo'lsa, doctor o'chirilmaydi.
+
+Doctor delete blok response:
+
+[source,json]
+----
+{
+  "message": "This doctor is assigned to one or more patients and cannot be deleted."
+}
+----
+
+=== Admin
+
+Admin Super Admindan pastroq boshqaruv rolidir.
+
+Ruxsatlar:
+
+* dashboard ko'rish
+* doctors CRUD
+* patients CRUD
+* diagnoses CRUD
+* doctor va patient accountlarini boshqarish
+
+Cheklovlar:
+
+* `super_admin` account yaratolmaydi
+* `super_admin` account update qilolmaydi
+* `super_admin` account delete qilolmaydi
+* `super_admin` role assign qilolmaydi
+* admin yoki super admin accountlarini boshqara olmaydi
+* assigned patientlari bor doctorni o'chira olmaydi
+
+=== Doctor
+
+Doctor cheklangan klinik accessga ega.
+
+Ruxsatlar:
+
+* limited dashboard data
+* faqat assigned patientlarni ko'rish
+* faqat assigned patientlarni update qilish
+* assigned patientlar uchun diagnosis yaratish
+* assigned patientlar diagnosislarini ko'rish
+* assigned patientlar diagnosislarini update qilish
+
+Cheklovlar:
+
+* users manage qilolmaydi
+* doctors create/update/delete qilolmaydi
+* patients delete qilolmaydi
+* diagnoses delete qilolmaydi
+* admin management pagesga kira olmaydi
+* boshqa doctorlarga assigned patientlarni ko'ra olmaydi
+* boshqa doctor yozuvlarini o'zgartira olmaydi
+
+=== Patient
+
+Patient eng cheklangan role.
+
+Ruxsatlar:
+
+* own profile ko'rish
+* assigned doctor ko'rish
+* own diagnosis history ko'rish
+
+Cheklovlar:
+
+* admin pagesga kira olmaydi
+* users manage qilolmaydi
+* doctors manage qilolmaydi
+* patients manage qilolmaydi
+* diagnoses create/update/delete qilolmaydi
+* boshqa patientlarni ko'ra olmaydi
+
+== Demo Accounts
+
+Seeddan keyin quyidagi accountlar mavjud bo'ladi.
+
+[cols="1,2,2", options="header"]
+|===
+| Role
+| Email
+| Password
+
+| Super Admin
+| `superadmin@caretrack.com`
+| `SuperAdmin12345!`
+
+| Admin
+| `admin@caretrack.com`
+| `Admin12345!`
+
+| Doctor
+| `amina.karimova@caretrack.com`
+| `Doctor12345!`
+
+| Patient
+| `aziz.rahmonov@example.com`
+| `Patient12345!`
+|===
+
+IMPORTANT: Agar database eski seed bilan yaratilgan bo'lsa, yangi strong password policy sababli demo parollar ishlashi uchun `npm run seed` qayta bajarilishi kerak.
+
+== Project Structure
+
+[source,text]
+----
+.
+├── README.md
+├── README.adoc
+├── Dockerfile
+├── render.yaml
+├── start.ps1
+├── start.sh
+├── backend/
+│   ├── server.js
+│   ├── package.json
+│   ├── .env.example
+│   ├── config/
+│   │   ├── db.js
+│   │   └── validateEnv.js
+│   ├── controllers/
+│   │   ├── authController.js
+│   │   ├── dashboardController.js
+│   │   ├── diagnosisController.js
+│   │   ├── doctorController.js
+│   │   ├── patientController.js
+│   │   └── userController.js
+│   ├── middleware/
+│   │   ├── authMiddleware.js
+│   │   ├── errorMiddleware.js
+│   │   ├── ownershipMiddleware.js
+│   │   ├── roleMiddleware.js
+│   │   └── securityMiddleware.js
+│   ├── models/
+│   │   ├── AuditLog.js
+│   │   ├── Diagnosis.js
+│   │   ├── Doctor.js
+│   │   ├── Patient.js
+│   │   ├── RefreshSession.js
+│   │   ├── RevokedToken.js
+│   │   └── User.js
+│   ├── routes/
+│   │   ├── authRoutes.js
+│   │   ├── dashboardRoutes.js
+│   │   ├── diagnosisRoutes.js
+│   │   ├── doctorRoutes.js
+│   │   ├── patientRoutes.js
+│   │   └── userRoutes.js
+│   ├── seed/
+│   │   └── seedAdmin.js
+│   ├── tests/
+│   │   └── security.test.js
+│   └── utils/
+│       ├── cryptoFields.js
+│       ├── email.js
+│       ├── generateToken.js
+│       ├── passwordPolicy.js
+│       └── rbac.js
+└── frontend/
+    ├── package.json
+    ├── .env.example
+    ├── index.html
+    ├── vite.config.js
+    ├── tailwind.config.js
+    ├── postcss.config.js
+    └── src/
+        ├── main.jsx
+        ├── App.jsx
+        ├── api/
+        │   └── axios.js
+        ├── components/
+        ├── context/
+        │   ├── AuthContext.jsx
+        │   └── LanguageContext.jsx
+        ├── i18n/
+        │   └── translations.js
+        ├── layout/
+        ├── pages/
+        ├── routes/
+        └── utils/
+----
+
+== Data Model
+
+=== User
+
+`User` account tizimdagi hamma odamlar uchun ishlatiladi.
+
+[cols="1,2", options="header"]
+|===
+| Field
+| Izoh
+
+| `name`
+| User display name
+
+| `email`
+| Unique login email
+
+| `password`
+| bcrypt hash, default querylarda select qilinmaydi
+
+| `role`
+| `super_admin`, `admin`, `doctor`, `patient`
+
+| `passwordResetToken`
+| Password reset token hash
+
+| `passwordResetExpires`
+| Reset token expiry
+
+| `passwordChangedAt`
+| Password o'zgargan vaqt
+
+| `failedLoginAttempts`
+| Login brute-force lockout uchun counter
+
+| `lockUntil`
+| Account vaqtinchalik locked bo'ladigan vaqt
+
+| `tokenVersion`
+| Logout-all va session invalidation uchun version
+|===
+
+=== Doctor
+
+[cols="1,2", options="header"]
+|===
+| Field
+| Izoh
+
+| `user`
+| `User` modelga reference, unique
+
+| `fullName`
+| Doctor full name
+
+| `specialty`
+| Mutaxassislik
+
+| `department`
+| Bo'lim
+
+| `phone`
+| Telefon
+
+| `email`
+| Doctor account emaili bilan mos keladi
+
+| `availability`
+| Qabul vaqti
+|===
+
+=== Patient
+
+[cols="1,2", options="header"]
+|===
+| Field
+| Izoh
+
+| `user`
+| `User` modelga reference, unique
+
+| `fullName`
+| Patient full name
+
+| `dateOfBirth`
+| Tug'ilgan sana
+
+| `gender`
+| `female`, `male`, `other`
+
+| `phone`
+| Telefon
+
+| `email`
+| Patient login emaili
+
+| `address`
+| Manzil
+
+| `assignedDoctor`
+| `Doctor` modelga reference
+
+| `emergencyContact`
+| Favqulodda kontakt
+|===
+
+=== Diagnosis
+
+[cols="1,2", options="header"]
+|===
+| Field
+| Izoh
+
+| `patient`
+| `Patient` modelga reference
+
+| `icdCode`
+| ICD kodi
+
+| `description`
+| Tashxis tavsifi
+
+| `severity`
+| `low`, `medium`, `high`, `critical`
+
+| `notes`
+| Application-level encryption orqali saqlanadi
+
+| `diagnosedDate`
+| Tashxis qo'yilgan sana
+
+| `createdBy`
+| `User` modelga reference
+|===
+
+=== Security Models
+
+[cols="1,2", options="header"]
+|===
+| Model
+| Vazifasi
+
+| `RefreshSession`
+| Refresh token sessionlarini hash ko'rinishida saqlaydi
+
+| `RevokedToken`
+| Logout qilingan access token JWT IDlarini blacklist qiladi
+
+| `AuditLog`
+| Sensitive endpointlardagi access va mutationlarni yozadi
+|===
+
+=== Relationships
+
+* Every person has one login account.
+* One doctor profile belongs to one doctor user account.
+* One patient profile belongs to one patient user account.
+* One doctor can have many patients.
+* One patient belongs to one doctor.
+* One patient can have many diagnosis records.
+* One diagnosis belongs to one patient.
+* One diagnosis is created by one user.
+
+== Security Architecture
+
+=== Authentication
+
+Authentication quyidagicha ishlaydi:
+
+. User email va password bilan login qiladi.
+. Backend passwordni bcrypt hash bilan solishtiradi.
+. Access token JWT sifatida yaratiladi.
+. Access token `httpOnly` cookie ichiga yoziladi.
+. Refresh token random secure token sifatida yaratiladi.
+. Refresh token hash ko'rinishida `RefreshSession` modelida saqlanadi.
+. Frontend API requestlarda `withCredentials: true` ishlatadi.
+. Access token tugasa frontend `/api/auth/refresh` endpoint orqali sessionni rotate qiladi.
+
+=== Token Storage
+
+Access token endi `localStorage`da saqlanmaydi.
+Bu XSS bo'lsa token o'g'irlanish riskini kamaytiradi.
+
+Cookie options:
+
+* `httpOnly: true`
+* `secure: true` productionda
+* `sameSite: strict` productionda
+* `sameSite: lax` developmentda
+
+=== Session Management
+
+Tizimda quyidagi session flowlar bor:
+
+* `POST /api/auth/login`
+* `POST /api/auth/refresh`
+* `POST /api/auth/logout`
+* `POST /api/auth/logout-all`
+
+`logout-all` userning barcha active refresh sessionlarini revoke qiladi va `tokenVersion` oshiradi.
+
+=== Password Policy
+
+Strong password policy:
+
+* kamida 12 belgi
+* kamida bitta uppercase
+* kamida bitta lowercase
+* kamida bitta number
+* kamida bitta special character
+
+Weak passwordlar validator orqali rad etiladi.
+
+=== Account Lockout
+
+Login brute-force hujumlariga qarshi:
+
+* `MAX_LOGIN_ATTEMPTS=5`
+* `ACCOUNT_LOCK_TIME=15m`
+
+Noto'g'ri login attemptlar limitdan oshsa account vaqtincha locked bo'ladi.
+
+=== Rate Limiting
+
+Security middleware:
+
+* global API limiter
+* auth endpointlar uchun alohida login limiter
+* slow down middleware
+
+Bu brute-force va request flooding risklarini kamaytiradi.
+
+=== Security Headers
+
+`helmet` orqali HTTP security headers qo'llanadi.
+Productionda Content Security Policy ham yoqiladi.
+
+=== Sanitization
+
+Quyidagilar qo'llanadi:
+
+* `express-mongo-sanitize`
+* `hpp`
+* custom script-string sanitization
+* JSON body limit: `100kb`
+* multipart/form-data default reject qilinadi
+
+File upload hozircha yoqilmagan.
+Bu ataylab qilingan: upload feature qo'shilganda alohida file type whitelist, size limit, virus scanning va storage policy kerak bo'ladi.
+
+=== Audit Logging
+
+`AuditLog` quyidagi sensitive yo'llarni kuzatadi:
+
+* auth endpoints
+* users endpoints
+* doctors endpoints
+* patients endpoints
+* diagnoses endpoints
+
+Audit log quyidagilarni yozadi:
+
+* actor user
+* actor role
+* action
+* resource
+* resourceId
+* method
+* path
+* statusCode
+* IP
+* user-agent
+* query metadata
+
+=== Application-level Encryption
+
+`Diagnosis.notes` field application-level AES-256-GCM encryption helper orqali saqlanadi.
+Kalit `FIELD_ENCRYPTION_KEY` orqali beriladi.
+Kalit bo'lmasa fallback sifatida `JWT_SECRET` ishlatiladi, lekin productionda alohida `FIELD_ENCRYPTION_KEY` berilishi kerak.
+
+=== HTTPS Enforcement
+
+Productionda `ENFORCE_HTTPS=true` bo'lsa HTTP requestlar HTTPSga redirect qilinadi.
+Production env validation `FRONTEND_URL` ichida `localhost` yoki `http://` bo'lsa serverni ishga tushirmaydi.
+
+== Environment Variables
+
+=== Backend `.env`
+
+`backend/.env.example`:
+
+[source,env]
+----
+PORT=5000
+MONGO_URI=mongodb://127.0.0.1:27017/caretrack_mrms
+JWT_SECRET=replace_with_a_long_random_secret
+JWT_EXPIRES_IN=15m
+REFRESH_TOKEN_EXPIRES_IN=7d
+PASSWORD_RESET_EXPIRES_IN=15m
+MAX_LOGIN_ATTEMPTS=5
+ACCOUNT_LOCK_TIME=15m
+FIELD_ENCRYPTION_KEY=replace_with_a_32_plus_character_field_secret
+SMTP_HOST=
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=
+SMTP_PASS=
+MAIL_FROM=CareTrack Clinic <no-reply@caretrack.local>
+FRONTEND_URL=http://localhost:5173
+NODE_ENV=development
+ENFORCE_HTTPS=true
+SEED_DEMO_DATA=false
+----
+
+[cols="1,3", options="header"]
+|===
+| Variable
+| Izoh
+
+| `PORT`
+| Backend server port
+
+| `MONGO_URI`
+| MongoDB connection string
+
+| `JWT_SECRET`
+| JWT signing secret, kamida 32 belgi tavsiya qilinadi
+
+| `JWT_EXPIRES_IN`
+| Access token muddati
+
+| `REFRESH_TOKEN_EXPIRES_IN`
+| Refresh session muddati
+
+| `PASSWORD_RESET_EXPIRES_IN`
+| Reset token muddati
+
+| `MAX_LOGIN_ATTEMPTS`
+| Lockoutdan oldingi noto'g'ri login urinishlari
+
+| `ACCOUNT_LOCK_TIME`
+| Account lock muddati
+
+| `FIELD_ENCRYPTION_KEY`
+| Medical field encryption uchun alohida secret
+
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`
+| Password reset email yuborish uchun SMTP sozlamalari
+
+| `MAIL_FROM`
+| Reset email sender qiymati
+
+| `FRONTEND_URL`
+| CORS allowlist. Bir nechta origin comma bilan yoziladi.
+
+| `NODE_ENV`
+| `development` yoki `production`
+
+| `ENFORCE_HTTPS`
+| Productionda HTTPS redirectni yoqish/o'chirish
+
+| `SEED_DEMO_DATA`
+| Server startupda DB bo'sh bo'lsa demo data yaratish
+|===
+
+=== Frontend `.env`
+
+`frontend/.env.example`:
+
+[source,env]
+----
+VITE_API_URL=http://localhost:5000/api
+----
+
+[cols="1,3", options="header"]
+|===
+| Variable
+| Izoh
+
+| `VITE_API_URL`
+| Frontend ishlatadigan backend API base URL
+|===
+
+== Installation and Running
+
+=== Requirements
+
+Kerakli dasturlar:
+
+* Node.js 18+
+* npm
+* MongoDB Community Server yoki MongoDB Atlas
+* PowerShell Windows uchun yoki Bash/macOS/Linux uchun
+
+Local MongoDB default host:
+
+[source,text]
+----
+127.0.0.1:27017
+----
+
+=== Quick Start on Windows
+
+Project rootdan:
+
+[source,powershell]
+----
+.\start.ps1
+----
+
+Seed bilan:
+
+[source,powershell]
+----
+.\start.ps1 -Seed
+----
+
+Script quyidagilarni qiladi:
+
+* missing `.env` fayllarni `.env.example`dan yaratadi
+* dependencies o'rnatadi
+* MongoDB connection tekshiradi
+* optional seed bajaradi
+* backend va frontendni alohida PowerShell oynalarida ishga tushiradi
+
+=== Quick Start on macOS, Linux, Git Bash
+
+[source,bash]
+----
+chmod +x start.sh
+./start.sh
+----
+
+Seed bilan:
+
+[source,bash]
+----
+./start.sh --seed
+----
+
+=== Manual Setup
+
+Backend:
+
+[source,bash]
+----
+cd backend
+cp .env.example .env
+npm install
+npm run seed
+npm run dev
+----
+
+Frontend:
+
+[source,bash]
+----
+cd frontend
+cp .env.example .env
+npm install
+npm run dev
+----
+
+Open:
+
+* Frontend: `{frontend-url}`
+* Backend health: `{backend-url}/api/health`
+
+== Scripts
+
+=== Backend Scripts
+
+[cols="1,3", options="header"]
+|===
+| Command
+| Izoh
+
+| `npm start`
+| `node server.js` bilan backendni ishga tushiradi
+
+| `npm run dev`
+| `nodemon server.js` bilan dev mode
+
+| `npm run seed`
+| Database reset qilib demo data yaratadi
+
+| `npm test`
+| Node test runner orqali security regression testlarni ishga tushiradi
+|===
+
+=== Frontend Scripts
+
+[cols="1,3", options="header"]
+|===
+| Command
+| Izoh
+
+| `npm run dev`
+| Vite development server
+
+| `npm run build`
+| Production frontend build
+
+| `npm run preview`
+| Production build preview
+|===
+
+== API Endpoints
+
+Base URL:
+
+[source,text]
+----
+http://localhost:5000/api
+----
+
+=== Auth
+
+[cols="1,2,2", options="header"]
+|===
+| Method
+| Endpoint
+| Izoh
+
+| `POST`
+| `/auth/login`
+| Email/password bilan login, cookies set qiladi
+
+| `POST`
+| `/auth/refresh`
+| Refresh session rotate qiladi
+
+| `POST`
+| `/auth/logout`
+| Current sessionni revoke qiladi
+
+| `POST`
+| `/auth/logout-all`
+| Userning barcha sessionlarini revoke qiladi
+
+| `POST`
+| `/auth/change-password`
+| Current password orqali password o'zgartirish
+
+| `POST`
+| `/auth/forgot-password`
+| Reset token/link yaratish
+
+| `POST`
+| `/auth/reset-password/:token`
+| Token orqali password reset qilish
+
+| `GET`
+| `/auth/me`
+| Current authenticated user
+
+| `POST`
+| `/auth/register`
+| Faqat Super Admin uchun generic account yaratish
+|===
+
+=== Users
+
+[cols="1,2,2", options="header"]
+|===
+| Method
+| Endpoint
+| Izoh
+
+| `GET`
+| `/users`
+| Users list. Super Admin hammasini, Admin doctor/patient accountlarni ko'radi.
+
+| `POST`
+| `/users`
+| Role bilan user yaratish
+
+| `POST`
+| `/users/admins`
+| Admin account yaratish, faqat Super Admin
+
+| `POST`
+| `/users/doctor-accounts`
+| Doctor account yaratish
+
+| `POST`
+| `/users/patient-accounts`
+| Patient account yaratish
+
+| `PUT`
+| `/users/:id`
+| User update
+
+| `DELETE`
+| `/users/:id`
+| User delete
+|===
+
+=== Doctors
+
+[cols="1,2,2", options="header"]
+|===
+| Method
+| Endpoint
+| Izoh
+
+| `GET`
+| `/doctors`
+| Rolega mos doctors list
+
+| `GET`
+| `/doctors/:id`
+| Doctor details
+
+| `POST`
+| `/doctors`
+| Doctor profile va login account yaratish
+
+| `PUT`
+| `/doctors/:id`
+| Doctor profile/account update
+
+| `DELETE`
+| `/doctors/:id`
+| Doctor delete, assigned patient bo'lsa bloklanadi
+|===
+
+Doctor yaratish example:
+
+[source,json]
+----
+{
+  "fullName": "Dr. Example",
+  "specialty": "Cardiology",
+  "department": "Heart Care",
+  "phone": "+998 90 000 00 00",
+  "email": "doctor.example@caretrack.com",
+  "availability": "Mon-Fri 09:00-15:00",
+  "password": "Doctor12345!"
+}
+----
+
+=== Patients
+
+[cols="1,2,2", options="header"]
+|===
+| Method
+| Endpoint
+| Izoh
+
+| `GET`
+| `/patients`
+| Rolega mos patient list
+
+| `GET`
+| `/patients/:id`
+| Patient details
+
+| `GET`
+| `/patients/:id/profile`
+| Patient profile va linked diagnoses
+
+| `POST`
+| `/patients`
+| Patient profile va login account yaratish
+
+| `PUT`
+| `/patients/:id`
+| Patient update, ownership check bilan
+
+| `DELETE`
+| `/patients/:id`
+| Patient va linked diagnoses delete, Admin/Super Admin
+|===
+
+Patient yaratish example:
+
+[source,json]
+----
+{
+  "fullName": "Patient Example",
+  "dateOfBirth": "1990-01-01",
+  "gender": "male",
+  "phone": "+998 90 111 22 33",
+  "email": "patient.example@caretrack.com",
+  "address": "Tashkent",
+  "assignedDoctor": "<doctorId>",
+  "emergencyContact": "Relative, +998 90 111 22 44",
+  "password": "Patient12345!"
+}
+----
+
+=== Diagnoses
+
+[cols="1,2,2", options="header"]
+|===
+| Method
+| Endpoint
+| Izoh
+
+| `GET`
+| `/diagnoses`
+| Rolega mos diagnosis list
+
+| `GET`
+| `/diagnoses/:id`
+| Diagnosis details
+
+| `GET`
+| `/diagnoses/patient/:patientId`
+| Patient diagnosis history
+
+| `POST`
+| `/diagnoses`
+| Diagnosis yaratish
+
+| `PUT`
+| `/diagnoses/:id`
+| Diagnosis update
+
+| `DELETE`
+| `/diagnoses/:id`
+| Diagnosis delete, Admin/Super Admin
+|===
+
+Diagnosis yaratish example:
+
+[source,json]
+----
+{
+  "patient": "<patientId>",
+  "icdCode": "I10",
+  "description": "Essential primary hypertension",
+  "severity": "medium",
+  "notes": "Continue monitoring blood pressure.",
+  "diagnosedDate": "2026-05-14"
+}
+----
+
+=== Dashboard
+
+[cols="1,2,2", options="header"]
+|===
+| Method
+| Endpoint
+| Izoh
+
+| `GET`
+| `/dashboard/stats`
+| Role-filtered dashboard statistics
+|===
+
+== Frontend Architecture
+
+=== Routing
+
+Main route map:
+
+[cols="1,2", options="header"]
+|===
+| Route
+| Sahifa
+
+| `/login`
+| Login
+
+| `/`
+| Account profile dashboard
+
+| `/dashboard`
+| Clinical operations dashboard
+
+| `/doctors`
+| Doctors list
+
+| `/doctors/:id`
+| Doctor details
+
+| `/patients`
+| Patients list
+
+| `/patients/:id`
+| Patient profile
+
+| `/diagnoses`
+| Diagnoses list
+
+| `/users`
+| User management
+
+| `/forbidden`
+| Forbidden page
+
+| `/404`
+| Not found
+|===
+
+=== Protected Routes
+
+Frontendda:
+
+* `PrivateRoute` - login bo'lmagan userni `/login`ga yuboradi
+* `RoleRoute` - role mos bo'lmasa `/forbidden`ga yuboradi
+* Sidebar items role bo'yicha yashiriladi
+* API esa baribir backendda himoyalangan, frontend faqat UX layer
+
+=== i18n
+
+Multi-language fayllar:
+
+* `frontend/src/context/LanguageContext.jsx`
+* `frontend/src/i18n/translations.js`
+* `frontend/src/components/LanguageSwitcher.jsx`
+
+Default language:
+
+[source,text]
+----
+uz
+----
+
+Language persistence:
+
+[source,text]
+----
+localStorage.caretrackLanguage
+----
+
+== Deployment
+
+=== Production Checklist
+
+Productionga chiqarishdan oldin:
+
+* `NODE_ENV=production`
+* `JWT_SECRET` kamida 32+ random character
+* `FIELD_ENCRYPTION_KEY` alohida random secret
+* `FRONTEND_URL` faqat HTTPS trusted originlar
+* `ENFORCE_HTTPS=true`
+* MongoDB Atlas yoki managed MongoDB
+* SMTP sozlamalari to'ldirilgan bo'lishi kerak
+* demo seed production real DBda ehtiyotkorlik bilan ishlatilishi kerak
+* logs va audit retention policy belgilanadi
+
+=== Render
+
+Repo ichida `render.yaml` mavjud.
+Render deploymentda quyidagilar sozlanadi:
+
+* backend service
+* frontend static build
+* environment variables
+* MongoDB connection string
+
+IMPORTANT: Production DB real data bilan ishlayotgan bo'lsa, `npm run seed` ishlatmang. Seed script mavjud users/doctors/patients/diagnoses/audit/session ma'lumotlarini reset qiladi.
+
+== Testing
+
+Backend tests:
+
+[source,bash]
+----
+cd backend
+npm test
+----
+
+Hozirgi testlar:
+
+* password policy weak passwordlarni rad etadi
+* RBAC helperlar privileged rolelarni to'g'ri aniqlaydi
+* production env validation insecure frontend originlarni rad etadi
+
+Frontend build test:
+
+[source,bash]
+----
+cd frontend
+npm run build
+----
+
+Backend syntax check uchun:
+
+[source,powershell]
+----
+cd backend
+Get-ChildItem -Recurse -Filter *.js | ForEach-Object { node --check $_.FullName }
+----
+
+== Troubleshooting
+
+=== Login Ishlamayapti
+
+Tekshiring:
+
+* seed qayta ishlatilganmi
+* demo parollarda `!` borligini unutmang
+* backend server ishlayaptimi
+* frontend `VITE_API_URL` to'g'rimi
+* browser cookies block qilinmaganmi
+* CORS `FRONTEND_URL` frontend origin bilan mosmi
+
+=== `Not authorized, token missing`
+
+Sabablar:
+
+* cookie browserda saqlanmagan
+* frontend `withCredentials: true` ishlamayapti
+* backend CORS `credentials: true` bilan ishlamayapti
+* frontend va backend originlari mos emas
+
+=== Productionda Server Ishga Tushmayapti
+
+`validateEnv.js` production safety tekshiruvlari sabab bo'lishi mumkin.
+
+Tekshiring:
+
+* `JWT_SECRET` 32+ character
+* `MONGO_URI` bor
+* `FRONTEND_URL` HTTPS origin
+* `FRONTEND_URL` localhost emas
+
+=== Doctor Delete Bo'lmayapti
+
+Agar doctor patientlarga assigned bo'lsa, tizim delete qilishga ruxsat bermaydi.
+
+Response:
+
+[source,json]
+----
+{
+  "message": "This doctor is assigned to one or more patients and cannot be deleted."
+}
+----
+
+Avval patientlarni boshqa doctorga o'tkazing yoki patientlarni delete qiling.
+
+=== Password Reset Email Ketmayapti
+
+Developmentda SMTP bo'lmasa reset token JSON response va console logda ko'rinadi.
+Productionda quyidagilar kerak:
+
+* `SMTP_HOST`
+* `SMTP_PORT`
+* `SMTP_USER`
+* `SMTP_PASS`
+* `MAIL_FROM`
+
+== Maintenance Notes
+
+=== Seed Data Reset
+
+Backend:
+
+[source,bash]
+----
+cd backend
+npm run seed
+----
+
+Bu quyidagilarni reset qiladi:
+
+* users
+* doctors
+* patients
+* diagnoses
+* refresh sessions
+* revoked tokens
+* audit logs
+
+=== Adding a New Language
+
+. `frontend/src/i18n/translations.js` ichida yangi language object qo'shing.
+. `languages` arrayga yangi code va label qo'shing.
+. UI automatic switcherda ko'rinadi.
+
+Example:
+
+[source,js]
+----
+{ code: 'tr', label: 'Türkçe' }
+----
+
+=== Adding File Uploads Later
+
+Hozir multipart/form-data requestlar bloklangan.
+Upload feature qo'shilsa quyidagilar kerak:
+
+* file type whitelist
+* size limit
+* secure filename policy
+* malware scanning
+* private storage
+* signed download URLs
+* audit logging
+
+== Known Limitations
+
+* Backend error messagelar asosan ingliz tilida qaytadi.
+* Frontend asosiy UI uch tilda, lekin API validation errors hali backend tilida keladi.
+* Application-level encryption hozir `Diagnosis.notes` fieldida ishlatilgan.
+* Audit log retention/archiving policy hali alohida avtomatlashtirilmagan.
+* Email template minimal; productionda brandlangan HTML template qilish mumkin.
+
+== License and Usage
+
+Bu loyiha educational/portfolio maqsadida yaratilgan.
+Real klinika production muhitida ishlatishdan oldin quyidagilar zarur:
+
+* professional security review
+* penetration testing
+* privacy/legal compliance review
+* backup and disaster recovery strategy
+* audit log retention policy
+* production monitoring and alerting
+
+== Summary
+
+{project-name} hozir quyidagi capabilitylarga ega:
+
+* full-stack React + Express + MongoDB architecture
+* advanced RBAC with ownership checks
+* Super Admin/Admin/Doctor/Patient account system
+* secure cookie-based JWT authentication
+* refresh sessions and token revocation
+* audit logging
+* password reset/change flows
+* security middleware stack
+* encrypted medical notes
+* Uzbek/English/Russian UI
+* production-style setup and deployment configuration
+

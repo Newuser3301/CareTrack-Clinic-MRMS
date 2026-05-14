@@ -8,8 +8,13 @@ import Loader from '../../components/Loader';
 import Modal from '../../components/Modal';
 import Table from '../../components/Table';
 import UserForm from './UserForm';
+import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
+import { roleLabel } from '../../utils/permissions';
 
 const UsersList = () => {
+  const { user: currentUser } = useAuth();
+  const { t } = useLanguage();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -23,7 +28,7 @@ const UsersList = () => {
       const { data } = await api.get('/users');
       setUsers(data);
     } catch (err) {
-      setError(err.response?.data?.message || 'Unable to load users.');
+      setError(err.response?.data?.message || t('common.loadingError'));
     } finally {
       setLoading(false);
     }
@@ -64,19 +69,19 @@ const UsersList = () => {
     <div className="space-y-5">
       <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Users</h1>
-          <p className="text-sm text-slate-500">Manage system access and roles.</p>
+          <h1 className="text-2xl font-bold text-slate-900">{t('pages.usersTitle')}</h1>
+          <p className="text-sm text-slate-500">{t('pages.usersSubtitle')}</p>
         </div>
-        <Button onClick={() => setModal({ open: true, user: null })}><Plus size={16} />New user</Button>
+        <Button onClick={() => setModal({ open: true, user: null })}><Plus size={16} />{t('pages.newUser')}</Button>
       </div>
       {error && <div className="rounded-md bg-red-50 p-3 text-sm text-red-700">{error}</div>}
       {loading ? <Loader /> : (
         <Table
           columns={[
-            { key: 'name', label: 'Name' },
-            { key: 'email', label: 'Email' },
-            { key: 'role', label: 'Role', render: (row) => <Badge tone={row.role}>{row.role}</Badge> },
-            { key: 'createdAt', label: 'Created', render: (row) => new Date(row.createdAt).toLocaleDateString() }
+            { key: 'name', label: t('common.name') },
+            { key: 'email', label: t('common.email') },
+            { key: 'role', label: t('common.role'), render: (row) => <Badge tone={row.role}>{t(`roles.${row.role}`, roleLabel(row.role))}</Badge> },
+            { key: 'createdAt', label: t('common.created'), render: (row) => new Date(row.createdAt).toLocaleDateString() }
           ]}
           data={users}
           renderActions={(user) => (
@@ -87,8 +92,14 @@ const UsersList = () => {
           )}
         />
       )}
-      <Modal open={modal.open} title={modal.user ? 'Edit user' : 'Create user'} onClose={() => setModal({ open: false, user: null })}>
-        <UserForm initialData={modal.user} onSubmit={saveUser} loading={saving} onCancel={() => setModal({ open: false, user: null })} />
+      <Modal open={modal.open} title={modal.user ? t('pages.usersTitle') : t('pages.newUser')} onClose={() => setModal({ open: false, user: null })}>
+        <UserForm
+          initialData={modal.user}
+          currentRole={currentUser?.role}
+          onSubmit={saveUser}
+          loading={saving}
+          onCancel={() => setModal({ open: false, user: null })}
+        />
       </Modal>
       <ConfirmDialog open={!!confirm} message={`Delete ${confirm?.name}?`} onCancel={() => setConfirm(null)} onConfirm={deleteUser} loading={saving} />
     </div>

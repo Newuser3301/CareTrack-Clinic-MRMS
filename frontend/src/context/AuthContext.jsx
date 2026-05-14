@@ -12,12 +12,6 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const loadUser = async () => {
-      const token = localStorage.getItem('caretrackToken');
-      if (!token) {
-        setLoading(false);
-        return;
-      }
-
       try {
         const { data } = await api.get('/auth/me');
         setUser(data.user);
@@ -34,14 +28,17 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     const { data } = await api.post('/auth/login', { email, password });
-    localStorage.setItem('caretrackToken', data.token);
     localStorage.setItem('caretrackUser', JSON.stringify(data.user));
     setUser(data.user);
     return data.user;
   };
 
-  const logout = () => {
-    localStorage.removeItem('caretrackToken');
+  const logout = async () => {
+    try {
+      await api.post('/auth/logout');
+    } catch {
+      // Local cleanup still happens if the server session is already gone.
+    }
     localStorage.removeItem('caretrackUser');
     setUser(null);
   };

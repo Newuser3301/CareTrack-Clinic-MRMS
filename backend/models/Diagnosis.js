@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { encryptText, decryptText } = require('../utils/cryptoFields');
 
 const diagnosisSchema = new mongoose.Schema(
   {
@@ -28,8 +29,9 @@ const diagnosisSchema = new mongoose.Schema(
     notes: {
       type: String,
       trim: true,
-      maxlength: 1200,
-      default: ''
+      default: '',
+      set: encryptText,
+      get: decryptText
     },
     diagnosedDate: {
       type: Date,
@@ -44,6 +46,9 @@ const diagnosisSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+diagnosisSchema.set('toJSON', { getters: true });
+diagnosisSchema.set('toObject', { getters: true });
 
 diagnosisSchema.index({ icdCode: 'text', description: 'text' });
 

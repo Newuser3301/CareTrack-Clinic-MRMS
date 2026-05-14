@@ -3,6 +3,7 @@ import DashboardLayout from './layout/DashboardLayout';
 import PrivateRoute from './routes/PrivateRoute';
 import RoleRoute from './routes/RoleRoute';
 import Login from './pages/Login';
+import Profile from './pages/Profile';
 import Dashboard from './pages/Dashboard';
 import DoctorsList from './pages/doctors/DoctorsList';
 import DoctorDetails from './pages/doctors/DoctorDetails';
@@ -11,27 +12,30 @@ import PatientProfile from './pages/patients/PatientProfile';
 import DiagnosesList from './pages/diagnoses/DiagnosesList';
 import UsersList from './pages/users/UsersList';
 import NotFound from './pages/NotFound';
+import Forbidden from './pages/Forbidden';
 
 const App = () => (
   <Routes>
     <Route path="/login" element={<Login />} />
     <Route element={<PrivateRoute />}>
       <Route element={<DashboardLayout />}>
-        <Route index element={<Dashboard />} />
-        <Route element={<RoleRoute allowedRoles={['admin', 'receptionist']} />}>
+        <Route index element={<Profile />} />
+        <Route path="dashboard" element={<Dashboard />} />
+        <Route element={<RoleRoute allowedRoles={['super_admin', 'admin', 'doctor', 'patient']} />}>
           <Route path="doctors" element={<DoctorsList />} />
           <Route path="doctors/:id" element={<DoctorDetails />} />
         </Route>
-        <Route element={<RoleRoute allowedRoles={['admin', 'clinician', 'receptionist']} />}>
+        <Route element={<RoleRoute allowedRoles={['super_admin', 'admin', 'doctor', 'patient']} />}>
           <Route path="patients" element={<PatientsList />} />
           <Route path="patients/:id" element={<PatientProfile />} />
         </Route>
-        <Route element={<RoleRoute allowedRoles={['admin', 'clinician']} />}>
+        <Route element={<RoleRoute allowedRoles={['super_admin', 'admin', 'doctor', 'patient']} />}>
           <Route path="diagnoses" element={<DiagnosesList />} />
         </Route>
-        <Route element={<RoleRoute allowedRoles={['admin']} />}>
+        <Route element={<RoleRoute allowedRoles={['super_admin', 'admin']} />}>
           <Route path="users" element={<UsersList />} />
         </Route>
+        <Route path="forbidden" element={<Forbidden />} />
       </Route>
     </Route>
     <Route path="/404" element={<NotFound />} />

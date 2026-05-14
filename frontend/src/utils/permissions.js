@@ -1,18 +1,27 @@
 export const permissions = {
-  canManageUsers: (role) => role === 'admin',
-  canCreateDoctor: (role) => role === 'admin',
-  canEditDoctor: (role) => role === 'admin',
-  canDeleteDoctor: (role) => role === 'admin',
-  canViewDoctors: (role) => ['admin', 'receptionist'].includes(role),
-  canChangePatientDoctor: (role) => ['admin', 'receptionist'].includes(role),
-  canCreatePatient: (role) => ['admin', 'receptionist'].includes(role),
-  canEditPatient: (role) => ['admin', 'clinician'].includes(role),
-  canDeletePatient: (role) => role === 'admin',
-  canViewPatients: (role) => ['admin', 'clinician', 'receptionist'].includes(role),
-  canViewDiagnoses: (role) => ['admin', 'clinician'].includes(role),
-  canCreateDiagnosis: (role) => role === 'admin',
-  canEditDiagnosis: (role) => ['admin', 'clinician'].includes(role),
-  canDeleteDiagnosis: (role) => role === 'admin'
+  canManageUsers: (role) => ['super_admin', 'admin'].includes(role),
+  canCreateAdmin: (role) => role === 'super_admin',
+  canCreateDoctor: (role) => ['super_admin', 'admin'].includes(role),
+  canEditDoctor: (role) => ['super_admin', 'admin'].includes(role),
+  canDeleteDoctor: (role) => ['super_admin', 'admin'].includes(role),
+  canViewDoctors: (role) => ['super_admin', 'admin', 'doctor', 'patient'].includes(role),
+  canChangePatientDoctor: (role) => ['super_admin', 'admin'].includes(role),
+  canCreatePatient: (role) => ['super_admin', 'admin'].includes(role),
+  canEditPatient: (role) => ['super_admin', 'admin', 'doctor'].includes(role),
+  canDeletePatient: (role) => ['super_admin', 'admin'].includes(role),
+  canViewPatients: (role) => ['super_admin', 'admin', 'doctor', 'patient'].includes(role),
+  canViewDiagnoses: (role) => ['super_admin', 'admin', 'doctor', 'patient'].includes(role),
+  canCreateDiagnosis: (role) => ['super_admin', 'admin', 'doctor'].includes(role),
+  canEditDiagnosis: (role) => ['super_admin', 'admin', 'doctor'].includes(role),
+  canDeleteDiagnosis: (role) => ['super_admin', 'admin'].includes(role)
 };
 
 export const hasAnyRole = (role, allowedRoles) => allowedRoles.includes(role);
+
+export const roleLabel = (role) =>
+  ({
+    super_admin: 'Super Admin',
+    admin: 'Admin',
+    doctor: 'Doctor',
+    patient: 'Patient'
+  })[role] || role;

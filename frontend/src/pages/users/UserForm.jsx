@@ -3,11 +3,13 @@ import { Save, X } from 'lucide-react';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
 import Select from '../../components/Select';
+import { useLanguage } from '../../context/LanguageContext';
 
-const emptyUser = { name: '', email: '', password: '', role: 'receptionist' };
+const emptyUser = { name: '', email: '', password: '', role: 'patient' };
 
-const UserForm = ({ initialData, onSubmit, onCancel, loading }) => {
+const UserForm = ({ initialData, currentRole, onSubmit, onCancel, loading }) => {
   const [form, setForm] = useState(emptyUser);
+  const { t } = useLanguage();
 
   useEffect(() => {
     setForm(initialData ? { ...initialData, password: '' } : emptyUser);
@@ -17,17 +19,29 @@ const UserForm = ({ initialData, onSubmit, onCancel, loading }) => {
 
   return (
     <form className="grid gap-4 md:grid-cols-2" onSubmit={(event) => { event.preventDefault(); onSubmit(form); }}>
-      <Input label="Name" value={form.name} onChange={(event) => update('name', event.target.value)} required />
-      <Input label="Email" type="email" value={form.email} onChange={(event) => update('email', event.target.value)} required />
-      <Input label={initialData ? 'Password (leave blank to keep)' : 'Password'} type="password" value={form.password} onChange={(event) => update('password', event.target.value)} required={!initialData} />
-      <Select label="Role" value={form.role} onChange={(event) => update('role', event.target.value)} options={[
-        { value: 'admin', label: 'Admin' },
-        { value: 'clinician', label: 'Clinician' },
-        { value: 'receptionist', label: 'Receptionist' }
-      ]} required />
+      <Input label={t('common.name')} value={form.name} onChange={(event) => update('name', event.target.value)} required />
+      <Input label={t('common.email')} type="email" value={form.email} onChange={(event) => update('email', event.target.value)} required />
+      <Input label={initialData ? t('forms.passwordKeep') : t('common.password')} type="password" minLength={12} value={form.password} onChange={(event) => update('password', event.target.value)} required={!initialData} />
+      <Select
+        label={t('common.role')}
+        value={form.role}
+        onChange={(event) => update('role', event.target.value)}
+        options={(currentRole === 'super_admin'
+          ? [
+              { value: 'super_admin', label: t('roles.super_admin') },
+              { value: 'admin', label: t('roles.admin') },
+              { value: 'doctor', label: t('roles.doctor') },
+              { value: 'patient', label: t('roles.patient') }
+            ]
+          : [
+              { value: 'doctor', label: t('roles.doctor') },
+              { value: 'patient', label: t('roles.patient') }
+            ])}
+        required
+      />
       <div className="flex justify-end gap-3 md:col-span-2">
-        <Button variant="secondary" onClick={onCancel}><X size={16} />Cancel</Button>
-        <Button type="submit" disabled={loading}><Save size={16} />{loading ? 'Saving...' : 'Save user'}</Button>
+        <Button variant="secondary" onClick={onCancel}><X size={16} />{t('common.cancel')}</Button>
+        <Button type="submit" disabled={loading}><Save size={16} />{loading ? t('common.saving') : t('forms.saveUser')}</Button>
       </div>
     </form>
   );

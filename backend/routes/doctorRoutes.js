@@ -9,6 +9,7 @@ const {
 } = require('../controllers/doctorController');
 const { protect } = require('../middleware/authMiddleware');
 const { authorize } = require('../middleware/roleMiddleware');
+const { passwordPolicyMessage, validatePassword } = require('../utils/passwordPolicy');
 
 const router = express.Router();
 
@@ -20,14 +21,25 @@ const doctorValidation = [
   body('email').isEmail().withMessage('Valid email is required').normalizeEmail(),
   body('availability').trim().notEmpty().withMessage('Availability is required')
 ];
+const createDoctorValidation = [
+  ...doctorValidation,
+  body('password').custom(validatePassword).withMessage(passwordPolicyMessage)
+];
+const updateDoctorValidation = [
+  ...doctorValidation,
+  body('password').optional({ checkFalsy: true }).custom(validatePassword).withMessage(passwordPolicyMessage)
+];
 
 router.use(protect);
 
-router.route('/').get(authorize('admin', 'receptionist'), getDoctors).post(authorize('admin'), doctorValidation, createDoctor);
+router
+  .route('/')
+  .get(authorize('super_admin', 'admin', 'doctor', 'patient'), getDoctors)
+  .post(authorize('super_admin', 'admin'), createDoctorValidation, createDoctor);
 router
   .route('/:id')
-  .get(authorize('admin', 'receptionist'), getDoctorById)
-  .put(authorize('admin'), doctorValidation, updateDoctor)
-  .delete(authorize('admin'), deleteDoctor);
+  .get(authorize('super_admin', 'admin', 'doctor', 'patient'), getDoctorById)
+  .put(authorize('super_admin', 'admin'), updateDoctorValidation, updateDoctor)
+  .delete(authorize('super_admin', 'admin'), deleteDoctor);
 
 module.exports = router;

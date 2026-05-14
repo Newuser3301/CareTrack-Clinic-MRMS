@@ -11,11 +11,13 @@ import SearchBar from '../../components/SearchBar';
 import Select from '../../components/Select';
 import Table from '../../components/Table';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { permissions } from '../../utils/permissions';
 import DiagnosisForm from './DiagnosisForm';
 
 const DiagnosesList = () => {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [searchParams] = useSearchParams();
   const defaultPatient = searchParams.get('patient') || '';
   const [diagnoses, setDiagnoses] = useState([]);
@@ -49,7 +51,7 @@ const DiagnosesList = () => {
       setDiagnoses(diagnosesRes.data);
       setPatients(patientsRes.data);
     } catch (err) {
-      setError(err.response?.data?.message || 'Unable to load diagnoses.');
+      setError(err.response?.data?.message || t('common.loadingError'));
     } finally {
       setLoading(false);
     }
@@ -91,24 +93,24 @@ const DiagnosesList = () => {
     <div className="space-y-5">
       <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Diagnoses</h1>
-          <p className="text-sm text-slate-500">Review diagnosis records and ICD details.</p>
+          <h1 className="text-2xl font-bold text-slate-900">{t('pages.diagnosesTitle')}</h1>
+          <p className="text-sm text-slate-500">{t('pages.diagnosesSubtitle')}</p>
         </div>
-        {permissions.canCreateDiagnosis(user?.role) && <Button onClick={() => setModal({ open: true, diagnosis: null })}><Plus size={16} />New diagnosis</Button>}
+        {permissions.canCreateDiagnosis(user?.role) && <Button onClick={() => setModal({ open: true, diagnosis: null })}><Plus size={16} />{t('pages.newDiagnosis')}</Button>}
       </div>
       {error && <div className="rounded-md bg-red-50 p-3 text-sm text-red-700">{error}</div>}
       <div className="flex flex-col gap-3 md:flex-row">
-        <SearchBar value={search} onChange={setSearch} placeholder="Search ICD code or description..." />
+        <SearchBar value={search} onChange={setSearch} placeholder={`${t('common.search')}...`} />
         <Select
           value={patientFilter}
           onChange={(event) => setPatientFilter(event.target.value)}
-          placeholder="All patients"
+          placeholder={t('pages.patientsTitle')}
           options={patients.map((patient) => ({ value: patient._id, label: patient.fullName }))}
         />
         <Select
           value={severity}
           onChange={(event) => setSeverity(event.target.value)}
-          placeholder="All severities"
+          placeholder={t('common.severity')}
           options={[
             { value: 'low', label: 'Low' },
             { value: 'medium', label: 'Medium' },
@@ -121,10 +123,10 @@ const DiagnosesList = () => {
         <Table
           columns={[
             { key: 'icdCode', label: 'ICD' },
-            { key: 'patient', label: 'Patient', render: (row) => row.patient?.fullName || '-' },
-            { key: 'description', label: 'Description' },
-            { key: 'severity', label: 'Severity', render: (row) => <Badge tone={row.severity}>{row.severity}</Badge> },
-            { key: 'diagnosedDate', label: 'Date', render: (row) => new Date(row.diagnosedDate).toLocaleDateString() }
+            { key: 'patient', label: t('dashboard.patients'), render: (row) => row.patient?.fullName || '-' },
+            { key: 'description', label: t('common.description') },
+            { key: 'severity', label: t('common.severity'), render: (row) => <Badge tone={row.severity}>{row.severity}</Badge> },
+            { key: 'diagnosedDate', label: t('common.date'), render: (row) => new Date(row.diagnosedDate).toLocaleDateString() }
           ]}
           data={diagnoses}
           renderActions={(diagnosis) => (
@@ -135,7 +137,7 @@ const DiagnosesList = () => {
           )}
         />
       )}
-      <Modal open={modal.open} title={modal.diagnosis ? 'Edit diagnosis' : 'Create diagnosis'} onClose={() => setModal({ open: false, diagnosis: null })}>
+      <Modal open={modal.open} title={modal.diagnosis ? t('pages.diagnosesTitle') : t('pages.newDiagnosis')} onClose={() => setModal({ open: false, diagnosis: null })}>
         <DiagnosisForm initialData={modal.diagnosis} patients={patients} defaultPatient={defaultPatient} onSubmit={saveDiagnosis} loading={saving} onCancel={() => setModal({ open: false, diagnosis: null })} />
       </Modal>
       <ConfirmDialog open={!!confirm} message={`Delete diagnosis ${confirm?.icdCode}?`} onCancel={() => setConfirm(null)} onConfirm={deleteDiagnosis} loading={saving} />

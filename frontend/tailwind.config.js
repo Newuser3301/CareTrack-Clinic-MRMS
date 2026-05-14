@@ -4,15 +4,16 @@ export default {
     extend: {
       colors: {
         primary: {
-          50: '#eff6ff',
-          100: '#dbeafe',
-          500: '#2563eb',
-          600: '#1d4ed8',
-          700: '#1e40af'
+          50: '#e8fbff',
+          100: '#d4f5fb',
+          500: '#0ea5c6',
+          600: '#0f7490',
+          700: '#073b4a'
         }
       },
       boxShadow: {
-        soft: '0 10px 30px rgba(15, 23, 42, 0.08)'
+        soft: '0 24px 60px rgba(3, 42, 54, 0.14)',
+        panel: '0 18px 45px rgba(15, 23, 42, 0.10)'
       }
     }
   },

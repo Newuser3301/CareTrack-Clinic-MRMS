@@ -23,10 +23,28 @@ const userSchema = new mongoose.Schema(
       minlength: 8,
       select: false
     },
+    passwordResetToken: {
+      type: String,
+      select: false
+    },
+    passwordResetExpires: {
+      type: Date,
+      select: false
+    },
+    passwordChangedAt: Date,
+    failedLoginAttempts: {
+      type: Number,
+      default: 0
+    },
+    lockUntil: Date,
+    tokenVersion: {
+      type: Number,
+      default: 0
+    },
     role: {
       type: String,
-      enum: ['admin', 'clinician', 'receptionist'],
-      default: 'receptionist'
+      enum: ['super_admin', 'admin', 'doctor', 'patient'],
+      default: 'patient'
     }
   },
   { timestamps: true }
@@ -36,11 +54,16 @@ userSchema.pre('save', async function hashPassword(next) {
   if (!this.isModified('password')) return next();
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
+  this.passwordChangedAt = new Date(Date.now() - 1000);
   next();
 });
 
 userSchema.methods.matchPassword = function matchPassword(enteredPassword) {
   return bcrypt.compare(enteredPassword, this.password);
+};
+
+userSchema.methods.isLocked = function isLocked() {
+  return Boolean(this.lockUntil && this.lockUntil > Date.now());
 };
 
 module.exports = mongoose.model('User', userSchema);

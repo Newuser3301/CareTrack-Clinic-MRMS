@@ -2,6 +2,12 @@ const mongoose = require('mongoose');
 
 const patientSchema = new mongoose.Schema(
   {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: [true, 'Patient user account is required'],
+      unique: true
+    },
     fullName: {
       type: String,
       required: [true, 'Full name is required'],
@@ -22,6 +28,13 @@ const patientSchema = new mongoose.Schema(
       required: [true, 'Phone is required'],
       trim: true,
       maxlength: 30
+    },
+    email: {
+      type: String,
+      required: [true, 'Email is required'],
+      trim: true,
+      lowercase: true,
+      match: [/^\S+@\S+\.\S+$/, 'Please provide a valid email']
     },
     address: {
       type: String,
