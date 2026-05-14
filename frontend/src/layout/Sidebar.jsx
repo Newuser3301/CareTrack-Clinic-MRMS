@@ -8,9 +8,10 @@ const Sidebar = ({ open, onClose }) => {
   const { user } = useAuth();
   const { t } = useLanguage();
   const role = user?.role;
+  const homePath = role === 'patient' ? '/' : '/dashboard';
   const items = [
     { to: '/', label: t('nav.profile'), icon: UserCircle, show: true },
-    { to: '/dashboard', label: t('nav.dashboard'), icon: LayoutDashboard, show: true },
+    { to: '/dashboard', label: t('nav.dashboard'), icon: LayoutDashboard, show: role !== 'patient' },
     { to: '/doctors', label: t('nav.doctors'), icon: Stethoscope, show: permissions.canViewDoctors(role) },
     { to: '/patients', label: t('nav.patients'), icon: UserRound, show: permissions.canViewPatients(role) },
     { to: '/diagnoses', label: t('nav.diagnoses'), icon: ClipboardList, show: permissions.canViewDiagnoses(role) },
@@ -25,7 +26,7 @@ const Sidebar = ({ open, onClose }) => {
           open ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="flex flex-col items-center gap-4 px-5 py-8 text-center">
+        <NavLink to={homePath} onClick={onClose} className="flex flex-col items-center gap-4 px-5 py-8 text-center">
           <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/95 text-primary-700 shadow-panel">
             <Activity size={26} />
           </div>
@@ -33,7 +34,7 @@ const Sidebar = ({ open, onClose }) => {
             <p className="text-sm font-black uppercase leading-tight text-white">CareTrack</p>
             <p className="text-xs font-bold uppercase text-cyan-100">Clinic Hub</p>
           </div>
-        </div>
+        </NavLink>
         <nav className="space-y-4 p-4">
           {items.map(({ to, label, icon: Icon }) => (
             <NavLink

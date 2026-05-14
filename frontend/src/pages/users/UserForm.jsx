@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Save, X } from 'lucide-react';
+import { RefreshCw, Save, X } from 'lucide-react';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
 import Select from '../../components/Select';
 import { useLanguage } from '../../context/LanguageContext';
+import { generateStrongPassword } from '../../utils/passwords';
 
 const emptyUser = { name: '', email: '', password: '', role: 'patient' };
 
@@ -12,16 +13,32 @@ const UserForm = ({ initialData, currentRole, onSubmit, onCancel, loading }) => 
   const { t } = useLanguage();
 
   useEffect(() => {
-    setForm(initialData ? { ...initialData, password: '' } : emptyUser);
+    setForm(initialData ? { ...initialData, password: '' } : { ...emptyUser, password: generateStrongPassword() });
   }, [initialData]);
 
   const update = (field, value) => setForm((current) => ({ ...current, [field]: value }));
+  const suggestPassword = () => update('password', generateStrongPassword());
 
   return (
     <form className="grid gap-4 md:grid-cols-2" onSubmit={(event) => { event.preventDefault(); onSubmit(form); }}>
       <Input label={t('common.name')} value={form.name} onChange={(event) => update('name', event.target.value)} required />
       <Input label={t('common.email')} type="email" value={form.email} onChange={(event) => update('email', event.target.value)} required />
-      <Input label={initialData ? t('forms.passwordKeep') : t('common.password')} type="password" minLength={12} value={form.password} onChange={(event) => update('password', event.target.value)} required={!initialData} />
+      <div className="space-y-2">
+        <Input
+          label={initialData ? t('forms.passwordKeep') : t('common.password')}
+          type="text"
+          minLength={12}
+          value={form.password}
+          onChange={(event) => update('password', event.target.value)}
+          helper={!initialData ? t('forms.passwordSuggestionHelp') : undefined}
+          required={!initialData}
+        />
+        {!initialData && (
+          <div className="flex justify-end">
+            <Button variant="ghost" className="min-h-10 px-3" onClick={suggestPassword}><RefreshCw size={16} />{t('forms.refreshSuggestedPassword')}</Button>
+          </div>
+        )}
+      </div>
       <Select
         label={t('common.role')}
         value={form.role}

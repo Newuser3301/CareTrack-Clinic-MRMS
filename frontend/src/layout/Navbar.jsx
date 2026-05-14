@@ -1,12 +1,28 @@
-import { Activity, Bell, LogOut, Menu, Moon, Search, Settings } from 'lucide-react';
+import { Activity, ClipboardList, LayoutDashboard, LogOut, Menu, Stethoscope, UserCircle, UserRound, Users } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import { permissions } from '../utils/permissions';
 
 const Navbar = ({ onMenuClick }) => {
   const { user, logout } = useAuth();
   const { t } = useLanguage();
+  const navigate = useNavigate();
+  const role = user?.role;
+  const homePath = role === 'patient' ? '/' : '/dashboard';
+  const quickActions = [
+    { to: '/', label: t('nav.profile'), icon: UserCircle, show: true },
+    { to: '/dashboard', label: t('nav.dashboard'), icon: LayoutDashboard, show: role !== 'patient' },
+    { to: '/doctors', label: t('nav.doctors'), icon: Stethoscope, show: permissions.canViewDoctors(role) },
+    { to: '/patients', label: t('nav.patients'), icon: UserRound, show: permissions.canViewPatients(role) },
+    { to: '/diagnoses', label: t('nav.diagnoses'), icon: ClipboardList, show: permissions.canViewDiagnoses(role) },
+    { to: '/users', label: t('nav.users'), icon: Users, show: permissions.canManageUsers(role) }
+  ].filter((item) => item.show).slice(0, 4);
+  const heading = role === 'patient'
+    ? { label: t('nav.profile'), title: t('nav.profile'), subtitle: t('profile.subtitle') }
+    : { label: t('nav.dashboardLabel'), title: t('nav.mainMenu'), subtitle: t('nav.subtitle') };
 
   return (
     <header className="sticky top-0 z-20 flex min-h-24 items-center justify-between gap-4 px-4 py-4 backdrop-blur lg:px-8">
@@ -14,29 +30,32 @@ const Navbar = ({ onMenuClick }) => {
         <Button variant="ghost" className="h-10 w-10 px-0 lg:hidden" onClick={onMenuClick} aria-label="Open navigation">
           <Menu size={20} />
         </Button>
-        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-500 to-primary-700 text-white shadow-panel">
-          <Activity size={28} />
-        </div>
-        <div>
-          <p className="text-sm font-black uppercase text-primary-600">{t('nav.dashboardLabel')}</p>
-          <p className="text-3xl font-black leading-none text-slate-950">{t('nav.mainMenu')}</p>
-          <p className="mt-1 text-sm font-semibold text-slate-500">{t('nav.subtitle')}</p>
-        </div>
-      </div>
-      <div className="hidden items-center gap-3 xl:flex">
-        <div className="rounded-[1.5rem] border border-white/70 bg-white/45 px-8 py-4 text-center shadow-sm">
-          <p className="text-xs font-black uppercase text-primary-600">{t('nav.liveTime')}</p>
-          <p className="mt-1 text-xl font-black text-slate-950">{new Date().toISOString().slice(0, 19).replace('T', ' ')}</p>
-        </div>
+        <button type="button" onClick={() => navigate(homePath)} className="flex items-center gap-3 text-left">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-500 to-primary-700 text-white shadow-panel">
+            <Activity size={28} />
+          </div>
+          <div>
+            <p className="text-sm font-black uppercase text-primary-600">{heading.label}</p>
+            <p className="text-3xl font-black leading-none text-slate-950">{heading.title}</p>
+            <p className="mt-1 text-sm font-semibold text-slate-500">{heading.subtitle}</p>
+          </div>
+        </button>
       </div>
       <div className="flex items-center gap-2">
-        {[Search, Bell, Settings, Moon].map((Icon, index) => (
-          <button key={index} className="hidden h-12 w-12 items-center justify-center rounded-2xl bg-white/70 text-slate-700 shadow-sm transition hover:bg-white md:flex">
+        {quickActions.map(({ to, label, icon: Icon }) => (
+          <button
+            key={to}
+            type="button"
+            title={label}
+            aria-label={label}
+            onClick={() => navigate(to)}
+            className="hidden h-12 w-12 items-center justify-center rounded-2xl bg-white/70 text-slate-700 shadow-sm transition hover:bg-white md:flex"
+          >
             <Icon size={20} />
           </button>
         ))}
         <LanguageSwitcher compact />
-        <div className="hidden items-center gap-3 rounded-2xl bg-white/70 px-4 py-2 shadow-sm sm:flex">
+        <button type="button" onClick={() => navigate('/')} className="hidden items-center gap-3 rounded-2xl bg-white/70 px-4 py-2 text-left shadow-sm transition hover:bg-white sm:flex">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-700 text-sm font-black text-white">
             {user?.name?.split(' ').map((part) => part[0]).join('').slice(0, 2).toUpperCase()}
           </div>
@@ -44,7 +63,7 @@ const Navbar = ({ onMenuClick }) => {
             <p className="text-sm font-black text-slate-950">{user?.name}</p>
             <p className="text-xs font-extrabold uppercase text-slate-500">{user?.role}</p>
           </div>
-        </div>
+        </button>
         <Button variant="secondary" className="h-12 w-12 px-0" onClick={logout} aria-label="Logout">
           <LogOut size={16} />
         </Button>

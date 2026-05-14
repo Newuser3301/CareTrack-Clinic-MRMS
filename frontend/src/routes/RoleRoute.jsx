@@ -4,7 +4,8 @@ import { hasAnyRole } from '../utils/permissions';
 
 const RoleRoute = ({ allowedRoles }) => {
   const { user } = useAuth();
-  return user && hasAnyRole(user.role, allowedRoles) ? <Outlet /> : <Navigate to="/forbidden" replace />;
+  if (!user) return <Navigate to="/login" replace />;
+  return hasAnyRole(user.role, allowedRoles) ? <Outlet /> : <Navigate to={user.role === 'patient' ? '/' : '/forbidden'} replace />;
 };
 
 export default RoleRoute;

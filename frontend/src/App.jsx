@@ -18,18 +18,20 @@ const App = () => (
   <Routes>
     <Route path="/login" element={<Login />} />
     <Route element={<PrivateRoute />}>
-      <Route element={<DashboardLayout />}>
+        <Route element={<DashboardLayout />}>
         <Route index element={<Profile />} />
-        <Route path="dashboard" element={<Dashboard />} />
-        <Route element={<RoleRoute allowedRoles={['super_admin', 'admin', 'doctor', 'patient']} />}>
+        <Route element={<RoleRoute allowedRoles={['super_admin', 'admin', 'doctor']} />}>
+          <Route path="dashboard" element={<Dashboard />} />
+        </Route>
+        <Route element={<RoleRoute allowedRoles={['super_admin', 'admin', 'doctor']} />}>
           <Route path="doctors" element={<DoctorsList />} />
           <Route path="doctors/:id" element={<DoctorDetails />} />
         </Route>
-        <Route element={<RoleRoute allowedRoles={['super_admin', 'admin', 'doctor', 'patient']} />}>
+        <Route element={<RoleRoute allowedRoles={['super_admin', 'admin', 'doctor']} />}>
           <Route path="patients" element={<PatientsList />} />
           <Route path="patients/:id" element={<PatientProfile />} />
         </Route>
-        <Route element={<RoleRoute allowedRoles={['super_admin', 'admin', 'doctor', 'patient']} />}>
+        <Route element={<RoleRoute allowedRoles={['super_admin', 'admin', 'doctor']} />}>
           <Route path="diagnoses" element={<DiagnosesList />} />
         </Route>
         <Route element={<RoleRoute allowedRoles={['super_admin', 'admin']} />}>

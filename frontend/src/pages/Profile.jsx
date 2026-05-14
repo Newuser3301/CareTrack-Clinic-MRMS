@@ -61,9 +61,9 @@ const Profile = () => {
       try {
         const requests = [
           api.get('/dashboard/stats'),
-          permissions.canViewPatients(user?.role) ? api.get('/patients') : Promise.resolve({ data: [] }),
-          permissions.canViewDiagnoses(user?.role) ? api.get('/diagnoses') : Promise.resolve({ data: [] }),
-          permissions.canViewDoctors(user?.role) ? api.get('/doctors') : Promise.resolve({ data: [] })
+          user?.role === 'patient' || permissions.canViewPatients(user?.role) ? api.get('/patients') : Promise.resolve({ data: [] }),
+          user?.role === 'patient' || permissions.canViewDiagnoses(user?.role) ? api.get('/diagnoses') : Promise.resolve({ data: [] }),
+          user?.role === 'doctor' || permissions.canViewDoctors(user?.role) ? api.get('/doctors') : Promise.resolve({ data: [] })
         ];
         const [statsRes, patientsRes, diagnosesRes, doctorsRes] = await Promise.all(requests);
         setData({
