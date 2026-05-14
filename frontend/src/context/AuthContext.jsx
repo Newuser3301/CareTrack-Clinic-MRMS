@@ -2,10 +2,12 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import api from '../api/axios';
 
 const AuthContext = createContext(null);
+const USER_KEY = 'caretrackUser';
+const TOKEN_KEY = 'caretrackAccessToken';
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
-    const stored = localStorage.getItem('caretrackUser');
+    const stored = localStorage.getItem(USER_KEY);
     return stored ? JSON.parse(stored) : null;
   });
   const [loading, setLoading] = useState(true);
@@ -15,9 +17,11 @@ export const AuthProvider = ({ children }) => {
       try {
         const { data } = await api.get('/auth/me');
         setUser(data.user);
-        localStorage.setItem('caretrackUser', JSON.stringify(data.user));
+        localStorage.setItem(USER_KEY, JSON.stringify(data.user));
       } catch {
         setUser(null);
+        localStorage.removeItem(USER_KEY);
+        localStorage.removeItem(TOKEN_KEY);
       } finally {
         setLoading(false);
       }
@@ -28,7 +32,8 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     const { data } = await api.post('/auth/login', { email, password });
-    localStorage.setItem('caretrackUser', JSON.stringify(data.user));
+    if (data.accessToken) localStorage.setItem(TOKEN_KEY, data.accessToken);
+    localStorage.setItem(USER_KEY, JSON.stringify(data.user));
     setUser(data.user);
     return data.user;
   };
@@ -39,7 +44,8 @@ export const AuthProvider = ({ children }) => {
     } catch {
       // Local cleanup still happens if the server session is already gone.
     }
-    localStorage.removeItem('caretrackUser');
+    localStorage.removeItem(USER_KEY);
+    localStorage.removeItem(TOKEN_KEY);
     setUser(null);
   };
 

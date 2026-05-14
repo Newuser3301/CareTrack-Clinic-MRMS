@@ -64,8 +64,8 @@ const clearAuthCookies = (res) => {
 };
 
 const sendAuthResponse = async (req, res, user, statusCode = 200) => {
-  await setAuthCookies(res, req, user);
-  res.status(statusCode).json({ user: publicUser(user) });
+  const access = await setAuthCookies(res, req, user);
+  res.status(statusCode).json({ user: publicUser(user), accessToken: access.token });
 };
 
 const register = async (req, res, next) => {
@@ -146,8 +146,8 @@ const refresh = async (req, res, next) => {
 
     session.revokedAt = new Date();
     await session.save();
-    await setAuthCookies(res, req, session.user);
-    res.json({ user: publicUser(session.user) });
+    const access = await setAuthCookies(res, req, session.user);
+    res.json({ user: publicUser(session.user), accessToken: access.token });
   } catch (error) {
     next(error);
   }
@@ -200,8 +200,8 @@ const changePassword = async (req, res, next) => {
     user.tokenVersion += 1;
     await user.save();
     await RefreshSession.updateMany({ user: user._id, revokedAt: { $exists: false } }, { $set: { revokedAt: new Date() } });
-    await setAuthCookies(res, req, user);
-    res.json({ message: 'Password changed', user: publicUser(user) });
+    const access = await setAuthCookies(res, req, user);
+    res.json({ message: 'Password changed', user: publicUser(user), accessToken: access.token });
   } catch (error) {
     next(error);
   }
