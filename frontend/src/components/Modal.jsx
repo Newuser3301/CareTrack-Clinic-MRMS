@@ -1,7 +1,29 @@
+import { useEffect } from 'react';
 import { X } from 'lucide-react';
 import Button from './Button';
 
 const Modal = ({ open, title, children, onClose }) => {
+  useEffect(() => {
+    if (!open) return undefined;
+
+    const body = document.body;
+    const html = document.documentElement;
+    const scrollShell = document.getElementById('dashboard-scroll-shell');
+    const previousBodyOverflow = body.style.overflow;
+    const previousHtmlOverflow = html.style.overflow;
+    const previousShellOverflow = scrollShell?.style.overflow;
+
+    body.style.overflow = 'hidden';
+    html.style.overflow = 'hidden';
+    if (scrollShell) scrollShell.style.overflow = 'hidden';
+
+    return () => {
+      body.style.overflow = previousBodyOverflow;
+      html.style.overflow = previousHtmlOverflow;
+      if (scrollShell) scrollShell.style.overflow = previousShellOverflow || '';
+    };
+  }, [open]);
+
   if (!open) return null;
 
   return (
