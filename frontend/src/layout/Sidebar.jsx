@@ -21,7 +21,7 @@ const Sidebar = ({ open, onClose }) => {
     <>
       <div className={`fixed inset-0 z-30 bg-slate-900/30 lg:hidden ${open ? 'block' : 'hidden'}`} onClick={onClose} />
       <aside
-        className={`fixed inset-y-3 left-3 z-40 w-64 transform rounded-[1.75rem] bg-gradient-to-b from-primary-700 via-cyan-950 to-slate-950 text-white shadow-soft transition lg:static lg:inset-auto lg:w-40 lg:translate-x-0 ${
+        className={`fixed inset-y-3 left-3 z-40 w-64 transform rounded-[1.75rem] bg-gradient-to-b from-primary-700 via-cyan-950 to-slate-950 text-white shadow-soft transition lg:sticky lg:top-6 lg:h-[calc(100vh-3rem)] lg:self-start lg:inset-auto lg:w-40 lg:translate-x-0 ${
           open ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
