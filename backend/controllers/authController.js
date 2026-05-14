@@ -7,12 +7,12 @@ const { generateAccessToken, generateRefreshToken, hashToken, parseDuration } = 
 const { validatePassword } = require('../utils/passwordPolicy');
 const { sendPasswordResetEmail } = require('../utils/email');
 
-const cookieOptions = {
+const getCookieOptions = () => ({
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',
-  sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+  sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
   path: '/'
-};
+});
 
 const publicUser = (user) => ({
   _id: user._id,
@@ -46,11 +46,11 @@ const setAuthCookies = async (res, req, user) => {
   });
 
   res.cookie('accessToken', access.token, {
-    ...cookieOptions,
+    ...getCookieOptions(),
     maxAge: access.expiresAt.getTime() - Date.now()
   });
   res.cookie('refreshToken', refreshToken, {
-    ...cookieOptions,
+    ...getCookieOptions(),
     maxAge: refreshMs
   });
 
@@ -58,6 +58,7 @@ const setAuthCookies = async (res, req, user) => {
 };
 
 const clearAuthCookies = (res) => {
+  const cookieOptions = getCookieOptions();
   res.clearCookie('accessToken', cookieOptions);
   res.clearCookie('refreshToken', cookieOptions);
 };

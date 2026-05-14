@@ -16,7 +16,7 @@ services:
       - key: JWT_EXPIRES_IN
         value: 7d
       - key: FRONTEND_URL
-        value: https://caretrack-mrms.onrender.com
+        value: https://caretrack-clinic-mrms.onrender.com
       - key: SUPER_ADMIN_NAME
         value: Super Admin
       - key: SUPER_ADMIN_EMAIL
