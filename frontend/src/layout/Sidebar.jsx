@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { Activity, ClipboardList, LayoutDashboard, Stethoscope, Users, UserCircle, UserRound } from 'lucide-react';
+import { Activity, ClipboardList, Stethoscope, Users, UserCircle, UserRound } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { permissions } from '../utils/permissions';
@@ -10,8 +10,7 @@ const Sidebar = ({ open, onClose }) => {
   const role = user?.role;
   const homePath = role === 'patient' ? '/' : '/dashboard';
   const items = [
-    { to: '/', label: t('nav.profile'), icon: UserCircle, show: true },
-    { to: '/dashboard', label: t('nav.dashboard'), icon: LayoutDashboard, show: role !== 'patient' },
+    { to: '/', label: t('nav.profile'), icon: UserCircle, show: ['patient', 'doctor'].includes(role) },
     { to: '/doctors', label: t('nav.doctors'), icon: Stethoscope, show: permissions.canViewDoctors(role) },
     { to: '/patients', label: t('nav.patients'), icon: UserRound, show: permissions.canViewPatients(role) },
     { to: '/diagnoses', label: t('nav.diagnoses'), icon: ClipboardList, show: permissions.canViewDiagnoses(role) },

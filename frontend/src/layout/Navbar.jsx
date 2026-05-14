@@ -1,4 +1,4 @@
-import { Activity, ClipboardList, LayoutDashboard, LogOut, Menu, Stethoscope, UserCircle, UserRound, Users } from 'lucide-react';
+import { Activity, ClipboardList, LogOut, Menu, Stethoscope, UserCircle, UserRound, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
 import LanguageSwitcher from '../components/LanguageSwitcher';
@@ -13,8 +13,7 @@ const Navbar = ({ onMenuClick }) => {
   const role = user?.role;
   const homePath = role === 'patient' ? '/' : '/dashboard';
   const quickActions = [
-    { to: '/', label: t('nav.profile'), icon: UserCircle, show: true },
-    { to: '/dashboard', label: t('nav.dashboard'), icon: LayoutDashboard, show: role !== 'patient' },
+    { to: '/', label: t('nav.profile'), icon: UserCircle, show: ['patient', 'doctor'].includes(role) },
     { to: '/doctors', label: t('nav.doctors'), icon: Stethoscope, show: permissions.canViewDoctors(role) },
     { to: '/patients', label: t('nav.patients'), icon: UserRound, show: permissions.canViewPatients(role) },
     { to: '/diagnoses', label: t('nav.diagnoses'), icon: ClipboardList, show: permissions.canViewDiagnoses(role) },
@@ -55,7 +54,7 @@ const Navbar = ({ onMenuClick }) => {
           </button>
         ))}
         <LanguageSwitcher compact />
-        <button type="button" onClick={() => navigate('/')} className="hidden items-center gap-3 rounded-2xl bg-white/70 px-4 py-2 text-left shadow-sm transition hover:bg-white sm:flex">
+        <button type="button" onClick={() => navigate(homePath)} className="hidden items-center gap-3 rounded-2xl bg-white/70 px-4 py-2 text-left shadow-sm transition hover:bg-white sm:flex">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-700 text-sm font-black text-white">
             {user?.name?.split(' ').map((part) => part[0]).join('').slice(0, 2).toUpperCase()}
           </div>

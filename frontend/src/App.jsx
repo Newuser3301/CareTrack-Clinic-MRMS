@@ -3,7 +3,7 @@ import DashboardLayout from './layout/DashboardLayout';
 import PrivateRoute from './routes/PrivateRoute';
 import RoleRoute from './routes/RoleRoute';
 import Login from './pages/Login';
-import Profile from './pages/Profile';
+import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import DoctorsList from './pages/doctors/DoctorsList';
 import DoctorDetails from './pages/doctors/DoctorDetails';
@@ -18,8 +18,8 @@ const App = () => (
   <Routes>
     <Route path="/login" element={<Login />} />
     <Route element={<PrivateRoute />}>
-        <Route element={<DashboardLayout />}>
-        <Route index element={<Profile />} />
+      <Route element={<DashboardLayout />}>
+        <Route index element={<Home />} />
         <Route element={<RoleRoute allowedRoles={['super_admin', 'admin', 'doctor']} />}>
           <Route path="dashboard" element={<Dashboard />} />
         </Route>
