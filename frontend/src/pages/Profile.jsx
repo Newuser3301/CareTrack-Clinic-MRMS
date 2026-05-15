@@ -24,7 +24,7 @@ const StatCard = ({ label, value, helper, icon: Icon, tone }) => (
     <div className="flex items-start justify-between gap-4">
       <div>
         <p className="text-sm font-semibold text-slate-500">{label}</p>
-        <p className="mt-2 text-3xl font-bold text-slate-950">{value}</p>
+        <p className="mt-2 text-2xl font-bold text-slate-950 sm:text-3xl">{value}</p>
         {helper && <p className="mt-1 text-xs font-medium text-slate-500">{helper}</p>}
       </div>
       <div className={`flex h-11 w-11 items-center justify-center rounded-2xl ${tone}`}>
@@ -124,7 +124,7 @@ const Profile = () => {
             </div>
             <div>
               <Badge tone={user?.role}>{t(`roles.${user?.role}`, roleLabel(user?.role))}</Badge>
-              <h1 className="mt-4 text-3xl font-bold text-slate-950">{profileTitle}</h1>
+              <h1 className="mt-4 text-2xl font-bold text-slate-950 sm:text-3xl">{profileTitle}</h1>
               <p className="mt-2 max-w-2xl text-sm text-slate-500">{t('profile.subtitle')}</p>
             </div>
           </div>

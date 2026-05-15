@@ -30,13 +30,13 @@ const Navbar = ({ onMenuClick }) => {
           <Menu size={20} />
         </Button>
         <button type="button" onClick={() => navigate(homePath)} className="flex items-center gap-3 text-left">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-500 to-primary-700 text-white shadow-panel">
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-500 to-primary-700 text-white shadow-panel sm:h-16 sm:w-16">
             <Activity size={28} />
           </div>
-          <div>
+          <div className="min-w-0">
             <p className="text-sm font-black uppercase text-primary-600">{heading.label}</p>
-            <p className="text-3xl font-black leading-none text-slate-950">{heading.title}</p>
-            <p className="mt-1 text-sm font-semibold text-slate-500">{heading.subtitle}</p>
+            <p className="truncate text-2xl font-black leading-none text-slate-950 sm:text-3xl">{heading.title}</p>
+            <p className="mt-1 hidden text-sm font-semibold text-slate-500 sm:block">{heading.subtitle}</p>
           </div>
         </button>
       </div>

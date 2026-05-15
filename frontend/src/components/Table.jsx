@@ -10,17 +10,17 @@ const Table = ({ columns, data, renderActions, emptyMessage }) => {
         <thead className="bg-cyan-50/70">
           <tr>
             {columns.map((column) => (
-              <th key={column.key} className="px-5 py-4 text-left text-xs font-extrabold uppercase tracking-wide text-slate-500">
+              <th key={column.key} className="px-3 py-4 text-left text-[11px] font-extrabold uppercase tracking-wide text-slate-500 sm:px-5 sm:text-xs">
                 {column.label}
               </th>
             ))}
-            {renderActions && <th className="px-5 py-4 text-right text-xs font-extrabold uppercase tracking-wide text-slate-500">{t('common.actions')}</th>}
+            {renderActions && <th className="px-3 py-4 text-right text-[11px] font-extrabold uppercase tracking-wide text-slate-500 sm:px-5 sm:text-xs">{t('common.actions')}</th>}
           </tr>
         </thead>
         <tbody className="divide-y divide-cyan-50">
           {data.length === 0 ? (
             <tr>
-              <td className="px-5 py-10 text-center text-sm font-semibold text-slate-500" colSpan={columns.length + (renderActions ? 1 : 0)}>
+              <td className="px-3 py-10 text-center text-sm font-semibold text-slate-500 sm:px-5" colSpan={columns.length + (renderActions ? 1 : 0)}>
                 {emptyMessage || t('common.noRecords')}
               </td>
             </tr>
@@ -28,11 +28,11 @@ const Table = ({ columns, data, renderActions, emptyMessage }) => {
             data.map((row) => (
               <tr key={row._id} className="hover:bg-cyan-50/60">
                 {columns.map((column) => (
-                  <td key={column.key} className="whitespace-nowrap px-5 py-4 text-sm font-semibold text-slate-700">
+                  <td key={column.key} className="whitespace-nowrap px-3 py-4 text-sm font-semibold text-slate-700 sm:px-5">
                     {column.render ? column.render(row) : row[column.key]}
                   </td>
                 ))}
-                {renderActions && <td className="px-5 py-4 text-right">{renderActions(row)}</td>}
+                {renderActions && <td className="px-3 py-4 text-right sm:px-5">{renderActions(row)}</td>}
               </tr>
             ))
           )}

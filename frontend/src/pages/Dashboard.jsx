@@ -10,7 +10,7 @@ const StatCard = ({ label, value, helper, icon: Icon, tone }) => (
     <div className="flex items-start justify-between gap-4">
       <div>
         <p className="text-sm font-medium text-slate-500">{label}</p>
-        <p className="mt-2 text-3xl font-bold text-slate-950">{value}</p>
+        <p className="mt-2 text-2xl font-bold text-slate-950 sm:text-3xl">{value}</p>
         {helper && <p className="mt-1 text-xs font-medium text-slate-500">{helper}</p>}
       </div>
       <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-md ${tone}`}>
@@ -70,7 +70,7 @@ const Dashboard = () => {
         <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
           <div>
             <p className="text-sm font-semibold uppercase tracking-wide text-primary-600">CareTrack Clinic</p>
-            <h1 className="mt-1 text-3xl font-bold text-slate-950">{t('dashboard.title')}</h1>
+            <h1 className="mt-1 text-2xl font-bold text-slate-950 sm:text-3xl">{t('dashboard.title')}</h1>
             <p className="mt-2 max-w-3xl text-sm text-slate-500">
               {t('dashboard.subtitle')}
             </p>
