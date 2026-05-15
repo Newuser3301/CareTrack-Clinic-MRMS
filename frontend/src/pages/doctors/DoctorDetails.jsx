@@ -6,6 +6,7 @@ import Button from '../../components/Button';
 import Loader from '../../components/Loader';
 import Table from '../../components/Table';
 import { useLanguage } from '../../context/LanguageContext';
+import { toI18nKey } from '../../utils/i18nKeys';
 
 const DoctorDetails = () => {
   const { id } = useParams();
@@ -25,7 +26,9 @@ const DoctorDetails = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">{doctor.fullName}</h1>
-          <p className="text-sm text-slate-500">{doctor.specialty} · {doctor.department}</p>
+          <p className="text-sm text-slate-500">
+            {t(`specialties.${toI18nKey(doctor.specialty)}`, doctor.specialty)} · {t(`departments.${toI18nKey(doctor.department)}`, doctor.department)}
+          </p>
         </div>
         <Link to="/doctors"><Button variant="secondary"><ArrowLeft size={16} />{t('common.back')}</Button></Link>
       </div>

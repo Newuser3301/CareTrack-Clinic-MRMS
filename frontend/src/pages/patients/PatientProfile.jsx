@@ -9,6 +9,7 @@ import Table from '../../components/Table';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { permissions } from '../../utils/permissions';
+import { toI18nKey } from '../../utils/i18nKeys';
 
 const PatientProfile = () => {
   const { id } = useParams();
@@ -51,8 +52,8 @@ const PatientProfile = () => {
         <h2 className="font-semibold text-slate-900">{t('forms.assignedDoctor')}</h2>
         <div className="mt-3 grid gap-3 md:grid-cols-3">
           <p>{patient.assignedDoctor?._id ? <Link to={`/doctors/${patient.assignedDoctor._id}`} className="text-primary-700 hover:underline">{patient.assignedDoctor.fullName}</Link> : '-'}</p>
-          <p>{patient.assignedDoctor?.specialty}</p>
-          <p>{patient.assignedDoctor?.department}</p>
+          <p>{patient.assignedDoctor?.specialty ? t(`specialties.${toI18nKey(patient.assignedDoctor.specialty)}`, patient.assignedDoctor.specialty) : '-'}</p>
+          <p>{patient.assignedDoctor?.department ? t(`departments.${toI18nKey(patient.assignedDoctor.department)}`, patient.assignedDoctor.department) : '-'}</p>
         </div>
       </section>
       <Table

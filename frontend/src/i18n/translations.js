@@ -70,6 +70,34 @@ export const translations = {
       departmentExample: "Yurak bo'limi",
       availabilityExample: 'Dush, 09:00'
     },
+    specialties: {
+      cardiology: 'Kardiologiya',
+      orthopedics: 'Ortopediya',
+      gastroenterology: 'Gastroenterologiya',
+      general_practice: 'Umumiy amaliyot',
+      pediatrics: 'Pediatriya',
+      dermatology: 'Dermatologiya',
+      nephrology: 'Nefrologiya',
+      gynecology: 'Ginekologiya',
+      neurology: 'Nevrologiya',
+      ophthalmology: 'Oftalmologiya',
+      pulmonology: 'Pulmonologiya',
+      endocrinology: 'Endokrinologiya'
+    },
+    departments: {
+      heart_care: "Yurak bo'limi",
+      internal_medicine: 'Ichki kasalliklar',
+      family_health: 'Oila salomatligi',
+      neuroscience: 'Neyro fanlar',
+      skin_health: 'Teri bo‘limi',
+      respiratory_care: 'Nafas yo‘llari',
+      women_health: 'Ayollar salomatligi',
+      bone_and_joint: 'Suyak va bo‘g‘im',
+      vision_center: 'Ko‘rish markazi',
+      digestive_health: 'Hazm bo‘limi',
+      kidney_care: 'Buyrak bo‘limi',
+      primary_care: 'Birlamchi bo‘lim'
+    },
     roles: {
       super_admin: 'Super Admin',
       admin: 'Admin',
@@ -279,6 +307,34 @@ export const translations = {
       allAssignedDoctors: 'All assigned doctors'
     },
     placeholders: { specialtyExample: 'Cardiology', departmentExample: 'Heart Care', availabilityExample: 'Mon, 09:00' },
+    specialties: {
+      cardiology: 'Cardiology',
+      orthopedics: 'Orthopedics',
+      gastroenterology: 'Gastroenterology',
+      general_practice: 'General Practice',
+      pediatrics: 'Pediatrics',
+      dermatology: 'Dermatology',
+      nephrology: 'Nephrology',
+      gynecology: 'Gynecology',
+      neurology: 'Neurology',
+      ophthalmology: 'Ophthalmology',
+      pulmonology: 'Pulmonology',
+      endocrinology: 'Endocrinology'
+    },
+    departments: {
+      heart_care: 'Heart Care',
+      internal_medicine: 'Internal Medicine',
+      family_health: 'Family Health',
+      neuroscience: 'Neuroscience',
+      skin_health: 'Skin Health',
+      respiratory_care: 'Respiratory Care',
+      women_health: 'Women Health',
+      bone_and_joint: 'Bone and Joint',
+      vision_center: 'Vision Center',
+      digestive_health: 'Digestive Health',
+      kidney_care: 'Kidney Care',
+      primary_care: 'Primary Care'
+    },
     login: {
       title: 'CareTrack Clinic',
       subtitle: 'Sign in to manage medical records',
@@ -480,6 +536,34 @@ export const translations = {
       allAssignedDoctors: 'Все назначенные врачи'
     },
     placeholders: { specialtyExample: 'Кардиология', departmentExample: 'Кардио отделение', availabilityExample: 'Пн, 09:00' },
+    specialties: {
+      cardiology: 'Кардиология',
+      orthopedics: 'Ортопедия',
+      gastroenterology: 'Гастроэнтерология',
+      general_practice: 'Общая практика',
+      pediatrics: 'Педиатрия',
+      dermatology: 'Дерматология',
+      nephrology: 'Нефрология',
+      gynecology: 'Гинекология',
+      neurology: 'Неврология',
+      ophthalmology: 'Офтальмология',
+      pulmonology: 'Пульмонология',
+      endocrinology: 'Эндокринология'
+    },
+    departments: {
+      heart_care: 'Кардио отделение',
+      internal_medicine: 'Терапия',
+      family_health: 'Семейное здоровье',
+      neuroscience: 'Нейронауки',
+      skin_health: 'Кожное отделение',
+      respiratory_care: 'Пульмонология',
+      women_health: 'Женское здоровье',
+      bone_and_joint: 'Кости и суставы',
+      vision_center: 'Центр зрения',
+      digestive_health: 'ЖКТ',
+      kidney_care: 'Нефрология',
+      primary_care: 'Первичная помощь'
+    },
     login: {
       title: 'CareTrack Clinic',
       subtitle: 'Войдите для управления медзаписями',

@@ -12,6 +12,7 @@ import Table from '../../components/Table';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { permissions } from '../../utils/permissions';
+import { toI18nKey } from '../../utils/i18nKeys';
 import DoctorForm from './DoctorForm';
 
 const DoctorsList = () => {
@@ -82,8 +83,8 @@ const DoctorsList = () => {
 
   const columns = [
     { key: 'fullName', label: t('common.name') },
-    { key: 'specialty', label: t('forms.specialty') },
-    { key: 'department', label: t('forms.department') },
+    { key: 'specialty', label: t('forms.specialty'), render: (row) => t(`specialties.${toI18nKey(row.specialty)}`, row.specialty) },
+    { key: 'department', label: t('forms.department'), render: (row) => t(`departments.${toI18nKey(row.department)}`, row.department) },
     { key: 'phone', label: t('common.phone') },
     { key: 'availability', label: t('forms.availability') }
   ];
