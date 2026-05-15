@@ -4,30 +4,32 @@ import { X } from 'lucide-react';
 import Button from './Button';
 
 const Modal = ({ open, title, children, onClose }) => {
-  useEffect(() => {
-    if (!open) return undefined;
+  const isOpen = open;
+  const portalTarget = useMemo(() => (typeof document === 'undefined' ? null : document.body), []);
 
-    const body = document.body;
-    const html = document.documentElement;
-    const scrollShell = document.getElementById('dashboard-scroll-shell');
+  useEffect(() => {
+    if (!isOpen) return undefined;
+    if (!portalTarget) return undefined;
+
+    const body = portalTarget;
+    const html = portalTarget.ownerDocument?.documentElement;
+    const scrollShell = portalTarget.ownerDocument?.getElementById('dashboard-scroll-shell');
     const previousBodyOverflow = body.style.overflow;
-    const previousHtmlOverflow = html.style.overflow;
+    const previousHtmlOverflow = html?.style.overflow;
     const previousShellOverflow = scrollShell?.style.overflow;
 
     body.style.overflow = 'hidden';
-    html.style.overflow = 'hidden';
+    if (html) html.style.overflow = 'hidden';
     if (scrollShell) scrollShell.style.overflow = 'hidden';
 
     return () => {
       body.style.overflow = previousBodyOverflow;
-      html.style.overflow = previousHtmlOverflow;
+      if (html) html.style.overflow = previousHtmlOverflow || '';
       if (scrollShell) scrollShell.style.overflow = previousShellOverflow || '';
     };
-  }, [open]);
+  }, [isOpen, portalTarget]);
 
-  if (!open) return null;
-
-  const portalTarget = useMemo(() => (typeof document === 'undefined' ? null : document.body), []);
+  if (!isOpen) return null;
   if (!portalTarget) return null;
 
   return createPortal(
