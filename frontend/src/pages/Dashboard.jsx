@@ -162,7 +162,7 @@ const Dashboard = () => {
             {stats.monthlyDiagnosisTrend.map((item) => (
               <ProgressRow key={`${item._id.year}-${item._id.month}`} label={monthLabel(item)} value={item.count} max={maxMonthlyTrend} helper={`${item.count} records`} tone="bg-cyan-600" />
             ))}
-            {!stats.monthlyDiagnosisTrend.length && <p className="text-sm text-slate-500">No diagnosis trend data yet.</p>}
+            {!stats.monthlyDiagnosisTrend.length && <p className="text-sm text-slate-500">{t('dashboard.noTrend')}</p>}
           </div>
         </section>
 
@@ -177,7 +177,9 @@ const Dashboard = () => {
 
         <section className="rounded-[1.5rem] border border-white/70 bg-white/80 p-5 shadow-panel">
           <h2 className="font-semibold text-slate-950">{t('dashboard.doctorPatientLoad')}</h2>
-          <p className="text-sm text-slate-500">Average {stats.averageDiagnosesPerPatient} diagnoses per patient.</p>
+          <p className="text-sm text-slate-500">
+            {t('dashboard.averageDiagnosesPerPatientPrefix')} {stats.averageDiagnosesPerPatient} {t('dashboard.averageDiagnosesPerPatientSuffix')}
+          </p>
           <div className="mt-5 space-y-4">
             {stats.doctorLoad.map((item) => (
               <ProgressRow key={item._id} label={item._id} value={item.count} max={maxDoctorLoad} helper={`${item.count} · ${item.specialty}`} tone="bg-green-600" />
@@ -195,7 +197,7 @@ const Dashboard = () => {
                 <div>
                   <p className="font-medium text-slate-950">{patient.fullName}</p>
                   <p className="text-sm text-slate-500">
-                    {patient.assignedDoctor?.fullName || 'No doctor assigned'} · {patient.assignedDoctor?.department || 'Unassigned'}
+                    {patient.assignedDoctor?.fullName || t('dashboard.noDoctorAssigned')} · {patient.assignedDoctor?.department || t('dashboard.unassigned')}
                   </p>
                 </div>
                 <span className="text-sm text-slate-500">{new Date(patient.createdAt).toLocaleDateString()}</span>

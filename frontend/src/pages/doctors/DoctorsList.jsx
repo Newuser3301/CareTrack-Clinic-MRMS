@@ -61,7 +61,7 @@ const DoctorsList = () => {
       setModal({ open: false, doctor: null });
       await loadDoctors();
     } catch (err) {
-      setError(err.response?.data?.message || 'Unable to save doctor.');
+      setError(err.response?.data?.message || t('common.unableToSave'));
     } finally {
       setSaving(false);
     }
@@ -74,18 +74,18 @@ const DoctorsList = () => {
       setConfirm(null);
       await loadDoctors();
     } catch (err) {
-      setError(err.response?.data?.message || 'Unable to delete doctor.');
+      setError(err.response?.data?.message || t('common.unableToDelete'));
     } finally {
       setSaving(false);
     }
   };
 
   const columns = [
-    { key: 'fullName', label: 'Name' },
-    { key: 'specialty', label: 'Specialty' },
-    { key: 'department', label: 'Department' },
-    { key: 'phone', label: 'Phone' },
-    { key: 'availability', label: 'Availability' }
+    { key: 'fullName', label: t('common.name') },
+    { key: 'specialty', label: t('forms.specialty') },
+    { key: 'department', label: t('forms.department') },
+    { key: 'phone', label: t('common.phone') },
+    { key: 'availability', label: t('forms.availability') }
   ];
 
   return (
@@ -102,10 +102,10 @@ const DoctorsList = () => {
         <div className="md:col-span-2">
           <SearchBar value={search} onChange={setSearch} placeholder={`${t('common.search')}...`} />
         </div>
-        <Input label="Specialty" value={specialty} onChange={(event) => setSpecialty(event.target.value)} placeholder="Cardiology" />
-        <Input label="Department" value={department} onChange={(event) => setDepartment(event.target.value)} placeholder="Heart Care" />
+        <Input label={t('forms.specialty')} value={specialty} onChange={(event) => setSpecialty(event.target.value)} placeholder={t('placeholders.specialtyExample')} />
+        <Input label={t('forms.department')} value={department} onChange={(event) => setDepartment(event.target.value)} placeholder={t('placeholders.departmentExample')} />
         <div className="md:col-span-4">
-          <Input label="Availability" value={availability} onChange={(event) => setAvailability(event.target.value)} placeholder="Mon, 09:00" />
+          <Input label={t('forms.availability')} value={availability} onChange={(event) => setAvailability(event.target.value)} placeholder={t('placeholders.availabilityExample')} />
         </div>
       </div>
       {loading ? <Loader /> : (
@@ -117,9 +117,9 @@ const DoctorsList = () => {
           data={doctors}
           renderActions={(doctor) => (
             <div className="flex justify-end gap-2">
-              <Link to={`/doctors/${doctor._id}`}><Button variant="secondary" className="h-9 w-9 px-0" aria-label="View doctor"><Eye size={16} /></Button></Link>
-              {permissions.canEditDoctor(role) && <Button variant="secondary" className="h-9 w-9 px-0" onClick={() => setModal({ open: true, doctor })} aria-label="Edit doctor"><Pencil size={16} /></Button>}
-              {permissions.canDeleteDoctor(role) && <Button variant="danger" className="h-9 w-9 px-0" onClick={() => setConfirm(doctor)} aria-label="Delete doctor"><Trash2 size={16} /></Button>}
+              <Link to={`/doctors/${doctor._id}`}><Button variant="secondary" className="h-9 w-9 px-0" aria-label={t('actions.view')}><Eye size={16} /></Button></Link>
+              {permissions.canEditDoctor(role) && <Button variant="secondary" className="h-9 w-9 px-0" onClick={() => setModal({ open: true, doctor })} aria-label={t('actions.edit')}><Pencil size={16} /></Button>}
+              {permissions.canDeleteDoctor(role) && <Button variant="danger" className="h-9 w-9 px-0" onClick={() => setConfirm(doctor)} aria-label={t('actions.delete')}><Trash2 size={16} /></Button>}
             </div>
           )}
         />
@@ -127,7 +127,7 @@ const DoctorsList = () => {
       <Modal open={modal.open} title={modal.doctor ? t('pages.doctorsTitle') : t('pages.newDoctor')} onClose={() => setModal({ open: false, doctor: null })}>
         <DoctorForm initialData={modal.doctor} onSubmit={saveDoctor} loading={saving} onCancel={() => setModal({ open: false, doctor: null })} />
       </Modal>
-      <ConfirmDialog open={!!confirm} message={`Delete ${confirm?.fullName}?`} onCancel={() => setConfirm(null)} onConfirm={deleteDoctor} loading={saving} />
+      <ConfirmDialog open={!!confirm} message={`${t('common.delete')} ${confirm?.fullName}?`} onCancel={() => setConfirm(null)} onConfirm={deleteDoctor} loading={saving} />
     </div>
   );
 };

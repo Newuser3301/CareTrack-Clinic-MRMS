@@ -4,7 +4,7 @@ import Button from '../components/Button';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
-import { permissions } from '../utils/permissions';
+import { permissions, roleLabel } from '../utils/permissions';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -57,10 +57,10 @@ const Navbar = () => {
           </div>
           <div>
             <p className="text-sm font-black text-slate-950">{user?.name}</p>
-            <p className="text-xs font-extrabold uppercase text-slate-500">{user?.role}</p>
+            <p className="text-xs font-extrabold uppercase text-slate-500">{t(`roles.${user?.role}`, roleLabel(user?.role))}</p>
           </div>
         </button>
-        <Button variant="secondary" className="h-12 w-12 px-0" onClick={logout} aria-label="Logout">
+        <Button variant="secondary" className="h-12 w-12 px-0" onClick={logout} aria-label={t('common.logout')}>
           <LogOut size={16} />
         </Button>
       </div>

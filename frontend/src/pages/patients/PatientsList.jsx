@@ -57,7 +57,7 @@ const PatientsList = () => {
       setModal({ open: false, patient: null });
       await loadData();
     } catch (err) {
-      setError(err.response?.data?.message || 'Unable to save patient.');
+      setError(err.response?.data?.message || t('common.unableToSave'));
     } finally {
       setSaving(false);
     }
@@ -70,7 +70,7 @@ const PatientsList = () => {
       setConfirm(null);
       await loadData();
     } catch (err) {
-      setError(err.response?.data?.message || 'Unable to delete patient.');
+      setError(err.response?.data?.message || t('common.unableToDelete'));
     } finally {
       setSaving(false);
     }
@@ -94,7 +94,7 @@ const PatientsList = () => {
           <Select
             value={assignedDoctor}
             onChange={(event) => setAssignedDoctor(event.target.value)}
-            placeholder="All assigned doctors"
+            placeholder={t('patients.allAssignedDoctors')}
             options={doctors.map((doctor) => ({ value: doctor._id, label: `${doctor.fullName} · ${doctor.specialty}` }))}
           />
         )}
@@ -102,18 +102,18 @@ const PatientsList = () => {
       {loading ? <Loader /> : (
         <Table
           columns={[
-            { key: 'fullName', label: 'Name', render: (row) => <Link to={`/patients/${row._id}`} className="text-primary-700 hover:underline">{row.fullName}</Link> },
-            { key: 'phone', label: 'Phone' },
-            { key: 'gender', label: 'Gender' },
-            { key: 'assignedDoctor', label: 'Doctor', render: (row) => row.assignedDoctor ? <Link to={`/doctors/${row.assignedDoctor._id}`} className="text-primary-700 hover:underline">{row.assignedDoctor.fullName}</Link> : '-' },
-            { key: 'createdAt', label: 'Created', render: (row) => new Date(row.createdAt).toLocaleDateString() }
+            { key: 'fullName', label: t('common.name'), render: (row) => <Link to={`/patients/${row._id}`} className="text-primary-700 hover:underline">{row.fullName}</Link> },
+            { key: 'phone', label: t('common.phone') },
+            { key: 'gender', label: t('common.gender'), render: (row) => t(`forms.${row.gender}`, row.gender) },
+            { key: 'assignedDoctor', label: t('forms.assignedDoctor'), render: (row) => row.assignedDoctor ? <Link to={`/doctors/${row.assignedDoctor._id}`} className="text-primary-700 hover:underline">{row.assignedDoctor.fullName}</Link> : '-' },
+            { key: 'createdAt', label: t('common.created'), render: (row) => new Date(row.createdAt).toLocaleDateString() }
           ]}
           data={patients}
           renderActions={(patient) => (
             <div className="flex justify-end gap-2">
-              <Link to={`/patients/${patient._id}`}><Button variant="secondary" className="h-9 w-9 px-0" aria-label="View patient"><Eye size={16} /></Button></Link>
-              {permissions.canEditPatient(role) && <Button variant="secondary" className="h-9 w-9 px-0" onClick={() => setModal({ open: true, patient })} aria-label="Edit patient"><Pencil size={16} /></Button>}
-              {permissions.canDeletePatient(role) && <Button variant="danger" className="h-9 w-9 px-0" onClick={() => setConfirm(patient)} aria-label="Delete patient"><Trash2 size={16} /></Button>}
+              <Link to={`/patients/${patient._id}`}><Button variant="secondary" className="h-9 w-9 px-0" aria-label={t('actions.view')}><Eye size={16} /></Button></Link>
+              {permissions.canEditPatient(role) && <Button variant="secondary" className="h-9 w-9 px-0" onClick={() => setModal({ open: true, patient })} aria-label={t('actions.edit')}><Pencil size={16} /></Button>}
+              {permissions.canDeletePatient(role) && <Button variant="danger" className="h-9 w-9 px-0" onClick={() => setConfirm(patient)} aria-label={t('actions.delete')}><Trash2 size={16} /></Button>}
             </div>
           )}
         />
@@ -128,7 +128,7 @@ const PatientsList = () => {
           onCancel={() => setModal({ open: false, patient: null })}
         />
       </Modal>
-      <ConfirmDialog open={!!confirm} message={`Delete ${confirm?.fullName} and linked diagnoses?`} onCancel={() => setConfirm(null)} onConfirm={deletePatient} loading={saving} />
+      <ConfirmDialog open={!!confirm} message={`${t('common.delete')} ${confirm?.fullName}?`} onCancel={() => setConfirm(null)} onConfirm={deletePatient} loading={saving} />
     </div>
   );
 };

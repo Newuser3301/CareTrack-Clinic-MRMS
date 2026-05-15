@@ -70,7 +70,7 @@ const DiagnosesList = () => {
       setModal({ open: false, diagnosis: null });
       await loadData();
     } catch (err) {
-      setError(err.response?.data?.message || 'Unable to save diagnosis.');
+      setError(err.response?.data?.message || t('common.unableToSave'));
     } finally {
       setSaving(false);
     }
@@ -83,7 +83,7 @@ const DiagnosesList = () => {
       setConfirm(null);
       await loadData();
     } catch (err) {
-      setError(err.response?.data?.message || 'Unable to delete diagnosis.');
+      setError(err.response?.data?.message || t('common.unableToDelete'));
     } finally {
       setSaving(false);
     }
@@ -112,10 +112,10 @@ const DiagnosesList = () => {
           onChange={(event) => setSeverity(event.target.value)}
           placeholder={t('common.severity')}
           options={[
-            { value: 'low', label: 'Low' },
-            { value: 'medium', label: 'Medium' },
-            { value: 'high', label: 'High' },
-            { value: 'critical', label: 'Critical' }
+            { value: 'low', label: t('severity.low') },
+            { value: 'medium', label: t('severity.medium') },
+            { value: 'high', label: t('severity.high') },
+            { value: 'critical', label: t('severity.critical') }
           ]}
         />
       </div>
@@ -125,14 +125,14 @@ const DiagnosesList = () => {
             { key: 'icdCode', label: 'ICD' },
             { key: 'patient', label: t('dashboard.patients'), render: (row) => row.patient?.fullName || '-' },
             { key: 'description', label: t('common.description') },
-            { key: 'severity', label: t('common.severity'), render: (row) => <Badge tone={row.severity}>{row.severity}</Badge> },
+            { key: 'severity', label: t('common.severity'), render: (row) => <Badge tone={row.severity}>{t(`severity.${row.severity}`, row.severity)}</Badge> },
             { key: 'diagnosedDate', label: t('common.date'), render: (row) => new Date(row.diagnosedDate).toLocaleDateString() }
           ]}
           data={diagnoses}
           renderActions={(diagnosis) => (
             <div className="flex justify-end gap-2">
-              {permissions.canEditDiagnosis(user?.role) && <Button variant="secondary" className="h-9 w-9 px-0" onClick={() => setModal({ open: true, diagnosis })} aria-label="Edit diagnosis"><Pencil size={16} /></Button>}
-              {permissions.canDeleteDiagnosis(user?.role) && <Button variant="danger" className="h-9 w-9 px-0" onClick={() => setConfirm(diagnosis)} aria-label="Delete diagnosis"><Trash2 size={16} /></Button>}
+              {permissions.canEditDiagnosis(user?.role) && <Button variant="secondary" className="h-9 w-9 px-0" onClick={() => setModal({ open: true, diagnosis })} aria-label={t('actions.edit')}><Pencil size={16} /></Button>}
+              {permissions.canDeleteDiagnosis(user?.role) && <Button variant="danger" className="h-9 w-9 px-0" onClick={() => setConfirm(diagnosis)} aria-label={t('actions.delete')}><Trash2 size={16} /></Button>}
             </div>
           )}
         />
@@ -140,7 +140,7 @@ const DiagnosesList = () => {
       <Modal open={modal.open} title={modal.diagnosis ? t('pages.diagnosesTitle') : t('pages.newDiagnosis')} onClose={() => setModal({ open: false, diagnosis: null })}>
         <DiagnosisForm initialData={modal.diagnosis} patients={patients} defaultPatient={defaultPatient} onSubmit={saveDiagnosis} loading={saving} onCancel={() => setModal({ open: false, diagnosis: null })} />
       </Modal>
-      <ConfirmDialog open={!!confirm} message={`Delete diagnosis ${confirm?.icdCode}?`} onCancel={() => setConfirm(null)} onConfirm={deleteDiagnosis} loading={saving} />
+      <ConfirmDialog open={!!confirm} message={`${t('common.delete')} ${confirm?.icdCode}?`} onCancel={() => setConfirm(null)} onConfirm={deleteDiagnosis} loading={saving} />
     </div>
   );
 };

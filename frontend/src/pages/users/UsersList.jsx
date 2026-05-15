@@ -47,7 +47,7 @@ const UsersList = () => {
       setModal({ open: false, user: null });
       await loadUsers();
     } catch (err) {
-      setError(err.response?.data?.message || 'Unable to save user.');
+      setError(err.response?.data?.message || t('common.unableToSave'));
     } finally {
       setSaving(false);
     }
@@ -60,7 +60,7 @@ const UsersList = () => {
       setConfirm(null);
       await loadUsers();
     } catch (err) {
-      setError(err.response?.data?.message || 'Unable to delete user.');
+      setError(err.response?.data?.message || t('common.unableToDelete'));
     } finally {
       setSaving(false);
     }
@@ -87,8 +87,8 @@ const UsersList = () => {
           data={users}
           renderActions={(user) => (
             <div className="flex justify-end gap-2">
-              <Button variant="secondary" className="h-9 w-9 px-0" onClick={() => setModal({ open: true, user })} aria-label="Edit user"><Pencil size={16} /></Button>
-              <Button variant="danger" className="h-9 w-9 px-0" onClick={() => setConfirm(user)} aria-label="Delete user"><Trash2 size={16} /></Button>
+              <Button variant="secondary" className="h-9 w-9 px-0" onClick={() => setModal({ open: true, user })} aria-label={t('actions.edit')}><Pencil size={16} /></Button>
+              <Button variant="danger" className="h-9 w-9 px-0" onClick={() => setConfirm(user)} aria-label={t('actions.delete')}><Trash2 size={16} /></Button>
             </div>
           )}
         />
@@ -102,7 +102,7 @@ const UsersList = () => {
           onCancel={() => setModal({ open: false, user: null })}
         />
       </Modal>
-      <ConfirmDialog open={!!confirm} message={`Delete ${confirm?.name}?`} onCancel={() => setConfirm(null)} onConfirm={deleteUser} loading={saving} />
+      <ConfirmDialog open={!!confirm} message={`${t('common.delete')} ${confirm?.name}?`} onCancel={() => setConfirm(null)} onConfirm={deleteUser} loading={saving} />
     </div>
   );
 };

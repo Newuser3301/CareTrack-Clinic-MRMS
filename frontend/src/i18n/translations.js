@@ -43,7 +43,32 @@ export const translations = {
       forbidden: 'Ruxsat yo‘q',
       forbiddenText: 'Bu sahifani ochish uchun accountingizda ruxsat yo‘q.',
       backToDashboard: 'Boshqaruvga qaytish',
-      pageMissing: 'So‘ralgan sahifa mavjud emas.'
+      pageMissing: 'So‘ralgan sahifa mavjud emas.',
+      logout: 'Chiqish',
+      unableToSave: 'Saqlab bo‘lmadi.',
+      unableToDelete: 'O‘chirib bo‘lmadi.'
+    },
+    actions: {
+      view: "Ko'rish",
+      edit: "Tahrirlash",
+      delete: "O'chirish"
+    },
+    severity: {
+      low: 'Past',
+      medium: "O'rtacha",
+      high: 'Yuqori',
+      critical: 'Kritik'
+    },
+    patients: {
+      profileSubtitle: "Bemor profili va bog'langan tibbiy yozuvlar.",
+      addDiagnosis: "Tashxis qo'shish",
+      noDiagnoses: 'Bu bemor uchun tashxislar topilmadi.',
+      allAssignedDoctors: 'Barcha biriktirilgan shifokorlar'
+    },
+    placeholders: {
+      specialtyExample: 'Kardiologiya',
+      departmentExample: "Yurak bo'limi",
+      availabilityExample: 'Dush, 09:00'
     },
     roles: {
       super_admin: 'Super Admin',
@@ -124,7 +149,12 @@ export const translations = {
       departmentWorkload: "Bo'lim yuklamasi",
       doctorPatientLoad: 'Shifokor bemor yuklamasi',
       recentPatients: 'So‘nggi bemorlar',
-      recentDiagnoses: 'So‘nggi tashxislar'
+      recentDiagnoses: 'So‘nggi tashxislar',
+      noTrend: 'Hozircha trend maʼlumotlari yoʻq.',
+      averageDiagnosesPerPatientPrefix: "O'rtacha",
+      averageDiagnosesPerPatientSuffix: "ta tashxis / bemor.",
+      noDoctorAssigned: 'Shifokor biriktirilmagan',
+      unassigned: 'Biriktirilmagan'
     },
     pages: {
       doctorsTitle: 'Shifokorlar',
@@ -210,6 +240,45 @@ export const translations = {
       pageMissing: 'The page you requested does not exist.'
     },
     roles: { super_admin: 'Super Admin', admin: 'Admin', doctor: 'Doctor', clinician: 'Clinician', receptionist: 'Receptionist', patient: 'Patient' },
+    common: {
+      actions: 'Actions',
+      cancel: 'Cancel',
+      save: 'Save',
+      saving: 'Saving...',
+      delete: 'Delete',
+      deleting: 'Deleting...',
+      back: 'Back',
+      search: 'Search',
+      created: 'Created',
+      name: 'Name',
+      email: 'Email',
+      password: 'Password',
+      role: 'Role',
+      phone: 'Phone',
+      date: 'Date',
+      gender: 'Gender',
+      address: 'Address',
+      description: 'Description',
+      severity: 'Severity',
+      loadingError: 'Unable to load data.',
+      noRecords: 'No records found.',
+      forbidden: 'Forbidden',
+      forbiddenText: "You don't have permission to view this page.",
+      backToDashboard: 'Back to dashboard',
+      pageMissing: 'The requested page does not exist.',
+      logout: 'Logout',
+      unableToSave: 'Unable to save.',
+      unableToDelete: 'Unable to delete.'
+    },
+    actions: { view: 'View', edit: 'Edit', delete: 'Delete' },
+    severity: { low: 'Low', medium: 'Medium', high: 'High', critical: 'Critical' },
+    patients: {
+      profileSubtitle: 'Patient profile and linked medical records.',
+      addDiagnosis: 'Add diagnosis',
+      noDiagnoses: 'No diagnoses linked to this patient.',
+      allAssignedDoctors: 'All assigned doctors'
+    },
+    placeholders: { specialtyExample: 'Cardiology', departmentExample: 'Heart Care', availabilityExample: 'Mon, 09:00' },
     login: {
       title: 'CareTrack Clinic',
       subtitle: 'Sign in to manage medical records',
@@ -281,7 +350,12 @@ export const translations = {
       departmentWorkload: 'Department Workload',
       doctorPatientLoad: 'Doctor Patient Load',
       recentPatients: 'Recent Patients',
-      recentDiagnoses: 'Recent Diagnoses'
+      recentDiagnoses: 'Recent Diagnoses',
+      noTrend: 'No trend data yet.',
+      averageDiagnosesPerPatientPrefix: 'Average',
+      averageDiagnosesPerPatientSuffix: 'diagnoses per patient.',
+      noDoctorAssigned: 'No doctor assigned',
+      unassigned: 'Unassigned'
     },
     pages: {
       doctorsTitle: 'Doctors',
@@ -367,6 +441,45 @@ export const translations = {
       pageMissing: 'Запрошенная страница не существует.'
     },
     roles: { super_admin: 'Супер админ', admin: 'Админ', doctor: 'Врач', clinician: 'Клиницист', receptionist: 'Регистратор', patient: 'Пациент' },
+    common: {
+      actions: 'Действия',
+      cancel: 'Отмена',
+      save: 'Сохранить',
+      saving: 'Сохранение...',
+      delete: 'Удалить',
+      deleting: 'Удаление...',
+      back: 'Назад',
+      search: 'Поиск',
+      created: 'Создано',
+      name: 'Имя',
+      email: 'Email',
+      password: 'Пароль',
+      role: 'Роль',
+      phone: 'Телефон',
+      date: 'Дата',
+      gender: 'Пол',
+      address: 'Адрес',
+      description: 'Описание',
+      severity: 'Степень',
+      loadingError: 'Не удалось загрузить данные.',
+      noRecords: 'Записей не найдено.',
+      forbidden: 'Нет доступа',
+      forbiddenText: 'У вас нет прав для просмотра этой страницы.',
+      backToDashboard: 'Вернуться на панель',
+      pageMissing: 'Запрошенная страница не существует.',
+      logout: 'Выйти',
+      unableToSave: 'Не удалось сохранить.',
+      unableToDelete: 'Не удалось удалить.'
+    },
+    actions: { view: 'Просмотр', edit: 'Редактировать', delete: 'Удалить' },
+    severity: { low: 'Низкая', medium: 'Средняя', high: 'Высокая', critical: 'Критическая' },
+    patients: {
+      profileSubtitle: 'Профиль пациента и связанные медицинские записи.',
+      addDiagnosis: 'Добавить диагноз',
+      noDiagnoses: 'Для этого пациента нет диагнозов.',
+      allAssignedDoctors: 'Все назначенные врачи'
+    },
+    placeholders: { specialtyExample: 'Кардиология', departmentExample: 'Кардио отделение', availabilityExample: 'Пн, 09:00' },
     login: {
       title: 'CareTrack Clinic',
       subtitle: 'Войдите для управления медзаписями',
@@ -438,7 +551,12 @@ export const translations = {
       departmentWorkload: 'Нагрузка отделов',
       doctorPatientLoad: 'Нагрузка врачей',
       recentPatients: 'Недавние пациенты',
-      recentDiagnoses: 'Недавние диагнозы'
+      recentDiagnoses: 'Недавние диагнозы',
+      noTrend: 'Пока нет данных тренда.',
+      averageDiagnosesPerPatientPrefix: 'В среднем',
+      averageDiagnosesPerPatientSuffix: 'диагнозов на пациента.',
+      noDoctorAssigned: 'Врач не назначен',
+      unassigned: 'Не назначено'
     },
     pages: {
       doctorsTitle: 'Врачи',
