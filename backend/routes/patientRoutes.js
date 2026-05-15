@@ -38,15 +38,15 @@ router.use(protect);
 
 router
   .route('/')
-  .get(authorize('super_admin', 'admin', 'doctor', 'patient'), getPatients)
-  .post(authorize('super_admin', 'admin'), createPatientValidation, createPatient);
+  .get(authorize('super_admin', 'admin', 'doctor', 'clinician', 'receptionist', 'patient'), getPatients)
+  .post(authorize('super_admin', 'admin', 'receptionist'), createPatientValidation, createPatient);
 
-router.get('/:id/profile', authorize('super_admin', 'admin', 'doctor', 'patient'), canAccessPatient(), getPatientProfile);
+router.get('/:id/profile', authorize('super_admin', 'admin', 'doctor', 'clinician', 'receptionist', 'patient'), canAccessPatient(), getPatientProfile);
 
 router
   .route('/:id')
-  .get(authorize('super_admin', 'admin', 'doctor', 'patient'), canAccessPatient(), getPatientById)
-  .put(authorize('super_admin', 'admin', 'doctor'), canAccessPatient({ write: true }), updatePatientValidation, updatePatient)
+  .get(authorize('super_admin', 'admin', 'doctor', 'clinician', 'receptionist', 'patient'), canAccessPatient(), getPatientById)
+  .put(authorize('super_admin', 'admin', 'doctor', 'clinician'), canAccessPatient({ write: true }), updatePatientValidation, updatePatient)
   .delete(authorize('super_admin', 'admin'), deletePatient);
 
 module.exports = router;

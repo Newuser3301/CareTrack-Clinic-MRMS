@@ -24,7 +24,7 @@ const getUserById = async (req, res, next) => {
       throw new Error('User not found');
     }
 
-    if (isAdmin(req.user) && !['doctor', 'patient'].includes(user.role)) {
+    if (isAdmin(req.user) && !['doctor', 'clinician', 'receptionist', 'patient'].includes(user.role)) {
       res.status(403);
       throw new Error('Admins cannot view admin or super admin accounts');
     }
@@ -32,6 +32,10 @@ const getUserById = async (req, res, next) => {
     const response = { user };
 
     if (user.role === 'doctor') {
+      response.profile = await Doctor.findOne({ user: user._id });
+    }
+
+    if (user.role === 'clinician') {
       response.profile = await Doctor.findOne({ user: user._id });
     }
 
@@ -47,7 +51,7 @@ const getUserById = async (req, res, next) => {
 
 const getUsers = async (req, res, next) => {
   try {
-    const filter = isSuperAdmin(req.user) ? {} : { role: { $in: ['doctor', 'patient'] } };
+    const filter = isSuperAdmin(req.user) ? {} : { role: { $in: ['doctor', 'clinician', 'receptionist', 'patient'] } };
     const users = await User.find(filter).sort({ createdAt: -1 });
     res.json(users);
   } catch (error) {
@@ -59,9 +63,9 @@ const createUser = async (req, res, next) => {
   if (!handleValidation(req, res, next)) return;
 
   try {
-    if (isAdmin(req.user) && !['doctor', 'patient'].includes(req.body.role)) {
+    if (isAdmin(req.user) && !['doctor', 'clinician', 'receptionist', 'patient'].includes(req.body.role)) {
       res.status(403);
-      throw new Error('Admins can only create doctor and patient accounts');
+      throw new Error('Admins can only create doctor, clinician, receptionist and patient accounts');
     }
 
     const user = await User.create(req.body);
@@ -85,11 +89,11 @@ const updateUser = async (req, res, next) => {
     }
 
     if (isAdmin(req.user)) {
-      if (!['doctor', 'patient'].includes(user.role)) {
+      if (!['doctor', 'clinician', 'receptionist', 'patient'].includes(user.role)) {
         res.status(403);
         throw new Error('Admins cannot update admin or super admin accounts');
       }
-      if (update.role && !['doctor', 'patient'].includes(update.role)) {
+      if (update.role && !['doctor', 'clinician', 'receptionist', 'patient'].includes(update.role)) {
         res.status(403);
         throw new Error('Admins cannot assign admin or super_admin roles');
       }
@@ -127,7 +131,7 @@ const deleteUser = async (req, res, next) => {
       throw new Error('User not found');
     }
 
-    if (isAdmin(req.user) && !['doctor', 'patient'].includes(user.role)) {
+    if (isAdmin(req.user) && !['doctor', 'clinician', 'receptionist', 'patient'].includes(user.role)) {
       res.status(403);
       throw new Error('Admins cannot delete admin or super admin accounts');
     }
@@ -137,7 +141,7 @@ const deleteUser = async (req, res, next) => {
       throw new Error('Only Super Admin can delete super_admin accounts');
     }
 
-    if (user.role === 'doctor') {
+    if (user.role === 'doctor' || user.role === 'clinician') {
       const doctor = await Doctor.findOne({ user: user._id });
       if (doctor) {
         const assignedCount = await Patient.countDocuments({ assignedDoctor: doctor._id });

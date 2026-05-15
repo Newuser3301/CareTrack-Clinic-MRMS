@@ -34,11 +34,11 @@ router.use(protect);
 
 router
   .route('/')
-  .get(authorize('super_admin', 'admin', 'doctor', 'patient'), getDoctors)
+  .get(authorize('super_admin', 'admin', 'doctor', 'patient', 'receptionist'), getDoctors)
   .post(authorize('super_admin', 'admin'), createDoctorValidation, createDoctor);
 router
   .route('/:id')
-  .get(authorize('super_admin', 'admin', 'doctor', 'patient'), getDoctorById)
+  .get(authorize('super_admin', 'admin', 'doctor', 'patient', 'receptionist'), getDoctorById)
   .put(authorize('super_admin', 'admin'), updateDoctorValidation, updateDoctor)
   .delete(authorize('super_admin', 'admin'), deleteDoctor);
 

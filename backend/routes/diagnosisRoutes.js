@@ -23,14 +23,14 @@ const diagnosisValidation = [
   body('diagnosedDate').isISO8601().withMessage('Valid diagnosed date is required')
 ];
 
-router.use(protect, authorize('super_admin', 'admin', 'doctor', 'patient'));
+router.use(protect, authorize('super_admin', 'admin', 'doctor', 'clinician', 'patient'));
 
 router.route('/').get(getDiagnoses).post(authorize('super_admin', 'admin', 'doctor'), diagnosisValidation, createDiagnosis);
 router.get('/patient/:patientId', getDiagnosesByPatient);
 router
   .route('/:id')
   .get(canAccessDiagnosis(), getDiagnosisById)
-  .put(authorize('super_admin', 'admin', 'doctor'), canAccessDiagnosis({ write: true }), diagnosisValidation, updateDiagnosis)
+  .put(authorize('super_admin', 'admin', 'doctor', 'clinician'), canAccessDiagnosis({ write: true }), diagnosisValidation, updateDiagnosis)
   .delete(authorize('super_admin', 'admin'), deleteDiagnosis);
 
 module.exports = router;

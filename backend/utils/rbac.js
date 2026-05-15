@@ -6,6 +6,8 @@ const SYSTEM_ROLES = ['super_admin', 'admin'];
 const isSuperAdmin = (user) => user?.role === 'super_admin';
 const isAdmin = (user) => user?.role === 'admin';
 const isSystemManager = (user) => SYSTEM_ROLES.includes(user?.role);
+const isClinician = (user) => user?.role === 'clinician';
+const isReceptionist = (user) => user?.role === 'receptionist';
 
 const forbid = (res, message = 'Forbidden: insufficient permissions') => {
   res.status(403);
@@ -17,6 +19,8 @@ const getPatientProfile = (userId) => Patient.findOne({ user: userId });
 
 const getVisiblePatientFilter = async (req, baseFilter = {}) => {
   if (isSystemManager(req.user)) return baseFilter;
+
+  if (isClinician(req.user) || isReceptionist(req.user)) return baseFilter;
 
   if (req.user.role === 'doctor') {
     const doctor = await getDoctorProfile(req.user._id);
@@ -35,6 +39,10 @@ const getVisiblePatientFilter = async (req, baseFilter = {}) => {
 
 const ensurePatientAccess = async (req, patient, res, { write = false } = {}) => {
   if (isSystemManager(req.user)) return;
+
+  if (isClinician(req.user)) return;
+
+  if (isReceptionist(req.user) && !write) return;
 
   if (req.user.role === 'doctor') {
     const doctor = await getDoctorProfile(req.user._id);
@@ -55,6 +63,8 @@ const ensureDiagnosisAccess = async (req, diagnosis, res, { write = false } = {}
 module.exports = {
   isSuperAdmin,
   isAdmin,
+  isClinician,
+  isReceptionist,
   isSystemManager,
   forbid,
   getDoctorProfile,

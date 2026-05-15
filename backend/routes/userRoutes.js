@@ -20,7 +20,7 @@ const userValidation = [
   body('name').optional().trim().notEmpty().withMessage('Name cannot be empty'),
   body('email').optional().isEmail().withMessage('Valid email is required').normalizeEmail(),
   body('password').optional({ checkFalsy: true }).custom(validatePassword).withMessage(passwordPolicyMessage),
-  body('role').optional().isIn(['super_admin', 'admin', 'doctor', 'patient']).withMessage('Invalid role')
+  body('role').optional().isIn(['super_admin', 'admin', 'doctor', 'clinician', 'receptionist', 'patient']).withMessage('Invalid role')
 ];
 
 router.use(protect, authorize('super_admin', 'admin'));
@@ -30,7 +30,7 @@ router.route('/').get(getUsers).post(
     body('name').trim().notEmpty().withMessage('Name is required'),
     body('email').isEmail().withMessage('Valid email is required').normalizeEmail(),
     body('password').custom(validatePassword).withMessage(passwordPolicyMessage),
-    body('role').isIn(['super_admin', 'admin', 'doctor', 'patient']).withMessage('Invalid role')
+    body('role').isIn(['super_admin', 'admin', 'doctor', 'clinician', 'receptionist', 'patient']).withMessage('Invalid role')
   ],
   createUser
 );

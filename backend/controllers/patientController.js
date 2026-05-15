@@ -93,7 +93,7 @@ const updatePatient = async (req, res, next) => {
     await ensurePatientAccess(req, patient, res, { write: true });
 
     const { password, user: _ignoredUser, ...patientData } = req.body;
-    if (req.user.role === 'doctor') delete patientData.assignedDoctor;
+    if (req.user.role === 'doctor' || req.user.role === 'clinician') delete patientData.assignedDoctor;
     Object.assign(patient, patientData);
     await patient.save();
 

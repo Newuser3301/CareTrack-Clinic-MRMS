@@ -49,6 +49,8 @@ export const translations = {
       super_admin: 'Super Admin',
       admin: 'Admin',
       doctor: 'Shifokor',
+      clinician: 'Klinik mutaxassis',
+      receptionist: 'Qabulxona xodimi',
       patient: 'Bemor'
     },
     login: {
@@ -207,7 +209,7 @@ export const translations = {
       backToDashboard: 'Back to dashboard',
       pageMissing: 'The page you requested does not exist.'
     },
-    roles: { super_admin: 'Super Admin', admin: 'Admin', doctor: 'Doctor', patient: 'Patient' },
+    roles: { super_admin: 'Super Admin', admin: 'Admin', doctor: 'Doctor', clinician: 'Clinician', receptionist: 'Receptionist', patient: 'Patient' },
     login: {
       title: 'CareTrack Clinic',
       subtitle: 'Sign in to manage medical records',
@@ -364,7 +366,7 @@ export const translations = {
       backToDashboard: 'Вернуться на панель',
       pageMissing: 'Запрошенная страница не существует.'
     },
-    roles: { super_admin: 'Супер админ', admin: 'Админ', doctor: 'Врач', patient: 'Пациент' },
+    roles: { super_admin: 'Супер админ', admin: 'Админ', doctor: 'Врач', clinician: 'Клиницист', receptionist: 'Регистратор', patient: 'Пациент' },
     login: {
       title: 'CareTrack Clinic',
       subtitle: 'Войдите для управления медзаписями',

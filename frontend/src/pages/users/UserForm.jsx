@@ -46,15 +46,19 @@ const UserForm = ({ initialData, currentRole, onSubmit, onCancel, loading }) => 
               { value: 'super_admin', label: t('roles.super_admin') },
               { value: 'admin', label: t('roles.admin') },
               { value: 'doctor', label: t('roles.doctor') },
+              { value: 'clinician', label: t('roles.clinician') },
+              { value: 'receptionist', label: t('roles.receptionist') },
               { value: 'patient', label: t('roles.patient') }
             ]
           : [
               { value: 'doctor', label: t('roles.doctor') },
+              { value: 'clinician', label: t('roles.clinician') },
+              { value: 'receptionist', label: t('roles.receptionist') },
               { value: 'patient', label: t('roles.patient') }
             ])}
         required
       />
-      <div className="flex justify-end gap-3 md:col-span-2">
+      <div className="sticky bottom-0 flex justify-end gap-3 bg-cyan-50/96 pt-4 md:col-span-2">
         <Button variant="secondary" onClick={onCancel}><X size={16} />{t('common.cancel')}</Button>
         <Button type="submit" disabled={loading}><Save size={16} />{loading ? t('common.saving') : t('forms.saveUser')}</Button>
       </div>
