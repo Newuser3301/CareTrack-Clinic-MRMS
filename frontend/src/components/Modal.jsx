@@ -1,4 +1,5 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import Button from './Button';
 
@@ -26,13 +27,18 @@ const Modal = ({ open, title, children, onClose }) => {
 
   if (!open) return null;
 
-  return (
+  const portalTarget = useMemo(() => (typeof document === 'undefined' ? null : document.body), []);
+  if (!portalTarget) return null;
+
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-950/50 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden bg-slate-950/50 p-4 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
     >
-      <div className="flex min-h-0 w-full max-w-2xl max-h-[90vh] flex-col overflow-hidden rounded-[1.75rem] border border-slate-900/80 bg-gradient-to-br from-slate-950 via-cyan-950 to-slate-900 shadow-[0_28px_90px_rgba(2,6,23,0.34)]">
+      <div
+        className="flex min-h-0 w-full max-w-2xl flex-col overflow-hidden rounded-[1.75rem] border border-slate-900/80 bg-gradient-to-br from-slate-950 via-cyan-950 to-slate-900 shadow-[0_28px_90px_rgba(2,6,23,0.34)] max-h-[calc(100dvh-1rem)] sm:max-h-[calc(100dvh-2rem)]"
+      >
         <div className="flex shrink-0 items-center justify-between border-b border-white/10 px-6 py-5">
           <h2 className="text-xl font-black text-white">{title}</h2>
           <Button
@@ -46,7 +52,8 @@ const Modal = ({ open, title, children, onClose }) => {
         </div>
         <div className="modal-scroll min-h-0 flex-1 overflow-y-auto bg-cyan-50/96 p-6">{children}</div>
       </div>
-    </div>
+    </div>,
+    portalTarget
   );
 };
 
