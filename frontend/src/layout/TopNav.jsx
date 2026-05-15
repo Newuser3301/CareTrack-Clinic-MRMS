@@ -5,7 +5,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { permissions } from '../utils/permissions';
 
 const itemClass = ({ isActive }) =>
-  `inline-flex items-center gap-2 whitespace-nowrap rounded-2xl border px-4 py-2 text-sm font-extrabold shadow-sm transition ${
+  `inline-flex h-12 w-12 items-center justify-center rounded-2xl border shadow-sm transition ${
     isActive
       ? 'border-white/70 bg-white text-primary-700'
       : 'border-white/60 bg-white/70 text-slate-700 hover:bg-white'
@@ -28,11 +28,10 @@ const TopNav = () => {
   return (
     <nav className="lg:hidden">
       <div className="overflow-x-auto">
-        <div className="flex items-center gap-2 px-4 pb-3">
+        <div className="flex items-center gap-3 px-4 pb-3">
           {items.map(({ to, label, icon: Icon }) => (
-            <NavLink key={to} to={to} className={itemClass}>
-              <Icon size={16} />
-              {label}
+            <NavLink key={to} to={to} className={itemClass} aria-label={label} title={label}>
+              <Icon size={20} />
             </NavLink>
           ))}
         </div>
@@ -42,4 +41,3 @@ const TopNav = () => {
 };
 
 export default TopNav;
-

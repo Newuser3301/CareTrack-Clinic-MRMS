@@ -1,4 +1,4 @@
-import { Activity, ClipboardList, LogOut, Menu, Stethoscope, UserCircle, UserRound, Users } from 'lucide-react';
+import { Activity, ClipboardList, LogOut, Stethoscope, UserCircle, UserRound, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
 import LanguageSwitcher from '../components/LanguageSwitcher';
@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { permissions } from '../utils/permissions';
 
-const Navbar = ({ onMenuClick }) => {
+const Navbar = () => {
   const { user, logout } = useAuth();
   const { t } = useLanguage();
   const navigate = useNavigate();
@@ -26,9 +26,6 @@ const Navbar = ({ onMenuClick }) => {
   return (
     <header className="sticky top-0 z-20 flex min-h-24 items-center justify-between gap-4 px-4 py-4 backdrop-blur lg:px-8">
       <div className="flex items-center gap-3">
-        <Button variant="ghost" className="hidden h-10 w-10 px-0 lg:inline-flex" onClick={onMenuClick} aria-label="Open navigation">
-          <Menu size={20} />
-        </Button>
         <button type="button" onClick={() => navigate(homePath)} className="flex items-center gap-3 text-left">
           <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-500 to-primary-700 text-white shadow-panel sm:h-16 sm:w-16">
             <Activity size={28} />
