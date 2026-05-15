@@ -26,7 +26,7 @@ const Navbar = ({ onMenuClick }) => {
   return (
     <header className="sticky top-0 z-20 flex min-h-24 items-center justify-between gap-4 px-4 py-4 backdrop-blur lg:px-8">
       <div className="flex items-center gap-3">
-        <Button variant="ghost" className="h-10 w-10 px-0 lg:hidden" onClick={onMenuClick} aria-label="Open navigation">
+        <Button variant="ghost" className="hidden h-10 w-10 px-0 lg:inline-flex" onClick={onMenuClick} aria-label="Open navigation">
           <Menu size={20} />
         </Button>
         <button type="button" onClick={() => navigate(homePath)} className="flex items-center gap-3 text-left">
