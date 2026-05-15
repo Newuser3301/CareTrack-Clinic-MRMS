@@ -11,13 +11,14 @@ import SearchBar from '../../components/SearchBar';
 import Table from '../../components/Table';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
+import { translations } from '../../i18n/translations';
 import { permissions } from '../../utils/permissions';
 import { toI18nKey } from '../../utils/i18nKeys';
 import DoctorForm from './DoctorForm';
 
 const DoctorsList = () => {
   const { user } = useAuth();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const role = user?.role;
   const [doctors, setDoctors] = useState([]);
   const [search, setSearch] = useState('');
@@ -30,14 +31,35 @@ const DoctorsList = () => {
   const [modal, setModal] = useState({ open: false, doctor: null });
   const [confirm, setConfirm] = useState(null);
 
+  const canonicalizeFilter = (dictionary, value) => {
+    const input = (value || '').trim();
+    if (!input) return undefined;
+    if (language === 'en') return input;
+
+    const langMap = translations?.[language]?.[dictionary];
+    const enMap = translations?.en?.[dictionary];
+    if (!langMap || !enMap) return input;
+
+    const inputLower = input.toLowerCase();
+    const candidates = Object.entries(langMap)
+      .filter(([, label]) => String(label).toLowerCase().includes(inputLower))
+      .map(([key]) => key);
+
+    if (!candidates.length) return input;
+
+    const exactKey = candidates.find((key) => String(langMap[key]).toLowerCase() === inputLower);
+    const key = exactKey || candidates[0];
+    return enMap[key] || input;
+  };
+
   const loadDoctors = async () => {
     setLoading(true);
     try {
       const { data } = await api.get('/doctors', {
         params: {
           search: search || undefined,
-          specialty: specialty || undefined,
-          department: department || undefined,
+          specialty: canonicalizeFilter('specialties', specialty),
+          department: canonicalizeFilter('departments', department),
           availability: availability || undefined
         }
       });
