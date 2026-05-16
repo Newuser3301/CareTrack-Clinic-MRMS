@@ -48,6 +48,10 @@ export const translations = {
       unableToSave: 'Saqlab bo‘lmadi.',
       unableToDelete: 'O‘chirib bo‘lmadi.'
     },
+    footer: {
+      rightsReserved: 'Barcha huquqlar himoyalangan.',
+      tagline: 'Medical Records Management System'
+    },
     actions: {
       view: "Ko'rish",
       edit: "Tahrirlash",
@@ -266,6 +270,10 @@ export const translations = {
       forbiddenText: 'Your account does not have permission to open this page.',
       backToDashboard: 'Back to dashboard',
       pageMissing: 'The page you requested does not exist.'
+    },
+    footer: {
+      rightsReserved: 'All rights reserved.',
+      tagline: 'Medical Records Management System'
     },
     roles: { super_admin: 'Super Admin', admin: 'Admin', doctor: 'Doctor', clinician: 'Clinician', receptionist: 'Receptionist', patient: 'Patient' },
     common: {
@@ -495,6 +503,10 @@ export const translations = {
       forbiddenText: 'У вашей учетной записи нет доступа к этой странице.',
       backToDashboard: 'Вернуться на панель',
       pageMissing: 'Запрошенная страница не существует.'
+    },
+    footer: {
+      rightsReserved: 'Все права защищены.',
+      tagline: 'Medical Records Management System'
     },
     roles: { super_admin: 'Супер админ', admin: 'Админ', doctor: 'Врач', clinician: 'Клиницист', receptionist: 'Регистратор', patient: 'Пациент' },
     common: {
