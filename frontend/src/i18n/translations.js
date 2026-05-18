@@ -67,7 +67,35 @@ export const translations = {
       profileSubtitle: "Bemor profili va bog'langan tibbiy yozuvlar.",
       addDiagnosis: "Tashxis qo'shish",
       noDiagnoses: 'Bu bemor uchun tashxislar topilmadi.',
-      allAssignedDoctors: 'Barcha biriktirilgan shifokorlar'
+      allAssignedDoctors: 'Barcha biriktirilgan shifokorlar',
+      patientInfo: 'Bemor ma’lumotlari',
+      sections: {
+        diagnoses: 'Tashxislar',
+        latestObservations: 'So‘nggi kuzatuvlar',
+        healthTrend: 'Sog‘liq trendi (qisqa)',
+        weightGraph: 'Vazn grafigi',
+        vitals: 'VITALS',
+        appointments: 'Qabul va uchrashuvlar',
+        recentVisits: 'So‘nggi tashriflar',
+        family: 'Oila anamnezi',
+        conditions: 'Holatlar',
+        attachments: 'Ilovalar',
+        allergies: 'Allergiyalar'
+      },
+      labels: {
+        noneLastDays: "Oxirgi {days} kunda yo‘q",
+        lastVitals: 'Oxirgi vitals',
+        calculatedBmi: 'Hisoblangan BMI',
+        bloodPressure: 'Qon bosimi',
+        pulse: 'Puls',
+        respiratoryRate: 'Nafas olish tezligi',
+        spo2: 'SpO2',
+        weightKg: 'Vazn (kg)',
+        heightCm: 'Bo‘y (cm)',
+        temperatureC: 'Harorat (°C)',
+        systolic: 'Sistolik bosim',
+        diastolic: 'Diastolik bosim'
+      }
     },
     placeholders: {
       specialtyExample: 'Kardiologiya',
@@ -312,7 +340,35 @@ export const translations = {
       profileSubtitle: 'Patient profile and linked medical records.',
       addDiagnosis: 'Add diagnosis',
       noDiagnoses: 'No diagnoses linked to this patient.',
-      allAssignedDoctors: 'All assigned doctors'
+      allAssignedDoctors: 'All assigned doctors',
+      patientInfo: 'Patient info',
+      sections: {
+        diagnoses: 'Diagnoses',
+        latestObservations: 'Latest observations',
+        healthTrend: 'Health trend summary',
+        weightGraph: 'Weight graph',
+        vitals: 'Vitals',
+        appointments: 'Appointments',
+        recentVisits: 'Recent visits',
+        family: 'Family history',
+        conditions: 'Conditions',
+        attachments: 'Attachments',
+        allergies: 'Allergies'
+      },
+      labels: {
+        noneLastDays: 'None in the last {days} days',
+        lastVitals: 'Last vitals',
+        calculatedBmi: 'Calculated BMI',
+        bloodPressure: 'Blood pressure',
+        pulse: 'Pulse',
+        respiratoryRate: 'Respiratory rate',
+        spo2: 'SpO2',
+        weightKg: 'Weight (kg)',
+        heightCm: 'Height (cm)',
+        temperatureC: 'Temperature (°C)',
+        systolic: 'Systolic BP',
+        diastolic: 'Diastolic BP'
+      }
     },
     placeholders: { specialtyExample: 'Cardiology', departmentExample: 'Heart Care', availabilityExample: 'Mon, 09:00' },
     specialties: {
@@ -545,7 +601,35 @@ export const translations = {
       profileSubtitle: 'Профиль пациента и связанные медицинские записи.',
       addDiagnosis: 'Добавить диагноз',
       noDiagnoses: 'Для этого пациента нет диагнозов.',
-      allAssignedDoctors: 'Все назначенные врачи'
+      allAssignedDoctors: 'Все назначенные врачи',
+      patientInfo: 'Данные пациента',
+      sections: {
+        diagnoses: 'Диагнозы',
+        latestObservations: 'Последние наблюдения',
+        healthTrend: 'Сводка динамики',
+        weightGraph: 'График веса',
+        vitals: 'Показатели',
+        appointments: 'Приёмы',
+        recentVisits: 'Недавние визиты',
+        family: 'Семейный анамнез',
+        conditions: 'Состояния',
+        attachments: 'Вложения',
+        allergies: 'Аллергии'
+      },
+      labels: {
+        noneLastDays: 'Нет за последние {days} дней',
+        lastVitals: 'Последние показатели',
+        calculatedBmi: 'Расчётный ИМТ',
+        bloodPressure: 'Артериальное давление',
+        pulse: 'Пульс',
+        respiratoryRate: 'Частота дыхания',
+        spo2: 'SpO2',
+        weightKg: 'Вес (кг)',
+        heightCm: 'Рост (см)',
+        temperatureC: 'Температура (°C)',
+        systolic: 'Систолическое АД',
+        diastolic: 'Диастолическое АД'
+      }
     },
     placeholders: { specialtyExample: 'Кардиология', departmentExample: 'Кардио отделение', availabilityExample: 'Пн, 09:00' },
     specialties: {

@@ -3,6 +3,7 @@ const Patient = require('../models/Patient');
 const Diagnosis = require('../models/Diagnosis');
 const User = require('../models/User');
 const { ensurePatientAccess, getVisiblePatientFilter } = require('../utils/rbac');
+const { buildClinicalFromPatient } = require('../utils/clinicalMock');
 
 const handleValidation = (req, res, next) => {
   const errors = validationResult(req);
@@ -149,7 +150,9 @@ const getPatientProfile = async (req, res, next) => {
       .populate('createdBy', 'name role')
       .sort({ diagnosedDate: -1 });
 
-    res.json({ patient, diagnoses });
+    const clinical = buildClinicalFromPatient(patient, diagnoses);
+
+    res.json({ patient, diagnoses, clinical });
   } catch (error) {
     next(error);
   }
