@@ -7,6 +7,7 @@ const {
   updateDoctor,
   deleteDoctor
 } = require('../controllers/doctorController');
+const { getDoctorAvailableTimes } = require('../controllers/appointmentController');
 const { protect } = require('../middleware/authMiddleware');
 const { authorize } = require('../middleware/roleMiddleware');
 const { passwordPolicyMessage, validatePassword } = require('../utils/passwordPolicy');
@@ -31,6 +32,12 @@ const updateDoctorValidation = [
 ];
 
 router.use(protect);
+
+router.get(
+  '/:id/available-times',
+  authorize('super_admin', 'admin', 'doctor', 'patient', 'receptionist'),
+  getDoctorAvailableTimes
+);
 
 router
   .route('/')

@@ -4,7 +4,9 @@ import { ArrowLeft, Calendar, FileText, Plus, Stethoscope } from 'lucide-react';
 import api from '../../api/axios';
 import Badge from '../../components/Badge';
 import Button from '../../components/Button';
+import Input from '../../components/Input';
 import Loader from '../../components/Loader';
+import Select from '../../components/Select';
 import Table from '../../components/Table';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
@@ -105,11 +107,20 @@ const PatientProfile = () => {
   const { t } = useLanguage();
   const [profile, setProfile] = useState(null);
   const [error, setError] = useState('');
+  const [booking, setBooking] = useState({ date: '', time: '' });
+  const [availableTimes, setAvailableTimes] = useState([]);
+  const [timesLoading, setTimesLoading] = useState(false);
+  const [bookingSaving, setBookingSaving] = useState(false);
+  const [bookingError, setBookingError] = useState('');
+  const [bookingSuccess, setBookingSuccess] = useState('');
 
-  useEffect(() => {
+  const fetchProfile = () =>
     api.get(`/patients/${id}/profile`)
       .then(({ data }) => setProfile(data))
       .catch((err) => setError(err.response?.data?.message || t('common.loadingError')));
+
+  useEffect(() => {
+    fetchProfile();
   }, [id]);
 
   if (error) return <div className="rounded-md bg-red-50 p-4 text-red-700">{error}</div>;
@@ -123,12 +134,100 @@ const PatientProfile = () => {
   const age = patient?.dateOfBirth ? yearsBetween(patient.dateOfBirth, new Date()) : null;
 
   const now = new Date();
+  const todayLocal = (() => {
+    const d = new Date();
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  })();
+  const isWeekend = (dateStr) => {
+    if (!dateStr) return false;
+    const d = new Date(`${dateStr}T00:00:00`);
+    const day = d.getDay();
+    return day === 0 || day === 6;
+  };
+  const canBookAppointment = ['super_admin', 'admin', 'receptionist', 'patient'].includes(user?.role);
+  const assignedDoctorId = patient?.assignedDoctor?._id;
+
+  useEffect(() => {
+    const date = booking.date;
+    if (!date || !assignedDoctorId) {
+      setAvailableTimes([]);
+      return;
+    }
+
+    setBookingError('');
+    setBookingSuccess('');
+
+    if (isWeekend(date)) {
+      setAvailableTimes([]);
+      setBookingError(t('appointments.weekendError', 'Weekend kunlari bron qilish mumkin emas'));
+      return;
+    }
+
+    setTimesLoading(true);
+    api.get(`/doctors/${assignedDoctorId}/available-times`, { params: { date } })
+      .then(({ data }) => setAvailableTimes(data?.available_times || []))
+      .catch((err) => {
+        setAvailableTimes([]);
+        setBookingError(err.response?.data?.message || t('common.loadingError'));
+      })
+      .finally(() => setTimesLoading(false));
+  }, [booking.date, assignedDoctorId]);
   const diagnosesLast730 = (diagnoses || []).filter((d) => {
     const dt = new Date(d.diagnosedDate);
     if (Number.isNaN(dt.getTime())) return false;
     const days = Math.floor((now.getTime() - dt.getTime()) / (24 * 60 * 60 * 1000));
     return days >= 0 && days <= 730;
   }).length;
+
+  const submitAppointment = async (event) => {
+    event.preventDefault();
+    setBookingError('');
+    setBookingSuccess('');
+
+    if (!canBookAppointment) return;
+    if (!assignedDoctorId) {
+      setBookingError(t('appointments.noDoctor', 'Shifokor biriktirilmagan'));
+      return;
+    }
+    if (!booking.date) {
+      setBookingError(t('appointments.selectDate', 'Sanani tanlang'));
+      return;
+    }
+    if (booking.date < todayLocal) {
+      setBookingError(t('appointments.pastDateError', "O‘tib ketgan sanaga bron qilish mumkin emas"));
+      return;
+    }
+    if (isWeekend(booking.date)) {
+      setBookingError(t('appointments.weekendError', 'Weekend kunlari bron qilish mumkin emas'));
+      return;
+    }
+    if (!booking.time) {
+      setBookingError(t('appointments.selectTime', 'Vaqtni tanlang'));
+      return;
+    }
+
+    setBookingSaving(true);
+    try {
+      await api.post('/appointments', {
+        doctor_id: assignedDoctorId,
+        patient_id: patient._id,
+        date: booking.date,
+        time: booking.time
+      });
+      setBookingSuccess(t('appointments.booked', 'Bron qilindi'));
+      setBooking({ date: booking.date, time: '' });
+      await fetchProfile();
+      const { data } = await api.get(`/doctors/${assignedDoctorId}/available-times`, { params: { date: booking.date } });
+      setAvailableTimes(data?.available_times || []);
+    } catch (err) {
+      setBookingError(err.response?.data?.message || t('common.unableToSave'));
+    } finally {
+      setBookingSaving(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -250,6 +349,39 @@ const PatientProfile = () => {
           <div className="grid gap-4 md:grid-cols-2">
             <Card title={t('patients.sections.appointments')} icon={Calendar}>
               <div className="space-y-3">
+                {canBookAppointment && assignedDoctorId && (
+                  <form onSubmit={submitAppointment} className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <Input
+                        label={t('appointments.date', 'Sana')}
+                        type="date"
+                        min={todayLocal}
+                        value={booking.date}
+                        onChange={(e) => setBooking({ date: e.target.value, time: '' })}
+                      />
+                      <Select
+                        label={t('appointments.time', 'Vaqt')}
+                        value={booking.time}
+                        onChange={(e) => setBooking((prev) => ({ ...prev, time: e.target.value }))}
+                        placeholder={timesLoading ? t('appointments.loadingTimes', 'Vaqtlar yuklanmoqda...') : t('appointments.selectTime', 'Vaqtni tanlang')}
+                        disabled={!booking.date || timesLoading || isWeekend(booking.date) || !availableTimes.length}
+                        options={availableTimes.map((time) => ({ value: time, label: time }))}
+                      />
+                    </div>
+                    {bookingError && <div className="mt-3 rounded-md bg-red-50 p-2 text-sm text-red-700">{bookingError}</div>}
+                    {bookingSuccess && <div className="mt-3 rounded-md bg-emerald-50 p-2 text-sm text-emerald-800">{bookingSuccess}</div>}
+                    <div className="mt-3 flex items-center justify-between gap-3">
+                      <Button type="submit" disabled={bookingSaving || timesLoading || !booking.date || !booking.time}>
+                        {bookingSaving ? t('appointments.booking', 'Bron qilinmoqda...') : t('appointments.book', 'Bron qilish')}
+                      </Button>
+                      <div className="text-xs text-slate-500">
+                        {!timesLoading && booking.date && !isWeekend(booking.date) && !availableTimes.length
+                          ? t('appointments.noSlots', 'Bo‘sh vaqt topilmadi')
+                          : ''}
+                      </div>
+                    </div>
+                  </form>
+                )}
                 {(clinical?.appointments || []).map((appt) => (
                   <div key={appt.id} className="rounded-lg border border-slate-200 p-3">
                     <div className="flex items-center justify-between gap-2">

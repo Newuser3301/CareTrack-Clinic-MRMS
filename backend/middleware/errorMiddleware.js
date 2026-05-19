@@ -14,8 +14,14 @@ const errorHandler = (err, req, res, next) => {
 
   if (err.code === 11000) {
     statusCode = 409;
-    const field = Object.keys(err.keyValue || {})[0] || 'field';
-    message = `${field} already exists`;
+    const keys = Object.keys(err.keyPattern || err.keyValue || {});
+    const isAppointmentSlotDup = keys.includes('doctor') && keys.includes('date') && keys.includes('time');
+    if (isAppointmentSlotDup) {
+      message = 'Bu vaqt band';
+    } else {
+      const field = Object.keys(err.keyValue || {})[0] || 'field';
+      message = `${field} already exists`;
+    }
   }
 
   if (err.name === 'ValidationError') {

@@ -1,0 +1,39 @@
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const {
+  parseDoctorAvailability,
+  generateSlotsForDate,
+  isWeekendDate,
+  isPastDate
+} = require('../utils/appointmentSlots');
+
+test('parseDoctorAvailability supports ranges and lists', () => {
+  const range = parseDoctorAvailability('Mon-Fri 09:30-17:30');
+  assert.ok(range);
+  assert.equal(range.startMinutes, 9 * 60 + 30);
+  assert.equal(range.endMinutes, 17 * 60 + 30);
+  [1, 2, 3, 4, 5].forEach((d) => assert.equal(range.allowedDays.has(d), true));
+  [0, 6].forEach((d) => assert.equal(range.allowedDays.has(d), false));
+
+  const list = parseDoctorAvailability('Mon, Wed, Fri 09:00-15:00');
+  assert.ok(list);
+  [1, 3, 5].forEach((d) => assert.equal(list.allowedDays.has(d), true));
+  [0, 2, 4, 6].forEach((d) => assert.equal(list.allowedDays.has(d), false));
+});
+
+test('generateSlotsForDate returns half-hour slots in doctor window', () => {
+  const doctor = { availability: 'Mon-Fri 09:30-10:30' };
+  assert.deepEqual(generateSlotsForDate(doctor, '2026-05-19'), ['09:30', '10:00']);
+});
+
+test('weekend and past-date helpers behave for ISO dates', () => {
+  assert.equal(isWeekendDate('2026-05-23'), true); // Saturday
+  assert.equal(isWeekendDate('2026-05-24'), true); // Sunday
+  assert.equal(isWeekendDate('2026-05-19'), false); // Tuesday
+
+  const now = new Date('2026-05-19T12:00:00');
+  assert.equal(isPastDate('2026-05-18', now), true);
+  assert.equal(isPastDate('2026-05-19', now), false);
+  assert.equal(isPastDate('2026-05-20', now), false);
+});
+

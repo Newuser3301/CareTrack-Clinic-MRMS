@@ -2,8 +2,10 @@ const { validationResult } = require('express-validator');
 const Patient = require('../models/Patient');
 const Diagnosis = require('../models/Diagnosis');
 const User = require('../models/User');
+const Appointment = require('../models/Appointment');
 const { ensurePatientAccess, getVisiblePatientFilter } = require('../utils/rbac');
 const { buildClinicalFromPatient } = require('../utils/clinicalMock');
+const { toISODateLocal } = require('../utils/appointmentSlots');
 
 const handleValidation = (req, res, next) => {
   const errors = validationResult(req);
@@ -151,6 +153,19 @@ const getPatientProfile = async (req, res, next) => {
       .sort({ diagnosedDate: -1 });
 
     const clinical = buildClinicalFromPatient(patient, diagnoses);
+
+    const today = toISODateLocal(new Date());
+    const appointments = await Appointment.find({ patient: patient._id, status: 'scheduled', date: { $gte: today } })
+      .sort({ date: 1, time: 1 })
+      .limit(20);
+
+    clinical.appointments = appointments.map((appt) => ({
+      id: String(appt._id),
+      scheduledAt: new Date(`${appt.date}T${appt.time}:00`).toISOString(),
+      status: appt.status,
+      type: appt.type,
+      location: appt.location
+    }));
 
     res.json({ patient, diagnoses, clinical });
   } catch (error) {

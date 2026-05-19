@@ -12,6 +12,7 @@ const doctorRoutes = require('./routes/doctorRoutes');
 const patientRoutes = require('./routes/patientRoutes');
 const diagnosisRoutes = require('./routes/diagnosisRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
+const appointmentRoutes = require('./routes/appointmentRoutes');
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
 const { seedDatabase } = require('./seed/seedAdmin');
 const { bootstrapSuperAdmin } = require('./utils/bootstrapSuperAdmin');
@@ -106,6 +107,7 @@ app.use('/api/doctors', doctorRoutes);
 app.use('/api/patients', patientRoutes);
 app.use('/api/diagnoses', diagnosisRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/appointments', appointmentRoutes);
 
 const frontendBuildPath = path.join(__dirname, 'public');
 
