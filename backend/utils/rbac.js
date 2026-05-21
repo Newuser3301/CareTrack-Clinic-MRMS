@@ -14,6 +14,16 @@ const forbid = (res, message = 'Forbidden: insufficient permissions') => {
   throw new Error(message);
 };
 
+const toObjectIdString = (value) => {
+  if (!value) return null;
+  if (typeof value === 'string') return value;
+  if (typeof value === 'object') {
+    if (value._id) return String(value._id);
+    return String(value);
+  }
+  return String(value);
+};
+
 const getDoctorProfile = (userId) => Doctor.findOne({ user: userId });
 const getPatientProfile = (userId) => Patient.findOne({ user: userId });
 
@@ -46,10 +56,14 @@ const ensurePatientAccess = async (req, patient, res, { write = false } = {}) =>
 
   if (req.user.role === 'doctor') {
     const doctor = await getDoctorProfile(req.user._id);
-    if (doctor && patient.assignedDoctor?.toString() === doctor._id.toString()) return;
+    const assignedDoctorId = toObjectIdString(patient.assignedDoctor);
+    if (doctor && assignedDoctorId && assignedDoctorId === doctor._id.toString()) return;
   }
 
-  if (!write && req.user.role === 'patient' && patient.user?.toString() === req.user._id.toString()) return;
+  if (!write && req.user.role === 'patient') {
+    const patientUserId = toObjectIdString(patient.user);
+    if (patientUserId && patientUserId === req.user._id.toString()) return;
+  }
 
   forbid(res);
 };
