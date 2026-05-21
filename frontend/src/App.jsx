@@ -10,6 +10,10 @@ import DoctorDetails from './pages/doctors/DoctorDetails';
 import PatientsList from './pages/patients/PatientsList';
 import PatientProfile from './pages/patients/PatientProfile';
 import DiagnosesList from './pages/diagnoses/DiagnosesList';
+import ReferralsList from './pages/referrals/ReferralsList';
+import RegistrationsList from './pages/registrations/RegistrationsList';
+import EmergenciesList from './pages/emergencies/EmergenciesList';
+import DiagnosisReport from './pages/reports/DiagnosisReport';
 import UsersList from './pages/users/UsersList';
 import UserDetails from './pages/users/UserDetails';
 import NotFound from './pages/NotFound';
@@ -31,9 +35,19 @@ const App = () => (
         <Route element={<RoleRoute allowedRoles={['super_admin', 'admin', 'doctor', 'clinician', 'receptionist']} />}>
           <Route path="patients" element={<PatientsList />} />
           <Route path="patients/:id" element={<PatientProfile />} />
+          <Route path="patients/:id/report" element={<DiagnosisReport />} />
         </Route>
         <Route element={<RoleRoute allowedRoles={['super_admin', 'admin', 'doctor', 'clinician']} />}>
           <Route path="diagnoses" element={<DiagnosesList />} />
+        </Route>
+        <Route element={<RoleRoute allowedRoles={['super_admin', 'admin', 'doctor', 'clinician', 'receptionist', 'patient']} />}>
+          <Route path="referrals" element={<ReferralsList />} />
+        </Route>
+        <Route element={<RoleRoute allowedRoles={['super_admin', 'admin', 'receptionist']} />}>
+          <Route path="registrations" element={<RegistrationsList />} />
+        </Route>
+        <Route element={<RoleRoute allowedRoles={['super_admin', 'admin', 'doctor', 'clinician', 'receptionist', 'patient']} />}>
+          <Route path="emergencies" element={<EmergenciesList />} />
         </Route>
         <Route element={<RoleRoute allowedRoles={['super_admin', 'admin']} />}>
           <Route path="users" element={<UsersList />} />

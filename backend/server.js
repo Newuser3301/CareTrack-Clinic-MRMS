@@ -13,6 +13,10 @@ const patientRoutes = require('./routes/patientRoutes');
 const diagnosisRoutes = require('./routes/diagnosisRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const appointmentRoutes = require('./routes/appointmentRoutes');
+const referralRoutes = require('./routes/referralRoutes');
+const registrationRoutes = require('./routes/registrationRoutes');
+const emergencyRoutes = require('./routes/emergencyRoutes');
+const reportRoutes = require('./routes/reportRoutes');
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
 const { seedDatabase } = require('./seed/seedAdmin');
 const { bootstrapSuperAdmin } = require('./utils/bootstrapSuperAdmin');
@@ -108,6 +112,10 @@ app.use('/api/patients', patientRoutes);
 app.use('/api/diagnoses', diagnosisRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/appointments', appointmentRoutes);
+app.use('/api/referrals', referralRoutes);
+app.use('/api/registrations', registrationRoutes);
+app.use('/api/emergencies', emergencyRoutes);
+app.use('/api/reports', reportRoutes);
 
 const frontendBuildPath = path.join(__dirname, 'public');
 

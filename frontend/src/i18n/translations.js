@@ -12,6 +12,9 @@ export const translations = {
       doctors: 'Shifokorlar',
       patients: 'Bemorlar',
       diagnoses: 'Tashxislar',
+      referrals: 'Yo‘llanmalar',
+      registrations: 'Ro‘yxatga olish',
+      emergencies: 'Favqulodda',
       users: 'Foydalanuvchilar',
       mainMenu: 'Asosiy menyu',
       subtitle: 'Jonli klinika boshqaruv markazi',
@@ -215,6 +218,36 @@ export const translations = {
       averageDiagnosesPerPatientSuffix: "ta tashxis / bemor.",
       noDoctorAssigned: 'Shifokor biriktirilmagan',
       unassigned: 'Biriktirilmagan'
+    },
+    reports: {
+      diagnosis: 'Tashxis hisoboti',
+      generated: 'Yaratilgan',
+      print: 'Chop etish',
+      assignedDoctor: 'Biriktirilgan shifokor'
+    },
+    referrals: {
+      subtitle: 'Bo‘limlar o‘rtasida yo‘llanmalarni boshqarish.',
+      new: 'Yangi yo‘llanma',
+      priority: 'Ustuvorlik',
+      status: 'Holat'
+    },
+    registrations: {
+      subtitle: 'Yangi bemor ro‘yxatga olishlarini topshirish va ko‘rib chiqish.',
+      new: 'Yangi ariza',
+      status: 'Status',
+      approve: 'Tasdiqlash',
+      reject: 'Rad etish',
+      reason: 'Sabab',
+      emergencyContact: 'Favqulodda aloqa'
+    },
+    emergencies: {
+      subtitle: 'Ish vaqtidan tashqari favqulodda murojaatlar.',
+      new: 'Yangi murojaat',
+      update: 'Holatni yangilash',
+      status: 'Status',
+      subject: 'Mavzu',
+      message: 'Xabar',
+      resolution: 'Yakuniy izoh'
     },
     pages: {
       doctorsTitle: 'Shifokorlar',

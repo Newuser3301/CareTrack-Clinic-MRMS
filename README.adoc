@@ -154,6 +154,8 @@ Tizimdagi har bir inson login accountga ega:
 * Super Admin
 * Admin
 * Doctor
+* Clinician
+* Receptionist
 * Patient
 
 Har bir account quyidagilarni saqlaydi:
@@ -173,6 +175,10 @@ Tizim quyidagilarni boshqaradi:
 * doctors
 * patients
 * diagnoses
+* referrals (yo‘llanmalar)
+* patient registrations (intake arizalar)
+* emergency messages (after-hours murojaatlar)
+* diagnosis reports (printable hisobot)
 * users
 * dashboard statistics
 * account profile pages
@@ -216,6 +222,8 @@ Tizimdagi role enum:
 super_admin
 admin
 doctor
+clinician
+receptionist
 patient
 ----
 

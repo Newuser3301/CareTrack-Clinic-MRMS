@@ -252,6 +252,9 @@ const PatientProfile = () => {
               <Button><Plus size={16} />{t('patients.addDiagnosis')}</Button>
             </Link>
           )}
+          <Link to={`/patients/${patient._id}/report`}>
+            <Button variant="secondary"><FileText size={16} />{t('reports.diagnosis', 'Tashxis hisoboti')}</Button>
+          </Link>
           <Link to="/patients"><Button variant="secondary"><ArrowLeft size={16} />{t('common.back')}</Button></Link>
         </div>
       </div>

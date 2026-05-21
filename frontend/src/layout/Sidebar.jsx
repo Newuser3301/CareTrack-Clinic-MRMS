@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { Activity, ClipboardList, Stethoscope, Users, UserCircle, UserRound } from 'lucide-react';
+import { Activity, ClipboardList, FilePlus2, LifeBuoy, Share2, Stethoscope, Users, UserCircle, UserRound } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { permissions } from '../utils/permissions';
@@ -14,6 +14,9 @@ const Sidebar = ({ open, onClose }) => {
     { to: '/doctors', label: t('nav.doctors'), icon: Stethoscope, show: permissions.canViewDoctors(role) },
     { to: '/patients', label: t('nav.patients'), icon: UserRound, show: permissions.canViewPatients(role) },
     { to: '/diagnoses', label: t('nav.diagnoses'), icon: ClipboardList, show: permissions.canViewDiagnoses(role) },
+    { to: '/referrals', label: t('nav.referrals', 'Yo‘llanmalar'), icon: Share2, show: permissions.canViewReferrals(role) },
+    { to: '/registrations', label: t('nav.registrations', 'Ro‘yxatga olish'), icon: FilePlus2, show: permissions.canViewRegistrations(role) },
+    { to: '/emergencies', label: t('nav.emergencies', 'Favqulodda'), icon: LifeBuoy, show: permissions.canViewEmergencies(role) },
     { to: '/users', label: t('nav.users'), icon: Users, show: permissions.canManageUsers(role) }
   ].filter((item) => item.show);
 

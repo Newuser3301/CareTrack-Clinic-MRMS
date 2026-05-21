@@ -54,7 +54,11 @@ const auditLogger = (req, res, next) => {
     req.path.includes('/diagnoses') ||
     req.path.includes('/doctors') ||
     req.path.includes('/users') ||
-    req.path.includes('/auth');
+    req.path.includes('/auth') ||
+    req.path.includes('/referrals') ||
+    req.path.includes('/registrations') ||
+    req.path.includes('/emergencies') ||
+    req.path.includes('/reports');
 
   if (!shouldAudit) return next();
 
