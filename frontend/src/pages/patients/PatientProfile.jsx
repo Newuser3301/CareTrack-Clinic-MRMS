@@ -123,17 +123,6 @@ const PatientProfile = () => {
     fetchProfile();
   }, [id]);
 
-  if (error) return <div className="rounded-md bg-red-50 p-4 text-red-700">{error}</div>;
-  if (!profile) return <Loader />;
-
-  const { patient, diagnoses, clinical } = profile;
-  const latest = clinical?.latestVitals;
-  const trend = clinical?.trendSummary || [];
-  const weightSeries = (clinical?.vitalsHistory || []).map((v) => v.weightKg);
-  const lastVitalsAt = latest?.recordedAt ? formatDateTime(latest.recordedAt) : '-';
-  const age = patient?.dateOfBirth ? yearsBetween(patient.dateOfBirth, new Date()) : null;
-
-  const now = new Date();
   const todayLocal = (() => {
     const d = new Date();
     const yyyy = d.getFullYear();
@@ -148,12 +137,13 @@ const PatientProfile = () => {
     return day === 0 || day === 6;
   };
   const canBookAppointment = ['super_admin', 'admin', 'receptionist', 'patient'].includes(user?.role);
-  const assignedDoctorId = patient?.assignedDoctor?._id;
+  const assignedDoctorId = profile?.patient?.assignedDoctor?._id;
 
   useEffect(() => {
     const date = booking.date;
-    if (!date || !assignedDoctorId) {
+    if (error || !profile || !date || !assignedDoctorId) {
       setAvailableTimes([]);
+      setTimesLoading(false);
       return;
     }
 
@@ -174,7 +164,19 @@ const PatientProfile = () => {
         setBookingError(err.response?.data?.message || t('common.loadingError'));
       })
       .finally(() => setTimesLoading(false));
-  }, [booking.date, assignedDoctorId]);
+  }, [booking.date, assignedDoctorId, error, profile, t]);
+
+  if (error) return <div className="rounded-md bg-red-50 p-4 text-red-700">{error}</div>;
+  if (!profile) return <Loader />;
+
+  const { patient, diagnoses, clinical } = profile;
+  const latest = clinical?.latestVitals;
+  const trend = clinical?.trendSummary || [];
+  const weightSeries = (clinical?.vitalsHistory || []).map((v) => v.weightKg);
+  const lastVitalsAt = latest?.recordedAt ? formatDateTime(latest.recordedAt) : '-';
+  const age = patient?.dateOfBirth ? yearsBetween(patient.dateOfBirth, new Date()) : null;
+
+  const now = new Date();
   const diagnosesLast730 = (diagnoses || []).filter((d) => {
     const dt = new Date(d.diagnosedDate);
     if (Number.isNaN(dt.getTime())) return false;
