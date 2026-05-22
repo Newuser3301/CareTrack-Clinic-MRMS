@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Pencil, Plus, Trash2 } from 'lucide-react';
+import { FileDown, Pencil, Plus, Trash2 } from 'lucide-react';
 import api from '../../api/axios';
 import Button from '../../components/Button';
 import ConfirmDialog from '../../components/ConfirmDialog';
@@ -31,6 +31,13 @@ const ReferralsList = () => {
   const canCreate = permissions.canCreateReferral(role);
   const canEdit = permissions.canEditReferral(role);
   const canDelete = permissions.canDeleteReferral(role);
+  const escapeHtml = (value) =>
+    String(value ?? '')
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
 
   const loadReferrals = async () => {
     setLoading(true);
@@ -60,7 +67,7 @@ const ReferralsList = () => {
 
   useEffect(() => {
     loadLookups();
-  }, []);
+  }, [canCreate, canEdit]);
 
   useEffect(() => {
     const timer = setTimeout(loadReferrals, 250);
@@ -94,6 +101,62 @@ const ReferralsList = () => {
     }
   };
 
+  const exportPdf = () => {
+    const rows = items.map((item) => `
+      <tr>
+        <td>${escapeHtml(item.patient?.fullName || '-')}</td>
+        <td>${escapeHtml(item.toDepartment || '-')}</td>
+        <td>${escapeHtml(item.toDoctor?.fullName || '-')}</td>
+        <td>${escapeHtml(item.reason || '-')}</td>
+        <td>${escapeHtml(item.priority || '-')}</td>
+        <td>${escapeHtml(item.status || '-')}</td>
+        <td>${escapeHtml(item.createdAt ? new Date(item.createdAt).toLocaleDateString() : '-')}</td>
+      </tr>
+    `).join('');
+    const popup = window.open('', '_blank', 'width=1100,height=800');
+    if (!popup) return;
+
+    popup.document.write(`
+      <!doctype html>
+      <html>
+        <head>
+          <title>CareTrack Referrals</title>
+          <style>
+            body { font-family: Arial, sans-serif; color: #0f172a; padding: 32px; }
+            h1 { margin: 0 0 6px; font-size: 24px; }
+            p { margin: 0 0 24px; color: #64748b; }
+            table { border-collapse: collapse; width: 100%; font-size: 12px; }
+            th, td { border: 1px solid #dbeafe; padding: 10px; text-align: left; vertical-align: top; }
+            th { background: #e0f2fe; color: #075985; }
+            tr:nth-child(even) td { background: #f8fafc; }
+            @media print { body { padding: 18px; } button { display: none; } }
+          </style>
+        </head>
+        <body>
+          <button onclick="window.print()" style="float:right;padding:10px 16px;border:0;border-radius:999px;background:#075795;color:white;font-weight:700;">PDF / Print</button>
+          <h1>CareTrack Clinic - Yo'llanmalar</h1>
+          <p>Generated: ${escapeHtml(new Date().toLocaleString())}</p>
+          <table>
+            <thead>
+              <tr>
+                <th>Bemor</th>
+                <th>Bo'lim</th>
+                <th>Shifokor</th>
+                <th>Tavsif</th>
+                <th>Daraja</th>
+                <th>Holat</th>
+                <th>Sana</th>
+              </tr>
+            </thead>
+            <tbody>${rows || '<tr><td colspan="7">Yozuvlar topilmadi.</td></tr>'}</tbody>
+          </table>
+        </body>
+      </html>
+    `);
+    popup.document.close();
+    popup.focus();
+  };
+
   const statusOptions = useMemo(
     () => [
       { value: '', label: t('common.search', 'Barchasi') },
@@ -109,7 +172,10 @@ const ReferralsList = () => {
           <h1 className="text-2xl font-bold text-slate-900">{t('nav.referrals', 'Yo‘llanmalar')}</h1>
           <p className="text-sm text-slate-500">{t('referrals.subtitle', 'Bo‘limlar o‘rtasida yo‘llanmalarni boshqarish.')}</p>
         </div>
-        {canCreate && <Button onClick={() => setModal({ open: true, referral: null })}><Plus size={16} />{t('referrals.new', 'Yangi yo‘llanma')}</Button>}
+        <div className="flex flex-wrap gap-2">
+          <Button variant="secondary" onClick={exportPdf}><FileDown size={16} />PDF</Button>
+          {canCreate && <Button onClick={() => setModal({ open: true, referral: null })}><Plus size={16} />{t('referrals.new', 'Yangi yo‘llanma')}</Button>}
+        </div>
       </div>
 
       {error && <div className="rounded-md bg-red-50 p-3 text-sm text-red-700">{error}</div>}
@@ -163,4 +229,3 @@ const ReferralsList = () => {
 };
 
 export default ReferralsList;
-

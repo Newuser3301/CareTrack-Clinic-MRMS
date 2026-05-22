@@ -20,7 +20,18 @@ const ReferralForm = ({ patients = [], doctors = [], initialData, onSubmit, load
   });
 
   useEffect(() => {
-    if (!initialData) return;
+    if (!initialData) {
+      setForm({
+        patient: '',
+        toDoctor: '',
+        toDepartment: '',
+        reason: '',
+        notes: '',
+        priority: 'normal',
+        status: 'pending'
+      });
+      return;
+    }
     setForm({
       patient: initialData.patient?._id || '',
       toDoctor: initialData.toDoctor?._id || '',

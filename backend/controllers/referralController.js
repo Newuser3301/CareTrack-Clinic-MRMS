@@ -89,7 +89,7 @@ const createReferral = async (req, res, next) => {
       res.status(404);
       throw new Error('Patient not found');
     }
-    await ensurePatientAccess(req, patient, res, { write: true });
+    await ensurePatientAccess(req, patient, res);
 
     let fromDoctor = req.body.fromDoctor;
     if (!isSystemManager(req.user)) {
@@ -192,4 +192,3 @@ module.exports = {
   updateReferral,
   deleteReferral
 };
-
