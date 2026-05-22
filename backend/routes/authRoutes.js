@@ -9,6 +9,7 @@ const {
   changePassword,
   forgotPassword,
   resetPassword,
+  getSession,
   getMe
 } = require('../controllers/authController');
 const { protect } = require('../middleware/authMiddleware');
@@ -42,6 +43,7 @@ router.post(
 );
 
 router.post('/refresh', authLimiter, refresh);
+router.get('/session', getSession);
 router.post('/logout', protect, logout);
 router.post('/logout-all', protect, logoutAll);
 router.post(

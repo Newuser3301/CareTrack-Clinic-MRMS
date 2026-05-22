@@ -1,4 +1,5 @@
 const crypto = require('crypto');
+const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
 const User = require('../models/User');
 const RefreshSession = require('../models/RefreshSession');
@@ -153,6 +154,53 @@ const refresh = async (req, res, next) => {
   }
 };
 
+const rotateRefreshSession = async (req, res, token) => {
+  const session = await RefreshSession.findOne({
+    tokenHash: hashToken(token),
+    revokedAt: { $exists: false },
+    expiresAt: { $gt: new Date() }
+  }).populate('user');
+
+  if (!session || !session.user) return null;
+
+  session.revokedAt = new Date();
+  await session.save();
+  const access = await setAuthCookies(res, req, session.user);
+  return { user: session.user, accessToken: access.token };
+};
+
+const getSession = async (req, res, next) => {
+  try {
+    const accessToken = req.cookies?.accessToken || (req.headers.authorization?.startsWith('Bearer') ? req.headers.authorization.split(' ')[1] : null);
+
+    if (accessToken) {
+      try {
+        const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
+        const revoked = decoded.jti ? await RevokedToken.exists({ jti: decoded.jti }) : false;
+        const user = !revoked ? await User.findById(decoded.id).select('-password') : null;
+
+        if (user && (user.tokenVersion || 0) === (decoded.tokenVersion || 0)) {
+          return res.json({ user: publicUser(user) });
+        }
+      } catch {
+        // Fall through to refresh-token recovery.
+      }
+    }
+
+    if (req.cookies?.refreshToken) {
+      const refreshed = await rotateRefreshSession(req, res, req.cookies.refreshToken);
+      if (refreshed?.user) {
+        return res.json({ user: publicUser(refreshed.user), accessToken: refreshed.accessToken });
+      }
+    }
+
+    clearAuthCookies(res);
+    return res.json({ user: null });
+  } catch (error) {
+    return next(error);
+  }
+};
+
 const logout = async (req, res, next) => {
   try {
     if (req.cookies?.refreshToken) {
@@ -271,5 +319,6 @@ module.exports = {
   changePassword,
   forgotPassword,
   resetPassword,
+  getSession,
   getMe
 };

@@ -15,9 +15,16 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const loadUser = async () => {
       try {
-        const { data } = await api.get('/auth/me');
-        setUser(data.user);
-        localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+        const { data } = await api.get('/auth/session', { skipAuthRefresh: true });
+        if (data.accessToken) localStorage.setItem(TOKEN_KEY, data.accessToken);
+        if (data.user) {
+          setUser(data.user);
+          localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+        } else {
+          setUser(null);
+          localStorage.removeItem(USER_KEY);
+          localStorage.removeItem(TOKEN_KEY);
+        }
       } catch {
         setUser(null);
         localStorage.removeItem(USER_KEY);
