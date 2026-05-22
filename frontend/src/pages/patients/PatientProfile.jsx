@@ -49,27 +49,27 @@ const withVars = (template, vars) => {
 };
 
 const Stat = ({ label, value, suffix }) => (
-  <div className="rounded-lg border border-slate-200 bg-white px-4 py-3 shadow-sm">
-    <div className="text-xs font-medium text-slate-500">{label}</div>
+  <div className="rounded-lg border border-slate-200 bg-white px-4 py-3 shadow-sm dark:border-sky-900/70 dark:bg-slate-900/70">
+    <div className="text-xs font-medium text-slate-500 dark:text-slate-400">{label}</div>
     <div className="mt-1 flex items-baseline gap-1">
-      <div className="text-lg font-semibold text-slate-900">{value ?? '-'}</div>
-      {suffix && <div className="text-xs text-slate-500">{suffix}</div>}
+      <div className="text-lg font-semibold text-slate-900 dark:text-white">{value ?? '-'}</div>
+      {suffix && <div className="text-xs text-slate-500 dark:text-slate-400">{suffix}</div>}
     </div>
   </div>
 );
 
 const Card = ({ title, icon: Icon, subtitle, children, right }) => (
-  <section className="rounded-xl border border-slate-200 bg-white shadow-sm">
-    <div className="flex items-start justify-between gap-3 border-b border-slate-200 px-5 py-4">
+  <section className="rounded-xl border border-slate-200 bg-white shadow-sm dark:border-sky-900/70 dark:bg-slate-950/60">
+    <div className="flex items-start justify-between gap-3 border-b border-slate-200 px-5 py-4 dark:border-sky-900/70">
       <div className="flex items-start gap-3">
         {Icon && (
-          <div className="mt-0.5 rounded-lg bg-slate-50 p-2 text-slate-600">
+          <div className="mt-0.5 rounded-lg bg-slate-50 p-2 text-slate-600 dark:bg-slate-800 dark:text-sky-100">
             <Icon size={18} />
           </div>
         )}
         <div>
-          <h2 className="text-sm font-semibold text-slate-900">{title}</h2>
-          {subtitle && <p className="mt-0.5 text-xs text-slate-500">{subtitle}</p>}
+          <h2 className="text-sm font-semibold text-slate-900 dark:text-white">{title}</h2>
+          {subtitle && <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">{subtitle}</p>}
         </div>
       </div>
       {right}
@@ -241,12 +241,12 @@ const PatientProfile = ({ patientId, selfView = false }) => {
             {initials(patient.fullName)}
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">{patient.fullName}</h1>
-            <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-slate-600">
-              <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700">
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{patient.fullName}</h1>
+            <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
+              <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700 dark:bg-slate-800 dark:text-slate-200">
                 {t(`forms.${patient.gender}`, patient.gender)}{typeof age === 'number' ? ` • ${age}y` : ''}
               </span>
-              <span className="text-xs text-slate-500">{t('patients.profileSubtitle')}</span>
+              <span className="text-xs text-slate-500 dark:text-slate-400">{t('patients.profileSubtitle')}</span>
             </div>
           </div>
         </div>
@@ -284,11 +284,11 @@ const PatientProfile = ({ patientId, selfView = false }) => {
               />
               <Stat label={t('patients.labels.spo2')} value={latest?.spo2} suffix="%" />
             </div>
-            <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-3">
+            <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-3 dark:border-sky-900/70 dark:bg-slate-900/70">
               <div className="flex items-center justify-between gap-3">
                 <div>
-                  <div className="text-xs font-semibold text-slate-700">{t('patients.sections.weightGraph')}</div>
-                  <div className="mt-0.5 text-xs text-slate-500">Last {clinical?.vitalsHistory?.length || 0} days</div>
+                  <div className="text-xs font-semibold text-slate-700 dark:text-slate-200">{t('patients.sections.weightGraph')}</div>
+                  <div className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">Last {clinical?.vitalsHistory?.length || 0} days</div>
                 </div>
                 <div className="w-56">
                   <Sparkline values={weightSeries} />
@@ -304,8 +304,8 @@ const PatientProfile = ({ patientId, selfView = false }) => {
           >
             <div className="overflow-x-auto">
               <table className="min-w-full text-sm">
-                <thead className="text-xs uppercase text-slate-500">
-                  <tr className="border-b border-slate-200">
+                <thead className="text-xs uppercase text-slate-500 dark:text-slate-400">
+                  <tr className="border-b border-slate-200 dark:border-sky-900/70">
                     <th className="py-2 pr-4 text-left">{t('common.date')}</th>
                     <th className="py-2 pr-4 text-left">HR</th>
                     <th className="py-2 pr-4 text-left">Temp (°C)</th>
@@ -315,15 +315,15 @@ const PatientProfile = ({ patientId, selfView = false }) => {
                 <tbody>
                   {trend.map((row) => (
                     <tr key={row.date} className="border-b border-slate-100">
-                      <td className="py-2 pr-4 text-slate-700">{formatDate(row.date)}</td>
-                      <td className="py-2 pr-4 text-slate-700">{row.hr}</td>
-                      <td className="py-2 pr-4 text-slate-700">{row.tempC}</td>
-                      <td className="py-2 pr-4 text-slate-700">{row.weightKg}</td>
+                      <td className="py-2 pr-4 text-slate-700 dark:text-slate-200">{formatDate(row.date)}</td>
+                      <td className="py-2 pr-4 text-slate-700 dark:text-slate-200">{row.hr}</td>
+                      <td className="py-2 pr-4 text-slate-700 dark:text-slate-200">{row.tempC}</td>
+                      <td className="py-2 pr-4 text-slate-700 dark:text-slate-200">{row.weightKg}</td>
                     </tr>
                   ))}
                   {!trend.length && (
                     <tr>
-                      <td colSpan={4} className="py-6 text-center text-slate-500">{t('common.noRecords')}</td>
+                      <td colSpan={4} className="py-6 text-center text-slate-500 dark:text-slate-400">{t('common.noRecords')}</td>
                     </tr>
                   )}
                 </tbody>
@@ -336,7 +336,7 @@ const PatientProfile = ({ patientId, selfView = false }) => {
             icon={FileText}
             subtitle={withVars(t('patients.labels.noneLastDays'), { days: 730 })}
             right={(
-              <div className="text-xs font-medium text-slate-600">
+              <div className="text-xs font-medium text-slate-600 dark:text-slate-300">
                 {diagnosesLast730} / {(diagnoses || []).length}
               </div>
             )}
@@ -357,7 +357,7 @@ const PatientProfile = ({ patientId, selfView = false }) => {
             <Card title={t('patients.sections.appointments')} icon={Calendar}>
               <div className="space-y-3">
                 {canBookAppointment && assignedDoctorId && (
-                  <form onSubmit={submitAppointment} className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                  <form onSubmit={submitAppointment} className="rounded-lg border border-slate-200 bg-slate-50 p-3 dark:border-sky-900/70 dark:bg-slate-900/70">
                     <div className="grid gap-3 sm:grid-cols-2">
                       <Input
                         label={t('appointments.date', 'Sana')}
@@ -381,7 +381,7 @@ const PatientProfile = ({ patientId, selfView = false }) => {
                       <Button type="submit" disabled={bookingSaving || timesLoading || !booking.date || !booking.time}>
                         {bookingSaving ? t('appointments.booking', 'Bron qilinmoqda...') : t('appointments.book', 'Bron qilish')}
                       </Button>
-                      <div className="text-xs text-slate-500">
+                      <div className="text-xs text-slate-500 dark:text-slate-400">
                         {!timesLoading && booking.date && !isWeekend(booking.date) && !availableTimes.length
                           ? t('appointments.noSlots', 'Bo‘sh vaqt topilmadi')
                           : ''}
@@ -390,34 +390,34 @@ const PatientProfile = ({ patientId, selfView = false }) => {
                   </form>
                 )}
                 {(clinical?.appointments || []).map((appt) => (
-                  <div key={appt.id} className="rounded-lg border border-slate-200 p-3">
+                  <div key={appt.id} className="rounded-lg border border-slate-200 p-3 dark:border-sky-900/70">
                     <div className="flex items-center justify-between gap-2">
-                      <div className="text-sm font-semibold text-slate-900">{appt.type}</div>
+                      <div className="text-sm font-semibold text-slate-900 dark:text-white">{appt.type}</div>
                       <Badge tone={appt.status === 'cancelled' ? 'high' : 'low'}>
                         {appt.status}
                       </Badge>
                     </div>
-                    <div className="mt-1 text-xs text-slate-600">{formatDateTime(appt.scheduledAt)} • {appt.location}</div>
+                    <div className="mt-1 text-xs text-slate-600 dark:text-slate-300">{formatDateTime(appt.scheduledAt)} • {appt.location}</div>
                   </div>
                 ))}
-                {!(clinical?.appointments || []).length && <div className="text-sm text-slate-500">{t('common.noRecords')}</div>}
+                {!(clinical?.appointments || []).length && <div className="text-sm text-slate-500 dark:text-slate-400">{t('common.noRecords')}</div>}
               </div>
             </Card>
 
             <Card title={t('patients.sections.recentVisits')} icon={Stethoscope}>
               <div className="space-y-3">
                 {(clinical?.visits || []).slice(0, 6).map((v) => (
-                  <div key={v.id} className="rounded-lg border border-slate-200 p-3">
+                  <div key={v.id} className="rounded-lg border border-slate-200 p-3 dark:border-sky-900/70">
                     <div className="flex items-start justify-between gap-2">
                       <div>
-                        <div className="text-sm font-semibold text-slate-900">{v.type}</div>
-                        <div className="mt-0.5 text-xs text-slate-600">{v.note}</div>
+                        <div className="text-sm font-semibold text-slate-900 dark:text-white">{v.type}</div>
+                        <div className="mt-0.5 text-xs text-slate-600 dark:text-slate-300">{v.note}</div>
                       </div>
-                      <div className="text-xs text-slate-500">{formatDateTime(v.occurredAt)}</div>
+                      <div className="text-xs text-slate-500 dark:text-slate-400">{formatDateTime(v.occurredAt)}</div>
                     </div>
                   </div>
                 ))}
-                {!(clinical?.visits || []).length && <div className="text-sm text-slate-500">{t('common.noRecords')}</div>}
+                {!(clinical?.visits || []).length && <div className="text-sm text-slate-500 dark:text-slate-400">{t('common.noRecords')}</div>}
               </div>
             </Card>
           </div>
@@ -425,34 +425,34 @@ const PatientProfile = ({ patientId, selfView = false }) => {
 
         <div className="space-y-4 lg:col-span-4">
           <Card title={t('patients.patientInfo')} icon={Stethoscope}>
-            <div className="space-y-2 text-sm text-slate-700">
+            <div className="space-y-2 text-sm text-slate-700 dark:text-slate-200">
               <div className="flex items-center justify-between gap-3">
-                <span className="text-slate-500">{t('forms.dateOfBirth')}</span>
+                <span className="text-slate-500 dark:text-slate-400">{t('forms.dateOfBirth')}</span>
                 <span className="font-medium">{formatDate(patient.dateOfBirth)}</span>
               </div>
               <div className="flex items-center justify-between gap-3">
-                <span className="text-slate-500">{t('common.phone')}</span>
+                <span className="text-slate-500 dark:text-slate-400">{t('common.phone')}</span>
                 <span className="font-medium">{patient.phone || '-'}</span>
               </div>
               <div className="flex items-center justify-between gap-3">
-                <span className="text-slate-500">{t('forms.emergencyContact')}</span>
+                <span className="text-slate-500 dark:text-slate-400">{t('forms.emergencyContact')}</span>
                 <span className="font-medium">{patient.emergencyContact || '-'}</span>
               </div>
-              <div className="pt-2 text-xs text-slate-500">{t('common.address')}</div>
-              <div className="text-sm font-medium text-slate-700">{patient.address || '-'}</div>
+              <div className="pt-2 text-xs text-slate-500 dark:text-slate-400">{t('common.address')}</div>
+              <div className="text-sm font-medium text-slate-700 dark:text-slate-200">{patient.address || '-'}</div>
             </div>
           </Card>
 
           <Card title={t('forms.assignedDoctor')} icon={Stethoscope}>
-            <div className="space-y-2 text-sm text-slate-700">
+            <div className="space-y-2 text-sm text-slate-700 dark:text-slate-200">
               <div className="font-medium">
                 {patient.assignedDoctor?._id ? (
-                  <Link to={`/doctors/${patient.assignedDoctor._id}`} className="text-primary-700 hover:underline">
+                  <Link to={`/doctors/${patient.assignedDoctor._id}`} className="text-primary-700 hover:underline dark:text-sky-200">
                     {patient.assignedDoctor.fullName}
                   </Link>
                 ) : '-'}
               </div>
-              <div className="text-xs text-slate-500">
+              <div className="text-xs text-slate-500 dark:text-slate-400">
                 {patient.assignedDoctor?.specialty ? t(`specialties.${toI18nKey(patient.assignedDoctor.specialty)}`, patient.assignedDoctor.specialty) : '-'}
                 {' • '}
                 {patient.assignedDoctor?.department ? t(`departments.${toI18nKey(patient.assignedDoctor.department)}`, patient.assignedDoctor.department) : '-'}
@@ -463,65 +463,65 @@ const PatientProfile = ({ patientId, selfView = false }) => {
           <Card title={t('patients.sections.conditions')} icon={Stethoscope}>
             <div className="flex flex-wrap gap-2">
               {(clinical?.conditions || []).map((c) => (
-                <span key={c.id} className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-medium text-slate-700">
+                <span key={c.id} className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-medium text-slate-700 dark:border-sky-900/70 dark:bg-slate-800 dark:text-slate-100">
                   {c.icdCode ? `${c.icdCode} • ` : ''}{c.label}
                 </span>
               ))}
-              {!(clinical?.conditions || []).length && <div className="text-sm text-slate-500">{t('common.noRecords')}</div>}
+              {!(clinical?.conditions || []).length && <div className="text-sm text-slate-500 dark:text-slate-400">{t('common.noRecords')}</div>}
             </div>
           </Card>
 
           <Card title={t('patients.sections.allergies')} icon={Stethoscope}>
             <div className="space-y-3">
               {(clinical?.allergies || []).map((a) => (
-                <div key={a.id} className="rounded-lg border border-slate-200 p-3">
+                <div key={a.id} className="rounded-lg border border-slate-200 p-3 dark:border-sky-900/70">
                   <div className="flex items-center justify-between gap-2">
-                    <div className="text-sm font-semibold text-slate-900">{a.substance}</div>
+                    <div className="text-sm font-semibold text-slate-900 dark:text-white">{a.substance}</div>
                     <Badge tone={a.severity === 'high' ? 'high' : 'medium'}>{a.severity}</Badge>
                   </div>
-                  <div className="mt-1 text-xs text-slate-600">{(a.reactions || []).join(' , ')}</div>
-                  <div className="mt-1 text-xs text-slate-500">{formatDate(a.notedAt)}</div>
+                  <div className="mt-1 text-xs text-slate-600 dark:text-slate-300">{(a.reactions || []).join(' , ')}</div>
+                  <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">{formatDate(a.notedAt)}</div>
                 </div>
               ))}
-              {!(clinical?.allergies || []).length && <div className="text-sm text-slate-500">{t('common.noRecords')}</div>}
+              {!(clinical?.allergies || []).length && <div className="text-sm text-slate-500 dark:text-slate-400">{t('common.noRecords')}</div>}
             </div>
           </Card>
 
           <Card title={t('patients.sections.family')} icon={Stethoscope}>
             <div className="space-y-3 text-sm">
               {(clinical?.familyHistory || []).map((f) => (
-                <div key={f.id} className="rounded-lg border border-slate-200 p-3">
-                  <div className="font-semibold text-slate-900">{f.relation}</div>
-                  <div className="mt-0.5 text-xs text-slate-600">{f.condition}{f.onsetAge ? ` • onset ~${f.onsetAge}y` : ''}</div>
+                <div key={f.id} className="rounded-lg border border-slate-200 p-3 dark:border-sky-900/70">
+                  <div className="font-semibold text-slate-900 dark:text-white">{f.relation}</div>
+                  <div className="mt-0.5 text-xs text-slate-600 dark:text-slate-300">{f.condition}{f.onsetAge ? ` • onset ~${f.onsetAge}y` : ''}</div>
                 </div>
               ))}
-              {!(clinical?.familyHistory || []).length && <div className="text-sm text-slate-500">{t('common.noRecords')}</div>}
+              {!(clinical?.familyHistory || []).length && <div className="text-sm text-slate-500 dark:text-slate-400">{t('common.noRecords')}</div>}
             </div>
           </Card>
 
           <Card title={t('patients.sections.attachments')} icon={FileText}>
             <div className="space-y-2 text-sm">
               {(clinical?.attachments || []).map((att) => (
-                <div key={att.id} className="flex items-center justify-between gap-3 rounded-lg border border-slate-200 p-3">
+                <div key={att.id} className="flex items-center justify-between gap-3 rounded-lg border border-slate-200 p-3 dark:border-sky-900/70">
                   <div className="min-w-0">
-                    <div className="truncate font-medium text-slate-900">{att.name}</div>
-                    <div className="mt-0.5 text-xs text-slate-500">{att.type} • {att.sizeKb}KB • {formatDate(att.uploadedAt)}</div>
+                    <div className="truncate font-medium text-slate-900 dark:text-white">{att.name}</div>
+                    <div className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">{att.type} • {att.sizeKb}KB • {formatDate(att.uploadedAt)}</div>
                   </div>
-                  <div className="text-slate-400">
+                  <div className="text-slate-400 dark:text-slate-500">
                     <FileText size={16} />
                   </div>
                 </div>
               ))}
-              {!(clinical?.attachments || []).length && <div className="text-sm text-slate-500">{t('common.noRecords')}</div>}
+              {!(clinical?.attachments || []).length && <div className="text-sm text-slate-500 dark:text-slate-400">{t('common.noRecords')}</div>}
             </div>
           </Card>
 
-          <div className="rounded-xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white px-5 py-4 shadow-sm">
-            <div className="flex items-center gap-2 text-xs font-semibold text-slate-700">
+          <div className="rounded-xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white px-5 py-4 shadow-sm dark:border-sky-900/70 dark:from-slate-950/70 dark:to-slate-900/70">
+            <div className="flex items-center gap-2 text-xs font-semibold text-slate-700 dark:text-slate-200">
               <Calendar size={14} />
               <span>{t('patients.sections.latestObservations')}</span>
             </div>
-            <div className="mt-2 text-xs text-slate-600">
+            <div className="mt-2 text-xs text-slate-600 dark:text-slate-300">
               {latest ? (
                 <>
                   {t('patients.labels.weightKg')}: <span className="font-semibold">{latest.weightKg}</span> •{' '}
