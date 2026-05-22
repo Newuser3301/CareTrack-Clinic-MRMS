@@ -26,7 +26,7 @@ const ReferralForm = ({ patients = [], doctors = [], initialData, onSubmit, load
       toDoctor: initialData.toDoctor?._id || '',
       toDepartment: initialData.toDepartment || '',
       reason: initialData.reason || '',
-      notes: initialData.notes || '',
+      notes: '',
       priority: initialData.priority || 'normal',
       status: initialData.status || 'pending'
     });
@@ -48,7 +48,7 @@ const ReferralForm = ({ patients = [], doctors = [], initialData, onSubmit, load
       toDoctor: form.toDoctor || undefined,
       toDepartment: form.toDepartment || '',
       reason: form.reason,
-      notes: form.notes || '',
+      notes: '',
       priority: form.priority,
       status: form.status
     });
@@ -76,17 +76,15 @@ const ReferralForm = ({ patients = [], doctors = [], initialData, onSubmit, load
         onChange={(event) => setForm((s) => ({ ...s, toDepartment: event.target.value }))}
         placeholder={t('placeholders.departmentExample')}
       />
-      <Input
-        label={t('common.description', 'Sabab')}
-        value={form.reason}
-        onChange={(event) => setForm((s) => ({ ...s, reason: event.target.value }))}
-        required
-      />
-      <Input
-        label={t('diagnoses.notes', 'Izoh')}
-        value={form.notes}
-        onChange={(event) => setForm((s) => ({ ...s, notes: event.target.value }))}
-      />
+      <label className="block">
+        <span className="mb-2 block text-sm font-extrabold text-slate-600">{t('common.description', 'Tavsif')}</span>
+        <textarea
+          className="focus-ring min-h-32 w-full rounded-[1.15rem] border border-sky-100 bg-white/95 px-4 py-3 text-sm font-semibold text-slate-900 shadow-sm placeholder:text-slate-400"
+          value={form.reason}
+          onChange={(event) => setForm((s) => ({ ...s, reason: event.target.value }))}
+          required
+        />
+      </label>
       <div className="grid gap-3 sm:grid-cols-2">
         <Select
           label={t('common.severity', 'Ustuvorlik')}
@@ -110,4 +108,3 @@ const ReferralForm = ({ patients = [], doctors = [], initialData, onSubmit, load
 };
 
 export default ReferralForm;
-
