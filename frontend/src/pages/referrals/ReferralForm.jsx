@@ -54,15 +54,16 @@ const ReferralForm = ({ patients = [], doctors = [], initialData, onSubmit, load
 
   const submit = (event) => {
     event.preventDefault();
-    onSubmit({
+    const payload = {
       patient: form.patient,
-      toDoctor: form.toDoctor || undefined,
       toDepartment: form.toDepartment || '',
       reason: form.reason,
       notes: '',
-      priority: form.priority,
-      status: form.status
-    });
+      priority: form.priority
+    };
+    if (form.toDoctor) payload.toDoctor = form.toDoctor;
+    if (initialData) payload.status = form.status;
+    onSubmit(payload);
   };
 
   return (
@@ -103,12 +104,14 @@ const ReferralForm = ({ patients = [], doctors = [], initialData, onSubmit, load
           onChange={(event) => setForm((s) => ({ ...s, priority: event.target.value }))}
           options={priorities.map((p) => ({ value: p, label: p }))}
         />
-        <Select
-          label={t('common.actions', 'Holat')}
-          value={form.status}
-          onChange={(event) => setForm((s) => ({ ...s, status: event.target.value }))}
-          options={statuses.map((s) => ({ value: s, label: s }))}
-        />
+        {initialData && (
+          <Select
+            label={t('common.actions', 'Holat')}
+            value={form.status}
+            onChange={(event) => setForm((s) => ({ ...s, status: event.target.value }))}
+            options={statuses.map((s) => ({ value: s, label: s }))}
+          />
+        )}
       </div>
       <div className="flex justify-end gap-2">
         <Button type="button" variant="secondary" onClick={onCancel}>{t('common.cancel')}</Button>
