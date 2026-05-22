@@ -5,7 +5,6 @@ import Select from '../../components/Select';
 import { useLanguage } from '../../context/LanguageContext';
 
 const priorities = ['low', 'normal', 'high', 'urgent'];
-const statuses = ['pending', 'accepted', 'rejected', 'completed', 'cancelled'];
 
 const ReferralForm = ({ patients = [], doctors = [], initialData, onSubmit, loading, onCancel }) => {
   const { t } = useLanguage();
@@ -15,8 +14,7 @@ const ReferralForm = ({ patients = [], doctors = [], initialData, onSubmit, load
     toDepartment: '',
     reason: '',
     notes: '',
-    priority: 'normal',
-    status: 'pending'
+    priority: 'normal'
   });
 
   useEffect(() => {
@@ -27,8 +25,7 @@ const ReferralForm = ({ patients = [], doctors = [], initialData, onSubmit, load
         toDepartment: '',
         reason: '',
         notes: '',
-        priority: 'normal',
-        status: 'pending'
+        priority: 'normal'
       });
       return;
     }
@@ -38,8 +35,7 @@ const ReferralForm = ({ patients = [], doctors = [], initialData, onSubmit, load
       toDepartment: initialData.toDepartment || '',
       reason: initialData.reason || '',
       notes: '',
-      priority: initialData.priority || 'normal',
-      status: initialData.status || 'pending'
+      priority: initialData.priority || 'normal'
     });
   }, [initialData, patients]);
 
@@ -62,7 +58,6 @@ const ReferralForm = ({ patients = [], doctors = [], initialData, onSubmit, load
       priority: form.priority
     };
     if (form.toDoctor) payload.toDoctor = form.toDoctor;
-    if (initialData) payload.status = form.status;
     onSubmit(payload);
   };
 
@@ -104,14 +99,6 @@ const ReferralForm = ({ patients = [], doctors = [], initialData, onSubmit, load
           onChange={(event) => setForm((s) => ({ ...s, priority: event.target.value }))}
           options={priorities.map((p) => ({ value: p, label: p }))}
         />
-        {initialData && (
-          <Select
-            label={t('common.actions', 'Holat')}
-            value={form.status}
-            onChange={(event) => setForm((s) => ({ ...s, status: event.target.value }))}
-            options={statuses.map((s) => ({ value: s, label: s }))}
-          />
-        )}
       </div>
       <div className="flex justify-end gap-2">
         <Button type="button" variant="secondary" onClick={onCancel}>{t('common.cancel')}</Button>

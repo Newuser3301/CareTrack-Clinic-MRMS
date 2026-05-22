@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FileDown, Pencil, Plus, Trash2 } from 'lucide-react';
 import api from '../../api/axios';
 import Button from '../../components/Button';
@@ -6,7 +6,6 @@ import ConfirmDialog from '../../components/ConfirmDialog';
 import Loader from '../../components/Loader';
 import Modal from '../../components/Modal';
 import SearchBar from '../../components/SearchBar';
-import Select from '../../components/Select';
 import Table from '../../components/Table';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
@@ -21,7 +20,6 @@ const ReferralsList = () => {
   const [patients, setPatients] = useState([]);
   const [doctors, setDoctors] = useState([]);
   const [search, setSearch] = useState('');
-  const [status, setStatus] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -42,7 +40,7 @@ const ReferralsList = () => {
   const loadReferrals = async () => {
     setLoading(true);
     try {
-      const { data } = await api.get('/referrals', { params: { search: search || undefined, status: status || undefined } });
+      const { data } = await api.get('/referrals', { params: { search: search || undefined } });
       setItems(data);
     } catch (err) {
       setError(err.response?.data?.message || t('common.loadingError'));
@@ -72,14 +70,77 @@ const ReferralsList = () => {
   useEffect(() => {
     const timer = setTimeout(loadReferrals, 250);
     return () => clearTimeout(timer);
-  }, [search, status]);
+  }, [search]);
+
+  const pdfText = (value) =>
+    String(value ?? '-')
+      .replaceAll("'", "'")
+      .replace(/[^\x20-\x7E]/g, '')
+      .replace(/[\\()]/g, '\\$&');
+
+  const downloadPdf = (filename, lines) => {
+    const contentLines = lines.map((line, index) => {
+      const y = 742 - index * 24;
+      const size = index === 0 ? 18 : 11;
+      const font = index === 0 ? 'F2' : 'F1';
+      return `/${font} ${size} Tf 1 0 0 1 50 ${y} Tm (${pdfText(line)}) Tj`;
+    });
+    const stream = `BT\n${contentLines.join('\n')}\nET`;
+    const objects = [
+      '1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj',
+      '2 0 obj << /Type /Pages /Kids [3 0 R] /Count 1 >> endobj',
+      '3 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R /F2 5 0 R >> >> /Contents 6 0 R >> endobj',
+      '4 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> endobj',
+      '5 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >> endobj',
+      `6 0 obj << /Length ${stream.length} >> stream\n${stream}\nendstream endobj`
+    ];
+    let pdf = '%PDF-1.4\n';
+    const offsets = [0];
+    objects.forEach((object) => {
+      offsets.push(pdf.length);
+      pdf += `${object}\n`;
+    });
+    const xrefAt = pdf.length;
+    pdf += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
+    offsets.slice(1).forEach((offset) => {
+      pdf += `${String(offset).padStart(10, '0')} 00000 n \n`;
+    });
+    pdf += `trailer << /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefAt}\n%%EOF`;
+    const blob = new Blob([pdf], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  };
+
+  const downloadReferralPdf = (referral) => {
+    const date = referral.createdAt ? new Date(referral.createdAt).toLocaleDateString() : new Date().toLocaleDateString();
+    downloadPdf(`referral-${referral._id || Date.now()}.pdf`, [
+      'CareTrack Clinic - Referral',
+      `Patient: ${referral.patient?.fullName || '-'}`,
+      `Phone: ${referral.patient?.phone || '-'}`,
+      `Department: ${referral.toDepartment || '-'}`,
+      `Doctor: ${referral.toDoctor?.fullName || '-'}`,
+      `Priority: ${referral.priority || '-'}`,
+      `Date: ${date}`,
+      '',
+      'Description:',
+      referral.reason || '-'
+    ]);
+  };
 
   const saveReferral = async (payload) => {
     setSaving(true);
     try {
-      if (modal.referral) await api.put(`/referrals/${modal.referral._id}`, payload);
-      else await api.post('/referrals', payload);
+      const { data } = modal.referral
+        ? await api.put(`/referrals/${modal.referral._id}`, payload)
+        : await api.post('/referrals', payload);
       setModal({ open: false, referral: null });
+      downloadReferralPdf(data);
       await loadReferrals();
     } catch (err) {
       setError(err.response?.data?.message || t('common.unableToSave'));
@@ -109,7 +170,6 @@ const ReferralsList = () => {
         <td>${escapeHtml(item.toDoctor?.fullName || '-')}</td>
         <td>${escapeHtml(item.reason || '-')}</td>
         <td>${escapeHtml(item.priority || '-')}</td>
-        <td>${escapeHtml(item.status || '-')}</td>
         <td>${escapeHtml(item.createdAt ? new Date(item.createdAt).toLocaleDateString() : '-')}</td>
       </tr>
     `).join('');
@@ -144,11 +204,10 @@ const ReferralsList = () => {
                 <th>Shifokor</th>
                 <th>Tavsif</th>
                 <th>Daraja</th>
-                <th>Holat</th>
                 <th>Sana</th>
               </tr>
             </thead>
-            <tbody>${rows || '<tr><td colspan="7">Yozuvlar topilmadi.</td></tr>'}</tbody>
+            <tbody>${rows || '<tr><td colspan="6">Yozuvlar topilmadi.</td></tr>'}</tbody>
           </table>
         </body>
       </html>
@@ -156,14 +215,6 @@ const ReferralsList = () => {
     popup.document.close();
     popup.focus();
   };
-
-  const statusOptions = useMemo(
-    () => [
-      { value: '', label: t('common.search', 'Barchasi') },
-      ...['pending', 'accepted', 'rejected', 'completed', 'cancelled'].map((s) => ({ value: s, label: s }))
-    ],
-    []
-  );
 
   return (
     <div className="space-y-5">
@@ -181,10 +232,9 @@ const ReferralsList = () => {
       {error && <div className="rounded-md bg-red-50 p-3 text-sm text-red-700">{error}</div>}
 
       <div className="grid gap-3 md:grid-cols-4">
-        <div className="md:col-span-3">
+        <div className="md:col-span-4">
           <SearchBar value={search} onChange={setSearch} placeholder={`${t('common.search')}...`} />
         </div>
-        <Select label={t('common.actions', 'Holat')} value={status} onChange={(e) => setStatus(e.target.value)} options={statusOptions} />
       </div>
 
       {loading ? <Loader /> : (
@@ -194,7 +244,6 @@ const ReferralsList = () => {
             { key: 'toDepartment', label: t('forms.department', "Bo'lim"), render: (row) => row.toDepartment || '-' },
             { key: 'toDoctor', label: t('nav.doctors'), render: (row) => row.toDoctor?.fullName || '-' },
             { key: 'priority', label: t('referrals.priority', 'Ustuvorlik'), render: (row) => row.priority },
-            { key: 'status', label: t('referrals.status', 'Holat'), render: (row) => row.status }
           ]}
           data={items}
           renderActions={(row) => (
