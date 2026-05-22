@@ -28,11 +28,11 @@ const App = () => (
         <Route element={<RoleRoute allowedRoles={['super_admin', 'admin']} />}>
           <Route path="dashboard" element={<Dashboard />} />
         </Route>
-        <Route element={<RoleRoute allowedRoles={['super_admin', 'admin', 'doctor', 'receptionist']} />}>
+        <Route element={<RoleRoute allowedRoles={['super_admin', 'admin', 'doctor', 'receptionist', 'patient']} />}>
           <Route path="doctors" element={<DoctorsList />} />
           <Route path="doctors/:id" element={<DoctorDetails />} />
         </Route>
-        <Route element={<RoleRoute allowedRoles={['super_admin', 'admin', 'doctor', 'clinician', 'receptionist']} />}>
+        <Route element={<RoleRoute allowedRoles={['super_admin', 'admin', 'doctor', 'clinician', 'receptionist', 'patient']} />}>
           <Route path="patients" element={<PatientsList />} />
           <Route path="patients/:id" element={<PatientProfile />} />
           <Route path="patients/:id/report" element={<DiagnosisReport />} />

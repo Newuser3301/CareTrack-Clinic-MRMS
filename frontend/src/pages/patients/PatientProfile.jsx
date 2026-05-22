@@ -101,8 +101,9 @@ const Sparkline = ({ values = [], stroke = '#0f766e' }) => {
   );
 };
 
-const PatientProfile = () => {
+const PatientProfile = ({ patientId, selfView = false }) => {
   const { id } = useParams();
+  const activePatientId = patientId || id;
   const { user } = useAuth();
   const { t } = useLanguage();
   const [profile, setProfile] = useState(null);
@@ -115,13 +116,14 @@ const PatientProfile = () => {
   const [bookingSuccess, setBookingSuccess] = useState('');
 
   const fetchProfile = () =>
-    api.get(`/patients/${id}/profile`)
+    api.get(`/patients/${activePatientId}/profile`)
       .then(({ data }) => setProfile(data))
       .catch((err) => setError(err.response?.data?.message || t('common.loadingError')));
 
   useEffect(() => {
+    if (!activePatientId) return;
     fetchProfile();
-  }, [id]);
+  }, [activePatientId]);
 
   const todayLocal = (() => {
     const d = new Date();
@@ -257,7 +259,7 @@ const PatientProfile = () => {
           <Link to={`/patients/${patient._id}/report`}>
             <Button variant="secondary"><FileText size={16} />{t('reports.diagnosis', 'Tashxis hisoboti')}</Button>
           </Link>
-          <Link to="/patients"><Button variant="secondary"><ArrowLeft size={16} />{t('common.back')}</Button></Link>
+          {!selfView && <Link to="/patients"><Button variant="secondary"><ArrowLeft size={16} />{t('common.back')}</Button></Link>}
         </div>
       </div>
 
