@@ -20,7 +20,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { permissions, roleLabel } from '../utils/permissions';
 
 const StatCard = ({ label, value, helper, icon: Icon, tone }) => (
-  <div className="rounded-[1.35rem] border border-white/70 bg-white/80 p-5 shadow-panel">
+  <div className="profile-card rounded-[1.35rem] border border-white/70 bg-white/80 p-5 shadow-panel">
     <div className="flex items-start justify-between gap-4">
       <div>
         <p className="text-sm font-semibold text-slate-500">{label}</p>
@@ -35,13 +35,13 @@ const StatCard = ({ label, value, helper, icon: Icon, tone }) => (
 );
 
 const InfoRow = ({ icon: Icon, label, value }) => (
-  <div className="flex items-start gap-3 rounded-2xl bg-slate-50 px-4 py-3">
-    <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white text-primary-700 shadow-sm">
+  <div className="profile-info-row flex items-start gap-3 rounded-2xl bg-slate-50 px-4 py-3">
+    <div className="profile-info-icon mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white text-primary-700 shadow-sm">
       <Icon size={16} />
     </div>
     <div className="min-w-0">
-      <p className="text-xs font-bold uppercase text-slate-400">{label}</p>
-      <p className="text-sm font-semibold text-slate-800">{value}</p>
+      <p className="profile-info-label text-xs font-bold uppercase text-slate-400">{label}</p>
+      <p className="profile-info-value text-sm font-semibold text-slate-800">{value}</p>
     </div>
   </div>
 );
@@ -118,7 +118,7 @@ const Profile = () => {
 
   return (
     <div className="mx-auto max-w-7xl space-y-6">
-      <section className="rounded-[1.75rem] border border-white/70 bg-white/80 p-6 shadow-panel">
+      <section className="profile-card rounded-[1.75rem] border border-white/70 bg-white/80 p-6 shadow-panel">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
           <div className="flex items-start gap-4">
             <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-[1.75rem] bg-gradient-to-br from-cyan-500 to-primary-700 text-2xl font-black text-white shadow-panel">
@@ -150,7 +150,7 @@ const Profile = () => {
       </section>
 
       <section className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
-        <div className="rounded-[1.5rem] border border-white/70 bg-white/80 p-5 shadow-panel">
+        <div className="profile-card rounded-[1.5rem] border border-white/70 bg-white/80 p-5 shadow-panel">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-lg font-bold text-slate-950">{t('profile.recentDiagnoses')}</h2>
@@ -160,7 +160,7 @@ const Profile = () => {
           </div>
           <div className="mt-5 space-y-3">
             {recentDiagnoses.map((diagnosis) => (
-              <div key={diagnosis._id} className="rounded-2xl bg-slate-50 p-4">
+              <div key={diagnosis._id} className="profile-info-row rounded-2xl bg-slate-50 p-4">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
                     <p className="font-semibold text-slate-950">{diagnosis.icdCode} · {diagnosis.description}</p>
@@ -177,7 +177,7 @@ const Profile = () => {
           </div>
         </div>
 
-        <div className="rounded-[1.5rem] border border-white/70 bg-white/80 p-5 shadow-panel">
+        <div className="profile-card rounded-[1.5rem] border border-white/70 bg-white/80 p-5 shadow-panel">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-lg font-bold text-slate-950">{t('profile.patientRoster')}</h2>
@@ -187,7 +187,7 @@ const Profile = () => {
           </div>
           <div className="mt-5 space-y-3">
             {visiblePatients.map((patient) => (
-              <div key={patient._id} className="rounded-2xl bg-slate-50 p-4">
+              <div key={patient._id} className="profile-info-row rounded-2xl bg-slate-50 p-4">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <p className="font-semibold text-slate-950">{patient.fullName}</p>
                   <p className="text-xs font-semibold uppercase text-slate-400">{patient.gender}</p>
@@ -206,7 +206,7 @@ const Profile = () => {
       </section>
 
       <section className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
-        <div className="rounded-[1.5rem] border border-white/70 bg-white/80 p-5 shadow-panel">
+        <div className="profile-card rounded-[1.5rem] border border-white/70 bg-white/80 p-5 shadow-panel">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-lg font-bold text-slate-950">{t('profile.priorityWatch')}</h2>
@@ -228,7 +228,7 @@ const Profile = () => {
           </div>
         </div>
 
-        <div className="rounded-[1.5rem] border border-white/70 bg-white/80 p-5 shadow-panel">
+        <div className="profile-card rounded-[1.5rem] border border-white/70 bg-white/80 p-5 shadow-panel">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-lg font-bold text-slate-950">{t('profile.systemHealth')}</h2>

@@ -114,6 +114,29 @@ body {
   color: #dbeafe;
 }
 
+.dark .profile-card {
+  background-color: rgba(15, 29, 52, 0.94) !important;
+  border-color: rgba(71, 124, 164, 0.65) !important;
+}
+
+.dark .profile-info-row {
+  background-color: rgba(23, 45, 76, 0.94) !important;
+  border-color: rgba(71, 124, 164, 0.45) !important;
+}
+
+.dark .profile-info-icon {
+  background-color: rgba(224, 242, 254, 0.12) !important;
+  color: #7dd3fc !important;
+}
+
+.dark .profile-info-label {
+  color: #93c5fd !important;
+}
+
+.dark .profile-info-value {
+  color: #f8fafc !important;
+}
+
 /* Modal internal scrolling (keeps design intact) */
 .modal-scroll {
   scrollbar-gutter: stable;

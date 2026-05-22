@@ -163,6 +163,10 @@ const ReferralsList = () => {
     `/${bold ? 'F2' : 'F1'} ${size} Tf 1 0 0 1 ${x} ${y} Tm (${pdfText(text)}) Tj`;
 
   const lineCmd = (x1, y1, x2, y2) => `${x1} ${y1} m ${x2} ${y2} l S`;
+  const rectCmd = (x, y, w, h) => `${x} ${y} ${w} ${h} re S`;
+  const fillRectCmd = (x, y, w, h, gray = 0.94) => `q ${gray} g ${x} ${y} ${w} ${h} re f Q`;
+  const strokeColorCmd = (r, g, b) => `${r} ${g} ${b} RG`;
+  const fillColorCmd = (r, g, b) => `${r} ${g} ${b} rg`;
 
   const downloadPdf = (filename, commands) => {
     const stream = `q\n0.8 w\n${commands.join('\n')}\nQ`;
@@ -203,51 +207,60 @@ const ReferralsList = () => {
     const date = referral.createdAt ? new Date(referral.createdAt).toLocaleDateString() : new Date().toLocaleDateString();
     const birthDate = patient.dateOfBirth ? new Date(patient.dateOfBirth).toLocaleDateString() : '-';
     const commands = [
-      textCmd(labels.ministry, 70, 700, 12),
-      lineCmd(70, 670, 300, 670),
-      textCmd(labels.institution, 105, 656, 10),
-      textCmd(labels.document, 385, 700, 12),
-      textCmd(labels.form, 405, 684, 11),
-      textCmd(`${labels.date}: ${date}`, 405, 668, 10),
-      textCmd(labels.title, 190, 620, 18, true),
-      textCmd(`(${labels.subtitle})`, 218, 600, 12, true),
-      textCmd(labels.patient, 55, 560, 12),
-      lineCmd(135, 558, 540, 558),
-      textCmd(patient.fullName || '-', 145, 562, 12),
-      textCmd(labels.phone, 55, 535, 12),
-      lineCmd(125, 533, 265, 533),
-      textCmd(patient.phone || '-', 135, 537, 11),
-      textCmd(labels.birthDate, 285, 535, 12),
-      lineCmd(390, 533, 540, 533),
-      textCmd(birthDate, 400, 537, 11),
-      textCmd(labels.address, 55, 510, 12),
-      lineCmd(130, 508, 540, 508),
-      textCmd(patient.address || '-', 140, 512, 10),
-      textCmd(labels.department, 55, 485, 12),
-      lineCmd(150, 483, 330, 483),
-      textCmd(referral.toDepartment || '-', 160, 487, 11),
-      textCmd(labels.doctor, 345, 485, 12),
-      lineCmd(410, 483, 540, 483),
-      textCmd(referral.toDoctor?.fullName || '-', 420, 487, 11),
-      textCmd(labels.priority, 55, 460, 12),
-      lineCmd(145, 458, 260, 458),
-      textCmd(referral.priority || '-', 155, 462, 11),
-      textCmd(labels.description, 245, 425, 16, true)
+      strokeColorCmd(0.08, 0.28, 0.45),
+      rectCmd(36, 36, 540, 720),
+      fillRectCmd(36, 705, 540, 51, 0.9),
+      rectCmd(36, 705, 540, 51),
+      fillColorCmd(0.03, 0.24, 0.38),
+      textCmd('CARETRACK CLINIC', 60, 732, 16, true),
+      textCmd(labels.subtitle, 60, 714, 10),
+      textCmd(labels.document, 390, 732, 11, true),
+      textCmd(labels.form, 390, 716, 10),
+      fillColorCmd(0, 0, 0),
+      textCmd(labels.ministry, 62, 675, 11),
+      lineCmd(62, 650, 285, 650),
+      textCmd(labels.institution, 102, 636, 9),
+      textCmd(`${labels.date}: ${date}`, 392, 675, 10),
+      textCmd('No: ________', 392, 658, 10),
+      textCmd(labels.title, 202, 602, 18, true),
+      lineCmd(185, 594, 428, 594),
+      textCmd(`(${labels.subtitle})`, 224, 580, 10, true),
+      fillRectCmd(55, 525, 502, 38, 0.96),
+      rectCmd(55, 525, 502, 38),
+      textCmd(`${labels.patient}:`, 70, 548, 11, true),
+      textCmd(patient.fullName || '-', 150, 548, 12),
+      textCmd(`${labels.phone}:`, 70, 530, 10),
+      textCmd(patient.phone || '-', 150, 530, 10),
+      textCmd(`${labels.birthDate}:`, 320, 530, 10),
+      textCmd(birthDate, 420, 530, 10),
+      fillRectCmd(55, 468, 502, 46, 0.98),
+      rectCmd(55, 468, 502, 46),
+      textCmd(`${labels.address}:`, 70, 495, 10),
+      textCmd(patient.address || '-', 150, 495, 10),
+      textCmd(`${labels.department}:`, 70, 475, 10),
+      textCmd(referral.toDepartment || '-', 150, 475, 10),
+      textCmd(`${labels.doctor}:`, 320, 475, 10),
+      textCmd(referral.toDoctor?.fullName || '-', 390, 475, 10),
+      textCmd(`${labels.priority}: ${referral.priority || '-'}`, 70, 446, 11, true),
+      fillRectCmd(55, 395, 502, 32, 0.9),
+      rectCmd(55, 395, 502, 32),
+      textCmd(labels.description, 240, 406, 15, true),
+      rectCmd(55, 200, 502, 190)
     ];
-    wrapPdfText(referral.reason || '-', 76).slice(0, 8).forEach((line, index) => {
-      commands.push(textCmd(`${index + 1}. ${line}`, 70, 390 - index * 22, 12));
+    wrapPdfText(referral.reason || '-', 72).slice(0, 7).forEach((line, index) => {
+      commands.push(textCmd(`${index + 1}. ${line}`, 75, 365 - index * 23, 11));
     });
     commands.push(
-      textCmd(labels.validity, 135, 170, 11),
-      lineCmd(285, 168, 455, 168),
-      lineCmd(70, 110, 170, 110),
-      textCmd(labels.stamp, 85, 95, 10),
-      textCmd(labels.responsible, 240, 125, 11),
-      lineCmd(370, 123, 540, 123),
-      textCmd(`(${labels.signature})`, 430, 108, 10),
-      textCmd(labels.receptionist, 240, 80, 11),
-      lineCmd(350, 78, 540, 78),
-      textCmd(`(${labels.signature})`, 430, 63, 10)
+      textCmd(labels.validity, 120, 172, 10),
+      lineCmd(250, 170, 455, 170),
+      rectCmd(70, 78, 105, 65),
+      textCmd(labels.stamp, 92, 108, 10),
+      textCmd(labels.responsible, 230, 126, 10),
+      lineCmd(360, 124, 535, 124),
+      textCmd(`(${labels.signature})`, 420, 110, 9),
+      textCmd(labels.receptionist, 230, 86, 10),
+      lineCmd(340, 84, 535, 84),
+      textCmd(`(${labels.signature})`, 420, 70, 9)
     );
     downloadPdf(`referral-${referral._id || Date.now()}.pdf`, commands);
   };
