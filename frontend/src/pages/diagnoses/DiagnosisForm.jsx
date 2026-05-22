@@ -39,13 +39,6 @@ const DiagnosisForm = ({ initialData, patients, defaultPatient, onSubmit, onCanc
       description: selected && !current.description ? selected.description : current.description
     }));
   };
-  const selectIcdCode = (option) => {
-    setForm((current) => ({
-      ...current,
-      icdCode: option.code,
-      description: current.description || option.description
-    }));
-  };
 
   return (
     <form className="grid gap-4 md:grid-cols-2" onSubmit={(event) => { event.preventDefault(); onSubmit({ ...form, notes: '' }); }}>
@@ -72,19 +65,6 @@ const DiagnosisForm = ({ initialData, patients, defaultPatient, onSubmit, onCanc
             <option key={option.code} value={option.code} label={option.description} />
           ))}
         </datalist>
-        <div className="mt-2 flex flex-wrap gap-2">
-          {icdCodeOptions.slice(0, 6).map((option) => (
-            <button
-              key={option.code}
-              type="button"
-              onClick={() => selectIcdCode(option)}
-              className="rounded-full bg-sky-50 px-3 py-1 text-xs font-black text-primary-700 transition hover:bg-sky-100"
-              title={option.description}
-            >
-              {option.code}
-            </button>
-          ))}
-        </div>
       </label>
       <Select
         label={t('common.severity')}
