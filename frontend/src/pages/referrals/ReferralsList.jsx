@@ -14,7 +14,7 @@ import ReferralForm from './ReferralForm';
 
 const ReferralsList = () => {
   const { user } = useAuth();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const role = user?.role;
   const [items, setItems] = useState([]);
   const [patients, setPatients] = useState([]);
@@ -29,14 +29,6 @@ const ReferralsList = () => {
   const canCreate = permissions.canCreateReferral(role);
   const canEdit = permissions.canEditReferral(role);
   const canDelete = permissions.canDeleteReferral(role);
-  const escapeHtml = (value) =>
-    String(value ?? '')
-      .replaceAll('&', '&amp;')
-      .replaceAll('<', '&lt;')
-      .replaceAll('>', '&gt;')
-      .replaceAll('"', '&quot;')
-      .replaceAll("'", '&#039;');
-
   const loadReferrals = async () => {
     setLoading(true);
     try {
@@ -72,20 +64,108 @@ const ReferralsList = () => {
     return () => clearTimeout(timer);
   }, [search]);
 
+  const referralPdfLabels = {
+    uz: {
+      ministry: "Sogliqni saqlash vazirligi",
+      document: "Tibbiy hujjat",
+      form: "Yollanma shakli",
+      institution: "muassasa nomi",
+      title: "TIBBIY YOLLANMA",
+      subtitle: "CareTrack Clinic MRMS",
+      patient: "Bemor",
+      phone: "Telefon",
+      birthDate: "Tugilgan sana",
+      address: "Manzil",
+      department: "Bolim",
+      doctor: "Shifokor",
+      priority: "Ustuvorlik",
+      date: "Sana",
+      description: "TAVSIF",
+      validity: "Yollanma muddati",
+      responsible: "Masul shifokor",
+      receptionist: "Qabul xodimi",
+      signature: "imzo",
+      stamp: "Muhr joyi"
+    },
+    en: {
+      ministry: "Ministry of Health",
+      document: "Medical documentation",
+      form: "Referral form",
+      institution: "institution name",
+      title: "MEDICAL REFERRAL",
+      subtitle: "CareTrack Clinic MRMS",
+      patient: "Patient",
+      phone: "Phone",
+      birthDate: "Date of birth",
+      address: "Address",
+      department: "Department",
+      doctor: "Doctor",
+      priority: "Priority",
+      date: "Date",
+      description: "DESCRIPTION",
+      validity: "Referral validity",
+      responsible: "Responsible doctor",
+      receptionist: "Receptionist",
+      signature: "signature",
+      stamp: "Stamp area"
+    },
+    ru: {
+      ministry: "Ministerstvo zdravookhraneniya",
+      document: "Meditsinskaya dokumentatsiya",
+      form: "Forma napravleniya",
+      institution: "naimenovanie uchrezhdeniya",
+      title: "MEDITSINSKOE NAPRAVLENIE",
+      subtitle: "CareTrack Clinic MRMS",
+      patient: "Pacient",
+      phone: "Telefon",
+      birthDate: "Data rozhdeniya",
+      address: "Adres",
+      department: "Otdelenie",
+      doctor: "Vrach",
+      priority: "Prioritet",
+      date: "Data",
+      description: "OPISANIE",
+      validity: "Srok deystviya napravleniya",
+      responsible: "Otvetstvennyy vrach",
+      receptionist: "Registrator",
+      signature: "podpis",
+      stamp: "Mesto pechati"
+    }
+  };
+
   const pdfText = (value) =>
     String(value ?? '-')
       .replaceAll("'", "'")
+      .replaceAll('‘', "'")
+      .replaceAll('’', "'")
+      .replaceAll('ʻ', "'")
+      .replaceAll('`', "'")
       .replace(/[^\x20-\x7E]/g, '')
       .replace(/[\\()]/g, '\\$&');
 
-  const downloadPdf = (filename, lines) => {
-    const contentLines = lines.map((line, index) => {
-      const y = 742 - index * 24;
-      const size = index === 0 ? 18 : 11;
-      const font = index === 0 ? 'F2' : 'F1';
-      return `/${font} ${size} Tf 1 0 0 1 50 ${y} Tm (${pdfText(line)}) Tj`;
+  const wrapPdfText = (value, max = 86) => {
+    const words = String(value || '-').split(/\s+/);
+    const lines = [];
+    let current = '';
+    words.forEach((word) => {
+      if (`${current} ${word}`.trim().length > max) {
+        if (current) lines.push(current);
+        current = word;
+      } else {
+        current = `${current} ${word}`.trim();
+      }
     });
-    const stream = `BT\n${contentLines.join('\n')}\nET`;
+    if (current) lines.push(current);
+    return lines;
+  };
+
+  const textCmd = (text, x, y, size = 12, bold = false) =>
+    `/${bold ? 'F2' : 'F1'} ${size} Tf 1 0 0 1 ${x} ${y} Tm (${pdfText(text)}) Tj`;
+
+  const lineCmd = (x1, y1, x2, y2) => `${x1} ${y1} m ${x2} ${y2} l S`;
+
+  const downloadPdf = (filename, commands) => {
+    const stream = `q\n0.8 w\n${commands.join('\n')}\nQ`;
     const objects = [
       '1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj',
       '2 0 obj << /Type /Pages /Kids [3 0 R] /Count 1 >> endobj',
@@ -118,19 +198,58 @@ const ReferralsList = () => {
   };
 
   const downloadReferralPdf = (referral) => {
+    const labels = referralPdfLabels[language] || referralPdfLabels.uz;
+    const patient = referral.patient || {};
     const date = referral.createdAt ? new Date(referral.createdAt).toLocaleDateString() : new Date().toLocaleDateString();
-    downloadPdf(`referral-${referral._id || Date.now()}.pdf`, [
-      'CareTrack Clinic - Referral',
-      `Patient: ${referral.patient?.fullName || '-'}`,
-      `Phone: ${referral.patient?.phone || '-'}`,
-      `Department: ${referral.toDepartment || '-'}`,
-      `Doctor: ${referral.toDoctor?.fullName || '-'}`,
-      `Priority: ${referral.priority || '-'}`,
-      `Date: ${date}`,
-      '',
-      'Description:',
-      referral.reason || '-'
-    ]);
+    const birthDate = patient.dateOfBirth ? new Date(patient.dateOfBirth).toLocaleDateString() : '-';
+    const commands = [
+      textCmd(labels.ministry, 70, 700, 12),
+      lineCmd(70, 670, 300, 670),
+      textCmd(labels.institution, 105, 656, 10),
+      textCmd(labels.document, 385, 700, 12),
+      textCmd(labels.form, 405, 684, 11),
+      textCmd(`${labels.date}: ${date}`, 405, 668, 10),
+      textCmd(labels.title, 190, 620, 18, true),
+      textCmd(`(${labels.subtitle})`, 218, 600, 12, true),
+      textCmd(labels.patient, 55, 560, 12),
+      lineCmd(135, 558, 540, 558),
+      textCmd(patient.fullName || '-', 145, 562, 12),
+      textCmd(labels.phone, 55, 535, 12),
+      lineCmd(125, 533, 265, 533),
+      textCmd(patient.phone || '-', 135, 537, 11),
+      textCmd(labels.birthDate, 285, 535, 12),
+      lineCmd(390, 533, 540, 533),
+      textCmd(birthDate, 400, 537, 11),
+      textCmd(labels.address, 55, 510, 12),
+      lineCmd(130, 508, 540, 508),
+      textCmd(patient.address || '-', 140, 512, 10),
+      textCmd(labels.department, 55, 485, 12),
+      lineCmd(150, 483, 330, 483),
+      textCmd(referral.toDepartment || '-', 160, 487, 11),
+      textCmd(labels.doctor, 345, 485, 12),
+      lineCmd(410, 483, 540, 483),
+      textCmd(referral.toDoctor?.fullName || '-', 420, 487, 11),
+      textCmd(labels.priority, 55, 460, 12),
+      lineCmd(145, 458, 260, 458),
+      textCmd(referral.priority || '-', 155, 462, 11),
+      textCmd(labels.description, 245, 425, 16, true)
+    ];
+    wrapPdfText(referral.reason || '-', 76).slice(0, 8).forEach((line, index) => {
+      commands.push(textCmd(`${index + 1}. ${line}`, 70, 390 - index * 22, 12));
+    });
+    commands.push(
+      textCmd(labels.validity, 135, 170, 11),
+      lineCmd(285, 168, 455, 168),
+      lineCmd(70, 110, 170, 110),
+      textCmd(labels.stamp, 85, 95, 10),
+      textCmd(labels.responsible, 240, 125, 11),
+      lineCmd(370, 123, 540, 123),
+      textCmd(`(${labels.signature})`, 430, 108, 10),
+      textCmd(labels.receptionist, 240, 80, 11),
+      lineCmd(350, 78, 540, 78),
+      textCmd(`(${labels.signature})`, 430, 63, 10)
+    );
+    downloadPdf(`referral-${referral._id || Date.now()}.pdf`, commands);
   };
 
   const saveReferral = async (payload) => {
@@ -162,60 +281,6 @@ const ReferralsList = () => {
     }
   };
 
-  const exportPdf = () => {
-    const rows = items.map((item) => `
-      <tr>
-        <td>${escapeHtml(item.patient?.fullName || '-')}</td>
-        <td>${escapeHtml(item.toDepartment || '-')}</td>
-        <td>${escapeHtml(item.toDoctor?.fullName || '-')}</td>
-        <td>${escapeHtml(item.reason || '-')}</td>
-        <td>${escapeHtml(item.priority || '-')}</td>
-        <td>${escapeHtml(item.createdAt ? new Date(item.createdAt).toLocaleDateString() : '-')}</td>
-      </tr>
-    `).join('');
-    const popup = window.open('', '_blank', 'width=1100,height=800');
-    if (!popup) return;
-
-    popup.document.write(`
-      <!doctype html>
-      <html>
-        <head>
-          <title>CareTrack Referrals</title>
-          <style>
-            body { font-family: Arial, sans-serif; color: #0f172a; padding: 32px; }
-            h1 { margin: 0 0 6px; font-size: 24px; }
-            p { margin: 0 0 24px; color: #64748b; }
-            table { border-collapse: collapse; width: 100%; font-size: 12px; }
-            th, td { border: 1px solid #dbeafe; padding: 10px; text-align: left; vertical-align: top; }
-            th { background: #e0f2fe; color: #075985; }
-            tr:nth-child(even) td { background: #f8fafc; }
-            @media print { body { padding: 18px; } button { display: none; } }
-          </style>
-        </head>
-        <body>
-          <button onclick="window.print()" style="float:right;padding:10px 16px;border:0;border-radius:999px;background:#075795;color:white;font-weight:700;">PDF / Print</button>
-          <h1>CareTrack Clinic - Yo'llanmalar</h1>
-          <p>Generated: ${escapeHtml(new Date().toLocaleString())}</p>
-          <table>
-            <thead>
-              <tr>
-                <th>Bemor</th>
-                <th>Bo'lim</th>
-                <th>Shifokor</th>
-                <th>Tavsif</th>
-                <th>Daraja</th>
-                <th>Sana</th>
-              </tr>
-            </thead>
-            <tbody>${rows || '<tr><td colspan="6">Yozuvlar topilmadi.</td></tr>'}</tbody>
-          </table>
-        </body>
-      </html>
-    `);
-    popup.document.close();
-    popup.focus();
-  };
-
   return (
     <div className="space-y-5">
       <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
@@ -224,7 +289,6 @@ const ReferralsList = () => {
           <p className="text-sm text-slate-500">{t('referrals.subtitle', 'Bo‘limlar o‘rtasida yo‘llanmalarni boshqarish.')}</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button variant="secondary" onClick={exportPdf}><FileDown size={16} />PDF</Button>
           {canCreate && <Button onClick={() => setModal({ open: true, referral: null })}><Plus size={16} />{t('referrals.new', 'Yangi yo‘llanma')}</Button>}
         </div>
       </div>
@@ -248,6 +312,7 @@ const ReferralsList = () => {
           data={items}
           renderActions={(row) => (
             <div className="flex justify-end gap-2">
+              <Button variant="secondary" className="h-9 w-9 px-0" onClick={() => downloadReferralPdf(row)} aria-label="PDF"><FileDown size={16} /></Button>
               {canEdit && <Button variant="secondary" className="h-9 w-9 px-0" onClick={() => setModal({ open: true, referral: row })} aria-label={t('actions.edit')}><Pencil size={16} /></Button>}
               {canDelete && <Button variant="danger" className="h-9 w-9 px-0" onClick={() => setConfirm(row)} aria-label={t('actions.delete')}><Trash2 size={16} /></Button>}
             </div>
