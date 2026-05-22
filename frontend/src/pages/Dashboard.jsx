@@ -76,13 +76,13 @@ const Dashboard = () => {
             </p>
           </div>
           <div className="grid grid-cols-2 gap-3 sm:flex">
-            <div className="rounded-md bg-red-50 px-4 py-3">
-              <p className="text-xs font-semibold uppercase text-red-600">{t('dashboard.critical')}</p>
-              <p className="text-2xl font-bold text-red-700">{stats.criticalDiagnoses}</p>
-            </div>
             <div className="rounded-md bg-amber-50 px-4 py-3">
-              <p className="text-xs font-semibold uppercase text-amber-700">{t('dashboard.highCritical')}</p>
-              <p className="text-2xl font-bold text-amber-700">{stats.severeDiagnoses}</p>
+              <p className="text-xs font-semibold uppercase text-amber-700">{t('dashboard.critical')}</p>
+              <p className="text-2xl font-bold text-amber-700">{stats.criticalDiagnoses}</p>
+            </div>
+            <div className="rounded-md bg-red-50 px-4 py-3">
+              <p className="text-xs font-semibold uppercase text-red-600">{t('dashboard.highCritical')}</p>
+              <p className="text-2xl font-bold text-red-700">{stats.severeDiagnoses}</p>
             </div>
           </div>
         </div>

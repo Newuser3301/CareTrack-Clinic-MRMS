@@ -34,25 +34,25 @@ const Modal = ({ open, title, children, onClose }) => {
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden bg-slate-950/50 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden bg-slate-950/35 p-4 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
     >
       <div
-        className="flex min-h-0 w-full max-w-2xl flex-col overflow-hidden rounded-[1.75rem] border border-slate-900/80 bg-gradient-to-br from-slate-950 via-cyan-950 to-slate-900 shadow-[0_28px_90px_rgba(2,6,23,0.34)] max-h-[calc(100dvh-1rem)] sm:max-h-[calc(100dvh-2rem)]"
+        className="flex min-h-0 w-full max-w-2xl flex-col overflow-hidden rounded-[1.75rem] border border-white/80 bg-sky-50/95 shadow-[0_28px_90px_rgba(15,58,101,0.26)] ring-1 ring-sky-100/80 backdrop-blur max-h-[calc(100dvh-1rem)] sm:max-h-[calc(100dvh-2rem)]"
       >
-        <div className="flex shrink-0 items-center justify-between border-b border-white/10 px-6 py-5">
-          <h2 className="text-xl font-black text-white">{title}</h2>
+        <div className="flex shrink-0 items-center justify-between border-b border-sky-100/80 bg-white/80 px-6 py-5">
+          <h2 className="text-xl font-black text-slate-950">{title}</h2>
           <Button
             variant="ghost"
-            className="h-9 w-9 bg-white/10 px-0 text-white hover:bg-white/20"
+            className="h-9 w-9 bg-sky-50 px-0 text-slate-600 hover:bg-white hover:text-primary-700"
             onClick={onClose}
             aria-label="Close modal"
           >
             <X size={18} />
           </Button>
         </div>
-        <div className="modal-scroll min-h-0 flex-1 overflow-y-auto bg-cyan-50/96 p-6">{children}</div>
+        <div className="modal-scroll min-h-0 flex-1 overflow-y-auto bg-sky-50/80 p-6">{children}</div>
       </div>
     </div>,
     portalTarget

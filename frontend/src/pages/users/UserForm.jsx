@@ -58,7 +58,7 @@ const UserForm = ({ initialData, currentRole, onSubmit, onCancel, loading }) => 
             ])}
         required
       />
-      <div className="sticky bottom-0 flex justify-end gap-3 bg-cyan-50/96 pt-4 md:col-span-2">
+      <div className="sticky bottom-0 flex justify-end gap-3 bg-sky-50/95 pt-4 md:col-span-2">
         <Button variant="secondary" onClick={onCancel}><X size={16} />{t('common.cancel')}</Button>
         <Button type="submit" disabled={loading}><Save size={16} />{loading ? t('common.saving') : t('forms.saveUser')}</Button>
       </div>

@@ -75,11 +75,59 @@ body {
   border-color: rgba(51, 91, 125, 0.65) !important;
 }
 
+.dark [class*="border-white"],
+.dark [class*="border-sky-100"],
+.dark [class*="border-cyan-100"],
+.dark [class*="border-slate-200"] {
+  border-color: rgba(51, 91, 125, 0.62) !important;
+}
+
 .dark [class*="bg-sky-50"],
 .dark [class*="bg-cyan-50"],
 .dark [class*="bg-slate-50"],
 .dark [class*="bg-slate-100"] {
   background-color: rgba(18, 41, 68, 0.86) !important;
+}
+
+.dark [class*="bg-sky-100"],
+.dark [class*="bg-cyan-100"],
+.dark [class*="bg-blue-50"],
+.dark [class*="bg-blue-100"],
+.dark [class*="bg-indigo-50"],
+.dark [class*="bg-indigo-100"] {
+  background-color: rgba(14, 116, 144, 0.2) !important;
+}
+
+.dark [class*="bg-green-50"],
+.dark [class*="bg-green-100"],
+.dark [class*="bg-emerald-50"],
+.dark [class*="bg-emerald-100"],
+.dark [class*="bg-teal-50"],
+.dark [class*="bg-teal-100"] {
+  background-color: rgba(22, 101, 52, 0.22) !important;
+}
+
+.dark [class*="bg-amber-50"],
+.dark [class*="bg-amber-100"],
+.dark [class*="bg-yellow-50"],
+.dark [class*="bg-yellow-100"],
+.dark [class*="bg-orange-50"],
+.dark [class*="bg-orange-100"] {
+  background-color: rgba(146, 64, 14, 0.24) !important;
+}
+
+.dark [class*="bg-red-50"],
+.dark [class*="bg-red-100"],
+.dark [class*="bg-rose-50"],
+.dark [class*="bg-rose-100"] {
+  background-color: rgba(159, 18, 57, 0.22) !important;
+}
+
+.dark [class*="bg-violet-50"],
+.dark [class*="bg-violet-100"],
+.dark [class*="bg-purple-50"],
+.dark [class*="bg-purple-100"] {
+  background-color: rgba(109, 40, 217, 0.22) !important;
 }
 
 .dark .text-slate-950,
@@ -97,6 +145,55 @@ body {
   color: #94a3b8 !important;
 }
 
+.dark .text-primary-700,
+.dark .text-primary-600 {
+  color: #7dd3fc !important;
+}
+
+.dark [class*="text-sky-700"],
+.dark [class*="text-sky-600"],
+.dark [class*="text-cyan-700"],
+.dark [class*="text-cyan-600"],
+.dark [class*="text-blue-700"],
+.dark [class*="text-blue-600"],
+.dark [class*="text-indigo-700"],
+.dark [class*="text-indigo-600"] {
+  color: #67e8f9 !important;
+}
+
+.dark [class*="text-green-700"],
+.dark [class*="text-green-600"],
+.dark [class*="text-emerald-800"],
+.dark [class*="text-emerald-700"],
+.dark [class*="text-emerald-600"],
+.dark [class*="text-teal-700"],
+.dark [class*="text-teal-600"] {
+  color: #86efac !important;
+}
+
+.dark [class*="text-amber-700"],
+.dark [class*="text-amber-600"],
+.dark [class*="text-yellow-700"],
+.dark [class*="text-yellow-600"],
+.dark [class*="text-orange-700"],
+.dark [class*="text-orange-600"] {
+  color: #fcd34d !important;
+}
+
+.dark [class*="text-red-700"],
+.dark [class*="text-red-600"],
+.dark [class*="text-rose-700"],
+.dark [class*="text-rose-600"] {
+  color: #fda4af !important;
+}
+
+.dark [class*="text-violet-700"],
+.dark [class*="text-violet-600"],
+.dark [class*="text-purple-700"],
+.dark [class*="text-purple-600"] {
+  color: #c4b5fd !important;
+}
+
 .dark input,
 .dark select,
 .dark textarea {
@@ -112,6 +209,16 @@ body {
 
 .dark table {
   color: #dbeafe;
+}
+
+.dark .divide-sky-100 > :not([hidden]) ~ :not([hidden]),
+.dark .divide-sky-50 > :not([hidden]) ~ :not([hidden]) {
+  border-color: rgba(51, 91, 125, 0.48) !important;
+}
+
+.dark [class*="hover:bg-sky-50"]:hover,
+.dark [class*="hover:bg-white"]:hover {
+  background-color: rgba(30, 64, 95, 0.9) !important;
 }
 
 .dark .profile-card {

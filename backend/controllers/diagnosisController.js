@@ -2,6 +2,7 @@ const { validationResult } = require('express-validator');
 const Diagnosis = require('../models/Diagnosis');
 const Patient = require('../models/Patient');
 const { ensureDiagnosisAccess, ensurePatientAccess, getVisiblePatientFilter, isSystemManager } = require('../utils/rbac');
+const { searchIcd10cm } = require('../utils/icd10cmApi');
 
 const handleValidation = (req, res, next) => {
   const errors = validationResult(req);
@@ -155,11 +156,22 @@ const getDiagnosesByPatient = async (req, res, next) => {
   }
 };
 
+const searchIcd10Codes = async (req, res, next) => {
+  try {
+    const results = await searchIcd10cm(req.query.terms, { count: req.query.count });
+    res.json(results);
+  } catch (error) {
+    res.status(502);
+    next(new Error(`Unable to search ICD-10-CM codes: ${error.message}`));
+  }
+};
+
 module.exports = {
   getDiagnoses,
   getDiagnosisById,
   createDiagnosis,
   updateDiagnosis,
   deleteDiagnosis,
-  getDiagnosesByPatient
+  getDiagnosesByPatient,
+  searchIcd10Codes
 };

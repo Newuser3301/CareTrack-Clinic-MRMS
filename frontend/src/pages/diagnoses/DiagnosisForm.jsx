@@ -3,23 +3,16 @@ import { Save, X } from 'lucide-react';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
 import Select from '../../components/Select';
+import api from '../../api/axios';
 import { useLanguage } from '../../context/LanguageContext';
 
 const emptyDiagnosis = { patient: '', icdCode: '', description: '', severity: 'low', notes: '', diagnosedDate: new Date().toISOString().slice(0, 10) };
 const toDateInput = (value) => (value ? new Date(value).toISOString().slice(0, 10) : '');
-const icdCodeOptions = [
-  { code: 'E11.9', description: 'Type 2 diabetes mellitus without complications' },
-  { code: 'J45.909', description: 'Unspecified asthma, uncomplicated' },
-  { code: 'I10', description: 'Essential hypertension' },
-  { code: 'J06.9', description: 'Acute upper respiratory infection, unspecified' },
-  { code: 'K21.9', description: 'Gastro-esophageal reflux disease without esophagitis' },
-  { code: 'M54.5', description: 'Low back pain' },
-  { code: 'N39.0', description: 'Urinary tract infection, site not specified' },
-  { code: 'R51.9', description: 'Headache, unspecified' }
-];
 
 const DiagnosisForm = ({ initialData, patients, defaultPatient, onSubmit, onCancel, loading }) => {
   const [form, setForm] = useState(emptyDiagnosis);
+  const [icdCodeOptions, setIcdCodeOptions] = useState([]);
+  const [icdLoading, setIcdLoading] = useState(false);
   const { t } = useLanguage();
 
   useEffect(() => {
@@ -30,13 +23,42 @@ const DiagnosisForm = ({ initialData, patients, defaultPatient, onSubmit, onCanc
     );
   }, [initialData, defaultPatient]);
 
+  useEffect(() => {
+    const query = form.icdCode.trim();
+    if (query.length < 2) {
+      setIcdCodeOptions([]);
+      setIcdLoading(false);
+      return undefined;
+    }
+
+    let cancelled = false;
+    const timer = setTimeout(async () => {
+      try {
+        setIcdLoading(true);
+        const { data } = await api.get('/diagnoses/icd10/search', {
+          params: { terms: query, count: 10 }
+        });
+        if (!cancelled) setIcdCodeOptions(Array.isArray(data) ? data : []);
+      } catch {
+        if (!cancelled) setIcdCodeOptions([]);
+      } finally {
+        if (!cancelled) setIcdLoading(false);
+      }
+    }, 350);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [form.icdCode]);
+
   const update = (field, value) => setForm((current) => ({ ...current, [field]: value }));
   const updateIcdCode = (value) => {
     const selected = icdCodeOptions.find((option) => option.code.toLowerCase() === value.trim().toLowerCase());
     setForm((current) => ({
       ...current,
       icdCode: value.toUpperCase(),
-      description: selected && !current.description ? selected.description : current.description
+      description: selected ? selected.name : current.description
     }));
   };
 
@@ -62,9 +84,10 @@ const DiagnosisForm = ({ initialData, patients, defaultPatient, onSubmit, onCanc
         />
         <datalist id="icd-code-options">
           {icdCodeOptions.map((option) => (
-            <option key={option.code} value={option.code} label={option.description} />
+            <option key={option.code} value={option.code} label={option.name} />
           ))}
         </datalist>
+        {icdLoading && <span className="mt-1 block text-sm text-slate-500">ICD-10-CM qidirilmoqda...</span>}
       </label>
       <Select
         label={t('common.severity')}
@@ -88,7 +111,7 @@ const DiagnosisForm = ({ initialData, patients, defaultPatient, onSubmit, onCanc
           required
         />
       </label>
-      <div className="sticky bottom-0 flex justify-end gap-3 bg-cyan-50/96 pt-4 md:col-span-2">
+      <div className="sticky bottom-0 flex justify-end gap-3 bg-sky-50/95 pt-4 md:col-span-2">
         <Button variant="secondary" onClick={onCancel}><X size={16} />{t('common.cancel')}</Button>
         <Button type="submit" disabled={loading}><Save size={16} />{loading ? t('common.saving') : t('forms.saveDiagnosis')}</Button>
       </div>

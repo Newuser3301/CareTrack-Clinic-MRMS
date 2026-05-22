@@ -6,7 +6,8 @@ const {
   createDiagnosis,
   updateDiagnosis,
   deleteDiagnosis,
-  getDiagnosesByPatient
+  getDiagnosesByPatient,
+  searchIcd10Codes
 } = require('../controllers/diagnosisController');
 const { protect } = require('../middleware/authMiddleware');
 const { authorize } = require('../middleware/roleMiddleware');
@@ -26,6 +27,7 @@ const diagnosisValidation = [
 router.use(protect, authorize('super_admin', 'admin', 'doctor', 'clinician', 'patient'));
 
 router.route('/').get(getDiagnoses).post(authorize('super_admin', 'admin', 'doctor'), diagnosisValidation, createDiagnosis);
+router.get('/icd10/search', authorize('super_admin', 'admin', 'doctor', 'clinician'), searchIcd10Codes);
 router.get('/patient/:patientId', getDiagnosesByPatient);
 router
   .route('/:id')
