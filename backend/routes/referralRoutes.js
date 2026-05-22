@@ -13,7 +13,7 @@ const { authorize } = require('../middleware/roleMiddleware');
 const router = express.Router();
 
 const referralValidation = [
-  body('patient').optional().isMongoId().withMessage('Valid patient is required'),
+  body('patient').optional({ checkFalsy: true }).isMongoId().withMessage('Valid patient is required'),
   body('fromDoctor').optional({ checkFalsy: true }).isMongoId().withMessage('Valid fromDoctor is required'),
   body('toDoctor').optional({ checkFalsy: true }).isMongoId().withMessage('Valid toDoctor is required'),
   body('toDepartment').optional({ checkFalsy: true }).trim().isLength({ max: 120 }).withMessage('toDepartment is too long'),
@@ -32,8 +32,13 @@ router
     authorize('super_admin', 'admin', 'doctor', 'clinician'),
     [
       body('patient').isMongoId().withMessage('Valid patient is required'),
+      body('fromDoctor').optional({ checkFalsy: true }).isMongoId().withMessage('Valid fromDoctor is required'),
+      body('toDoctor').optional({ checkFalsy: true }).isMongoId().withMessage('Valid toDoctor is required'),
+      body('toDepartment').optional({ checkFalsy: true }).trim().isLength({ max: 120 }).withMessage('toDepartment is too long'),
       body('reason').trim().notEmpty().withMessage('Reason is required'),
-      ...referralValidation
+      body('notes').optional({ checkFalsy: true }).trim().isLength({ max: 2000 }).withMessage('Notes is too long'),
+      body('priority').optional().isIn(['low', 'normal', 'high', 'urgent']).withMessage('Invalid priority'),
+      body('status').optional().isIn(['pending', 'accepted', 'rejected', 'completed', 'cancelled']).withMessage('Invalid status')
     ],
     createReferral
   );

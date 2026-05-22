@@ -22,7 +22,7 @@ const ReferralForm = ({ patients = [], doctors = [], initialData, onSubmit, load
   useEffect(() => {
     if (!initialData) {
       setForm({
-        patient: '',
+        patient: patients[0]?._id || '',
         toDoctor: '',
         toDepartment: '',
         reason: '',
@@ -41,7 +41,7 @@ const ReferralForm = ({ patients = [], doctors = [], initialData, onSubmit, load
       priority: initialData.priority || 'normal',
       status: initialData.status || 'pending'
     });
-  }, [initialData]);
+  }, [initialData, patients]);
 
   const patientOptions = useMemo(
     () => patients.map((p) => ({ value: p._id, label: `${p.fullName} (${p.phone || '-'})` })),
