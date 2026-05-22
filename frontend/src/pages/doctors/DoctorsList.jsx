@@ -16,6 +16,37 @@ import { permissions } from '../../utils/permissions';
 import { toI18nKey } from '../../utils/i18nKeys';
 import DoctorForm from './DoctorForm';
 
+const canonicalFilterValues = {
+  specialties: {
+    cardiology: 'Cardiology',
+    orthopedics: 'Orthopedics',
+    gastroenterology: 'Gastroenterology',
+    general_practice: 'General Practice',
+    pediatrics: 'Pediatrics',
+    dermatology: 'Dermatology',
+    nephrology: 'Nephrology',
+    gynecology: 'Gynecology',
+    neurology: 'Neurology',
+    ophthalmology: 'Ophthalmology',
+    pulmonology: 'Pulmonology',
+    endocrinology: 'Endocrinology'
+  },
+  departments: {
+    heart_care: 'Heart Care',
+    internal_medicine: 'Internal Medicine',
+    family_health: 'Family Health',
+    neuroscience: 'Neuroscience',
+    skin_health: 'Skin Health',
+    respiratory_care: 'Respiratory Care',
+    women_health: 'Women Health',
+    bone_and_joint: 'Bone and Joint',
+    vision_center: 'Vision Center',
+    digestive_health: 'Digestive Health',
+    kidney_care: 'Kidney Care',
+    primary_care: 'Primary Care'
+  }
+};
+
 const DoctorsList = () => {
   const { user } = useAuth();
   const { t, language } = useLanguage();
@@ -37,8 +68,8 @@ const DoctorsList = () => {
     if (language === 'en') return input;
 
     const langMap = translations?.[language]?.[dictionary];
-    const enMap = translations?.en?.[dictionary];
-    if (!langMap || !enMap) return input;
+    const rawMap = canonicalFilterValues[dictionary];
+    if (!langMap || !rawMap) return input;
 
     const inputLower = input.toLowerCase();
     const candidates = Object.entries(langMap)
@@ -49,7 +80,7 @@ const DoctorsList = () => {
 
     const exactKey = candidates.find((key) => String(langMap[key]).toLowerCase() === inputLower);
     const key = exactKey || candidates[0];
-    return enMap[key] || input;
+    return rawMap[key] || input;
   };
 
   const loadDoctors = async () => {
@@ -104,11 +135,11 @@ const DoctorsList = () => {
   };
 
   const columns = [
-    { key: 'fullName', label: t('common.name') },
-    { key: 'specialty', label: t('forms.specialty'), render: (row) => t(`specialties.${toI18nKey(row.specialty)}`, row.specialty) },
+    { key: 'fullName', label: t('doctors.table.doctor', 'Shifokor') },
+    { key: 'specialty', label: t('doctors.table.specialty', 'Mutaxassisligi'), render: (row) => t(`specialties.${toI18nKey(row.specialty)}`, row.specialty) },
     { key: 'department', label: t('forms.department'), render: (row) => t(`departments.${toI18nKey(row.department)}`, row.department) },
     { key: 'phone', label: t('common.phone') },
-    { key: 'availability', label: t('forms.availability') }
+    { key: 'availability', label: t('doctors.table.workingHours', 'Ish vaqti') }
   ];
 
   return (
