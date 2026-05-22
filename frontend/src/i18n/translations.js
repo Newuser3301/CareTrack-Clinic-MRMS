@@ -251,9 +251,7 @@ export const translations = {
     },
     doctors: {
       table: {
-        doctor: 'Shifokor',
-        specialty: 'Mutaxassisligi',
-        workingHours: 'Ish vaqti'
+        doctor: 'Shifokor'
       }
     },
     pages: {
@@ -522,9 +520,7 @@ export const translations = {
     },
     doctors: {
       table: {
-        doctor: 'Doctor',
-        specialty: 'Specialty',
-        workingHours: 'Working hours'
+        doctor: 'Doctor'
       }
     },
     pages: {
@@ -793,9 +789,7 @@ export const translations = {
     },
     doctors: {
       table: {
-        doctor: 'Врач',
-        specialty: 'Специальность',
-        workingHours: 'График работы'
+        doctor: 'Врач'
       }
     },
     pages: {
