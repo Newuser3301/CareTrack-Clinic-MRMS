@@ -134,7 +134,7 @@ const DoctorsList = () => {
       {loading ? <Loader /> : (
         <Table
           columns={[
-            { ...columns[0], render: (row) => <Link to={`/doctors/${row._id}`} className="text-primary-700 hover:underline">{row.fullName}</Link> },
+            { ...columns[0], render: (row) => <Link to={`/doctors/${row._id}`} className="text-primary-700 hover:underline dark:text-white dark:hover:text-sky-100">{row.fullName}</Link> },
             ...columns.slice(1)
           ]}
           data={doctors}

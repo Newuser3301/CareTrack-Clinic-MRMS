@@ -104,12 +104,13 @@ const parseDoctorAvailability = (availability) => {
   // Examples:
   // - "Mon-Fri 09:30-17:30"
   // - "Mon, Wed, Fri 09:00-15:00"
-  const match = availability.trim().match(/^(.+?)\s+(\d{2}:\d{2})\s*-\s*(\d{2}:\d{2})$/);
+  // - "Dush, 09:00" (single 30-minute slot)
+  const match = availability.trim().match(/^(.+?)[,\s]+(\d{2}:\d{2})(?:\s*-\s*(\d{2}:\d{2}))?$/);
   if (!match) return null;
 
-  const daysPart = match[1];
+  const daysPart = match[1].replace(/,+$/, '').trim();
   const start = parseTimeToMinutes(match[2]);
-  const end = parseTimeToMinutes(match[3]);
+  const end = match[3] ? parseTimeToMinutes(match[3]) : start + 30;
   if (start === null || end === null || end <= start) return null;
 
   const allowedDays = new Set();
@@ -156,7 +157,7 @@ const generateSlotsForDate = ({ availability }, dateStr, { intervalMinutes = 30 
   const date = parseISODateLocal(dateStr);
   if (!date) return [];
 
-  const parsed = parseDoctorAvailability(availability);
+  const parsed = parseDoctorAvailability(availability) || parseDoctorAvailability('Mon-Fri 09:00-17:00');
   if (!parsed) return [];
 
   const weekday = date.getDay();

@@ -32,9 +32,22 @@ test('parseDoctorAvailability supports daily and localized day labels', () => {
   [0, 6].forEach((d) => assert.equal(uzbekRange.allowedDays.has(d), false));
 });
 
+test('parseDoctorAvailability supports single-time day entries', () => {
+  const single = parseDoctorAvailability('Dush, 09:00');
+  assert.ok(single);
+  assert.equal(single.allowedDays.has(1), true);
+  assert.equal(single.startMinutes, 9 * 60);
+  assert.equal(single.endMinutes, 9 * 60 + 30);
+});
+
 test('generateSlotsForDate returns half-hour slots in doctor window', () => {
   const doctor = { availability: 'Mon-Fri 09:30-10:30' };
   assert.deepEqual(generateSlotsForDate(doctor, '2026-05-19'), ['09:30', '10:00']);
+});
+
+test('generateSlotsForDate falls back to clinic hours when availability is invalid', () => {
+  const doctor = { availability: 'qwert' };
+  assert.deepEqual(generateSlotsForDate(doctor, '2026-05-19').slice(0, 3), ['09:00', '09:30', '10:00']);
 });
 
 test('weekend and past-date helpers behave for ISO dates', () => {
