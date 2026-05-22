@@ -111,8 +111,10 @@ const Profile = () => {
         { label: t('dashboard.patients'), value: data.stats.totalPatients, helper: t('profile.patientRoster'), icon: UserRound, tone: 'bg-green-50 text-green-700' },
         { label: t('dashboard.diagnoses'), value: data.stats.totalDiagnoses, helper: t('profile.careSummary'), icon: ClipboardList, tone: 'bg-cyan-50 text-cyan-700' },
         { label: t('profile.riskCases'), value: data.stats.severeDiagnoses, helper: t('profile.priorityWatch'), icon: AlertTriangle, tone: 'bg-amber-50 text-amber-700' },
-        { label: t('dashboard.users'), value: data.stats.totalUsers, helper: t('dashboard.systemAccounts'), icon: Users, tone: 'bg-slate-100 text-slate-700' }
-      ];
+        permissions.canManageUsers(user?.role)
+          ? { label: t('dashboard.users'), value: data.stats.totalUsers, helper: t('dashboard.systemAccounts'), icon: Users, tone: 'bg-slate-100 text-slate-700' }
+          : null
+      ].filter(Boolean);
 
   return (
     <div className="mx-auto max-w-7xl space-y-6">
@@ -141,7 +143,7 @@ const Profile = () => {
         </div>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <section className={`grid gap-4 md:grid-cols-2 ${summaryStats.length >= 4 ? 'xl:grid-cols-4' : 'xl:grid-cols-3'}`}>
         {summaryStats.map((item) => (
           <StatCard key={item.label} {...item} />
         ))}

@@ -46,7 +46,7 @@ router.get('/:id/profile', authorize('super_admin', 'admin', 'doctor', 'clinicia
 router
   .route('/:id')
   .get(authorize('super_admin', 'admin', 'doctor', 'clinician', 'receptionist', 'patient'), canAccessPatient(), getPatientById)
-  .put(authorize('super_admin', 'admin', 'doctor', 'clinician'), canAccessPatient({ write: true }), updatePatientValidation, updatePatient)
+  .put(authorize('super_admin', 'admin', 'clinician'), canAccessPatient({ write: true }), updatePatientValidation, updatePatient)
   .delete(authorize('super_admin', 'admin'), deletePatient);
 
 module.exports = router;

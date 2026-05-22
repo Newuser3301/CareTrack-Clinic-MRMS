@@ -11,7 +11,8 @@ const Navbar = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const role = user?.role;
-  const homePath = role === 'patient' ? '/' : '/dashboard';
+  const canViewDashboard = ['super_admin', 'admin'].includes(role);
+  const homePath = canViewDashboard ? '/dashboard' : '/';
   const quickActions = [
     { to: '/', label: t('nav.profile'), icon: UserCircle, show: ['patient', 'doctor'].includes(role) },
     { to: '/doctors', label: t('nav.doctors'), icon: Stethoscope, show: permissions.canViewDoctors(role) },
