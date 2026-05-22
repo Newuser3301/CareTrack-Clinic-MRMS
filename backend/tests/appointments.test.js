@@ -21,6 +21,17 @@ test('parseDoctorAvailability supports ranges and lists', () => {
   [0, 2, 4, 6].forEach((d) => assert.equal(list.allowedDays.has(d), false));
 });
 
+test('parseDoctorAvailability supports daily and localized day labels', () => {
+  const daily = parseDoctorAvailability('Daily 08:00-20:00');
+  assert.ok(daily);
+  [0, 1, 2, 3, 4, 5, 6].forEach((d) => assert.equal(daily.allowedDays.has(d), true));
+
+  const uzbekRange = parseDoctorAvailability('Dush-Juma 09:00-12:00');
+  assert.ok(uzbekRange);
+  [1, 2, 3, 4, 5].forEach((d) => assert.equal(uzbekRange.allowedDays.has(d), true));
+  [0, 6].forEach((d) => assert.equal(uzbekRange.allowedDays.has(d), false));
+});
+
 test('generateSlotsForDate returns half-hour slots in doctor window', () => {
   const doctor = { availability: 'Mon-Fri 09:30-10:30' };
   assert.deepEqual(generateSlotsForDate(doctor, '2026-05-19'), ['09:30', '10:00']);
@@ -36,4 +47,3 @@ test('weekend and past-date helpers behave for ISO dates', () => {
   assert.equal(isPastDate('2026-05-19', now), false);
   assert.equal(isPastDate('2026-05-20', now), false);
 });
-

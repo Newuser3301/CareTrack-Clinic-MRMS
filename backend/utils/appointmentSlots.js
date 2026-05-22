@@ -8,9 +8,49 @@ const DAY_TO_INDEX = {
   Sat: 6
 };
 
+const DAY_ALIASES = {
+  sun: 'Sun',
+  sunday: 'Sun',
+  yak: 'Sun',
+  yakshanba: 'Sun',
+  vos: 'Sun',
+  voskresenye: 'Sun',
+  mon: 'Mon',
+  monday: 'Mon',
+  dush: 'Mon',
+  dushanba: 'Mon',
+  pn: 'Mon',
+  tue: 'Tue',
+  tuesday: 'Tue',
+  sesh: 'Tue',
+  seshanba: 'Tue',
+  vt: 'Tue',
+  wed: 'Wed',
+  wednesday: 'Wed',
+  chor: 'Wed',
+  chorshanba: 'Wed',
+  sr: 'Wed',
+  thu: 'Thu',
+  thursday: 'Thu',
+  paysh: 'Thu',
+  payshanba: 'Thu',
+  cht: 'Thu',
+  fri: 'Fri',
+  friday: 'Fri',
+  juma: 'Fri',
+  pyat: 'Fri',
+  sat: 'Sat',
+  saturday: 'Sat',
+  shan: 'Sat',
+  shanba: 'Sat',
+  sub: 'Sat'
+};
+
 const normalizeDayToken = (token) => {
-  const trimmed = token.trim();
+  const trimmed = token.trim().replace(/\.$/, '');
   if (!trimmed) return null;
+  const normalized = trimmed.toLowerCase();
+  if (DAY_ALIASES[normalized]) return DAY_ALIASES[normalized];
   const key = trimmed.slice(0, 1).toUpperCase() + trimmed.slice(1, 3).toLowerCase();
   return DAY_TO_INDEX[key] === undefined ? null : key;
 };
@@ -73,6 +113,12 @@ const parseDoctorAvailability = (availability) => {
   if (start === null || end === null || end <= start) return null;
 
   const allowedDays = new Set();
+  const normalizedDaysPart = daysPart.trim().toLowerCase();
+  if (['daily', 'everyday', 'har kuni', 'har-kuni', 'каждый день', 'ежедневно'].includes(normalizedDaysPart)) {
+    Object.values(DAY_TO_INDEX).forEach((day) => allowedDays.add(day));
+    return { allowedDays, startMinutes: start, endMinutes: end };
+  }
+
   const dayTokens = daysPart.split(',').map((t) => t.trim()).filter(Boolean);
 
   const addRange = (fromKey, toKey) => {
@@ -132,4 +178,3 @@ module.exports = {
   parseTimeToMinutes,
   generateSlotsForDate
 };
-
