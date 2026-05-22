@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { Activity, ClipboardList, FilePlus2, LifeBuoy, Share2, Stethoscope, Users, UserCircle, UserRound } from 'lucide-react';
+import { Activity, Bell, ClipboardList, FilePlus2, LayoutGrid, LifeBuoy, Moon, Share2, Stethoscope, Sun, Users, UserCircle, UserRound } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { permissions } from '../utils/permissions';
@@ -10,6 +10,7 @@ const Sidebar = ({ open, onClose }) => {
   const role = user?.role;
   const homePath = role === 'patient' ? '/' : '/dashboard';
   const items = [
+    { to: '/dashboard', label: t('nav.dashboard'), icon: LayoutGrid, show: role && role !== 'patient' },
     { to: '/', label: t('nav.profile'), icon: UserCircle, show: Boolean(role) },
     { to: '/doctors', label: t('nav.doctors'), icon: Stethoscope, show: permissions.canViewDoctors(role) },
     { to: '/patients', label: t('nav.patients'), icon: UserRound, show: permissions.canViewPatients(role) },
@@ -24,28 +25,28 @@ const Sidebar = ({ open, onClose }) => {
     <>
       <div className={`fixed inset-0 z-30 bg-slate-900/30 lg:hidden ${open ? 'block' : 'hidden'}`} onClick={onClose} />
       <aside
-        className={`fixed inset-y-3 left-3 z-40 w-[min(16rem,calc(100vw-1.5rem))] transform rounded-[1.75rem] bg-gradient-to-b from-primary-700 via-cyan-950 to-slate-950 text-white shadow-soft transition lg:fixed lg:left-6 lg:top-0 lg:h-screen lg:w-40 lg:translate-x-0 lg:overflow-y-auto ${
+        className={`fixed inset-y-3 left-3 z-40 w-[min(17rem,calc(100vw-1.5rem))] transform overflow-hidden rounded-[1.75rem] bg-primary-600 text-white shadow-soft transition lg:fixed lg:left-8 lg:top-8 lg:h-[calc(100dvh-4rem)] lg:w-48 lg:translate-x-0 lg:overflow-y-auto ${
           open ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <NavLink to={homePath} onClick={onClose} className="flex flex-col items-center gap-4 px-5 py-8 text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/95 text-primary-700 shadow-panel">
-            <Activity size={26} />
+        <NavLink to={homePath} onClick={onClose} className="flex flex-col items-center gap-3 bg-primary-700/35 px-5 py-8 text-center">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full border-4 border-sky-100 bg-white text-primary-700 shadow-panel">
+            <Activity size={25} />
           </div>
           <div>
-            <p className="text-sm font-black uppercase leading-tight text-white">CareTrack</p>
-            <p className="text-xs font-bold uppercase text-cyan-100">Clinic Hub</p>
+            <p className="text-base font-black leading-tight text-white">{user?.name || 'CareTrack'}</p>
+            <p className="mt-1 max-w-[9rem] truncate text-xs font-semibold text-sky-100">{user?.email || 'Clinic Hub'}</p>
           </div>
         </NavLink>
-        <nav className="space-y-4 p-4">
+        <nav className="space-y-2 p-4">
           {items.map(({ to, label, icon: Icon }) => (
             <NavLink
               key={to}
               to={to}
               onClick={onClose}
               className={({ isActive }) =>
-                `flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-extrabold lg:flex-col lg:justify-center lg:gap-2 lg:px-2 ${
-                  isActive ? 'bg-white text-primary-700 shadow-panel' : 'text-cyan-100 hover:bg-white/10 hover:text-white'
+                `flex items-center gap-3 rounded-full px-4 py-3 text-sm font-bold ${
+                  isActive ? 'bg-white text-primary-700 shadow-panel' : 'text-sky-100 hover:bg-white/10 hover:text-white'
                 }`
               }
             >
@@ -54,6 +55,21 @@ const Sidebar = ({ open, onClose }) => {
             </NavLink>
           ))}
         </nav>
+        <div className="mt-auto px-4 pb-5">
+          <div className="rounded-full bg-primary-700/55 p-1">
+            <div className="grid grid-cols-2 gap-1">
+              <button type="button" className="flex items-center justify-center gap-2 rounded-full bg-white/15 px-3 py-2 text-xs font-bold text-white">
+                <Sun size={14} /> Light
+              </button>
+              <button type="button" className="flex items-center justify-center gap-2 rounded-full px-3 py-2 text-xs font-bold text-sky-100">
+                <Moon size={14} /> Dark
+              </button>
+            </div>
+          </div>
+          <div className="mt-3 flex items-center justify-center gap-2 text-xs font-semibold text-sky-100">
+            <Bell size={14} /> CareTrack
+          </div>
+        </div>
       </aside>
     </>
   );

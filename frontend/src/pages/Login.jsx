@@ -38,10 +38,10 @@ const Login = () => {
   };
 
   return (
-    <div className="grid min-h-screen bg-slate-950 lg:grid-cols-[1.1fr_0.9fr]">
-      <section className="hidden min-h-screen flex-col justify-between bg-slate-950 p-10 text-white lg:flex">
+    <div className="app-bg grid min-h-screen p-4 lg:grid-cols-[1.05fr_0.95fr] lg:p-8">
+      <section className="hidden min-h-[calc(100dvh-4rem)] flex-col justify-between rounded-[2rem] bg-primary-700 p-10 text-white shadow-soft lg:flex">
         <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-md bg-green-500 text-white">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-primary-700">
             <Activity size={26} />
           </div>
           <div>
@@ -50,21 +50,21 @@ const Login = () => {
           </div>
         </div>
         <div className="max-w-2xl">
-          <p className="text-sm font-semibold uppercase tracking-wide text-green-400">{t('login.clinicalOps')}</p>
+          <p className="text-sm font-semibold uppercase tracking-wide text-sky-100">{t('login.clinicalOps')}</p>
           <h1 className="mt-4 text-5xl font-bold leading-tight">{t('login.heroTitle')}</h1>
           <p className="mt-5 text-lg text-slate-300">
             {t('login.heroText')}
           </p>
           <div className="mt-8 grid grid-cols-3 gap-4">
-            <div className="rounded-lg border border-white/10 bg-white/5 p-4">
+            <div className="rounded-[1.25rem] border border-white/15 bg-white/10 p-4">
               <p className="text-2xl font-bold">RBAC</p>
               <p className="mt-1 text-sm text-slate-400">{t('login.workflows')}</p>
             </div>
-            <div className="rounded-lg border border-white/10 bg-white/5 p-4">
+            <div className="rounded-[1.25rem] border border-white/15 bg-white/10 p-4">
               <p className="text-2xl font-bold">JWT</p>
               <p className="mt-1 text-sm text-slate-400">{t('login.protected')}</p>
             </div>
-            <div className="rounded-lg border border-white/10 bg-white/5 p-4">
+            <div className="rounded-[1.25rem] border border-white/15 bg-white/10 p-4">
               <p className="text-2xl font-bold">MRMS</p>
               <p className="mt-1 text-sm text-slate-400">{t('login.records')}</p>
             </div>
@@ -72,11 +72,11 @@ const Login = () => {
         </div>
         <p className="text-sm text-slate-500">CareTrack Clinic MRMS</p>
       </section>
-      <section className="flex items-center justify-center bg-slate-100 p-4">
-      <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-soft">
+      <section className="flex items-center justify-center p-4">
+      <div className="w-full max-w-md rounded-[2rem] border-[10px] border-white/60 bg-white/[0.92] p-8 shadow-soft backdrop-blur">
         <div className="mb-6 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-md bg-primary-600 text-white">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary-600 text-white">
             <Activity size={26} />
           </div>
           <div>

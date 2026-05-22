@@ -4,10 +4,10 @@ const Table = ({ columns, data, renderActions, emptyMessage }) => {
   const { t } = useLanguage();
 
   return (
-    <div className="overflow-hidden rounded-[1.5rem] border border-white/70 bg-white/80 shadow-panel backdrop-blur">
+    <div className="clinic-card overflow-hidden backdrop-blur">
     <div className="overflow-x-auto">
-      <table className="min-w-full divide-y divide-cyan-100">
-        <thead className="bg-cyan-50/70">
+      <table className="min-w-full divide-y divide-sky-100">
+        <thead className="bg-sky-50/85">
           <tr>
             {columns.map((column) => (
               <th key={column.key} className="px-3 py-4 text-left text-[11px] font-extrabold uppercase tracking-wide text-slate-500 sm:px-5 sm:text-xs">
@@ -17,7 +17,7 @@ const Table = ({ columns, data, renderActions, emptyMessage }) => {
             {renderActions && <th className="px-3 py-4 text-right text-[11px] font-extrabold uppercase tracking-wide text-slate-500 sm:px-5 sm:text-xs">{t('common.actions')}</th>}
           </tr>
         </thead>
-        <tbody className="divide-y divide-cyan-50">
+        <tbody className="divide-y divide-sky-50">
           {data.length === 0 ? (
             <tr>
               <td className="px-3 py-10 text-center text-sm font-semibold text-slate-500 sm:px-5" colSpan={columns.length + (renderActions ? 1 : 0)}>
@@ -26,7 +26,7 @@ const Table = ({ columns, data, renderActions, emptyMessage }) => {
             </tr>
           ) : (
             data.map((row) => (
-              <tr key={row._id} className="hover:bg-cyan-50/60">
+              <tr key={row._id} className="hover:bg-sky-50/70">
                 {columns.map((column) => (
                   <td key={column.key} className="whitespace-nowrap px-3 py-4 text-sm font-semibold text-slate-700 sm:px-5">
                     {column.render ? column.render(row) : row[column.key]}

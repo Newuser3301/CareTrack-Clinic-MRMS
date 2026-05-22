@@ -1,11 +1,11 @@
 const styles = {
-  low: 'bg-green-100 text-green-700',
-  medium: 'bg-blue-100 text-blue-700',
+  low: 'bg-emerald-100 text-emerald-700',
+  medium: 'bg-sky-100 text-sky-700',
   high: 'bg-amber-100 text-amber-700',
-  critical: 'bg-red-100 text-red-700',
-  super_admin: 'bg-red-100 text-red-700',
-  admin: 'bg-blue-100 text-blue-700',
-  doctor: 'bg-green-100 text-green-700',
+  critical: 'bg-rose-100 text-rose-700',
+  super_admin: 'bg-rose-100 text-rose-700',
+  admin: 'bg-sky-100 text-sky-700',
+  doctor: 'bg-emerald-100 text-emerald-700',
   patient: 'bg-slate-100 text-slate-700'
 };
 

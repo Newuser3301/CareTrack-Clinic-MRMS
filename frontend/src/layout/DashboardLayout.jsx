@@ -6,14 +6,14 @@ import Footer from './Footer';
 
 const DashboardLayout = () => {
   return (
-    <div className="min-h-screen overflow-x-hidden p-3 lg:h-[100dvh] lg:overflow-hidden lg:p-6">
+    <div className="app-bg min-h-screen overflow-x-hidden p-3 lg:h-[100dvh] lg:overflow-hidden lg:p-8">
       <div className="hidden lg:block">
         <Sidebar open={false} onClose={() => {}} />
       </div>
-      <div id="dashboard-scroll-shell" className="flex min-w-0 flex-col rounded-[2rem] border border-white/60 bg-cyan-50/45 shadow-soft backdrop-blur lg:ml-[11.5rem] lg:h-[calc(100dvh-3rem)] lg:overflow-y-auto">
+      <div id="dashboard-scroll-shell" className="glass-panel flex min-w-0 flex-col rounded-[2rem] backdrop-blur-xl lg:ml-[13.5rem] lg:h-[calc(100dvh-4rem)] lg:overflow-y-auto">
         <Navbar />
         <TopNav />
-        <main className="mx-auto w-full max-w-[1760px] flex-1 p-4 lg:p-8">
+        <main className="mx-auto w-full max-w-[1760px] flex-1 p-3 sm:p-5 lg:p-6">
           <Outlet />
         </main>
         <Footer />

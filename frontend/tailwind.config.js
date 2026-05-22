@@ -4,16 +4,17 @@ export default {
     extend: {
       colors: {
         primary: {
-          50: '#e8fbff',
-          100: '#d4f5fb',
-          500: '#0ea5c6',
-          600: '#0f7490',
-          700: '#073b4a'
+          50: '#e9f6ff',
+          100: '#d2ecff',
+          500: '#1d8de2',
+          600: '#0d72c4',
+          700: '#075795'
         }
       },
       boxShadow: {
-        soft: '0 24px 60px rgba(3, 42, 54, 0.14)',
-        panel: '0 18px 45px rgba(15, 23, 42, 0.10)'
+        soft: '0 30px 80px rgba(12, 78, 135, 0.25)',
+        panel: '0 16px 34px rgba(13, 86, 151, 0.11)',
+        insetBlue: 'inset 0 1px 0 rgba(255,255,255,0.7)'
       }
     }
   },
