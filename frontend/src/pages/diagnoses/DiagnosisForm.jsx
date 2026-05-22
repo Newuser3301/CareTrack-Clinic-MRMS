@@ -23,7 +23,7 @@ const DiagnosisForm = ({ initialData, patients, defaultPatient, onSubmit, onCanc
   const update = (field, value) => setForm((current) => ({ ...current, [field]: value }));
 
   return (
-    <form className="grid gap-4 md:grid-cols-2" onSubmit={(event) => { event.preventDefault(); onSubmit(form); }}>
+    <form className="grid gap-4 md:grid-cols-2" onSubmit={(event) => { event.preventDefault(); onSubmit({ ...form, notes: '' }); }}>
       <Select
         label={t('dashboard.patients')}
         value={form.patient}
@@ -46,13 +46,13 @@ const DiagnosisForm = ({ initialData, patients, defaultPatient, onSubmit, onCanc
         required
       />
       <Input label={t('forms.diagnosedDate')} type="date" value={form.diagnosedDate} onChange={(event) => update('diagnosedDate', event.target.value)} required />
-      <Input label={t('common.description')} className="md:col-span-2" value={form.description} onChange={(event) => update('description', event.target.value)} required />
       <label className="block md:col-span-2">
-        <span className="mb-1 block text-sm font-medium text-slate-700">{t('forms.notes')}</span>
+        <span className="mb-2 block text-sm font-extrabold text-slate-600">{t('common.description')}</span>
         <textarea
-          className="focus-ring min-h-28 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm"
-          value={form.notes}
-          onChange={(event) => update('notes', event.target.value)}
+          className="focus-ring min-h-32 w-full rounded-[1.15rem] border border-sky-100 bg-white/95 px-4 py-3 text-sm font-semibold text-slate-900 shadow-sm placeholder:text-slate-400"
+          value={form.description}
+          onChange={(event) => update('description', event.target.value)}
+          required
         />
       </label>
       <div className="sticky bottom-0 flex justify-end gap-3 bg-cyan-50/96 pt-4 md:col-span-2">
