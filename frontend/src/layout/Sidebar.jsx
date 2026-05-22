@@ -2,11 +2,13 @@ import { NavLink } from 'react-router-dom';
 import { Activity, Bell, ClipboardList, FilePlus2, LayoutGrid, LifeBuoy, Moon, Share2, Stethoscope, Sun, Users, UserCircle, UserRound } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useTheme } from '../context/ThemeContext';
 import { permissions } from '../utils/permissions';
 
 const Sidebar = ({ open, onClose }) => {
   const { user } = useAuth();
   const { t } = useLanguage();
+  const { theme, setTheme } = useTheme();
   const role = user?.role;
   const homePath = role === 'patient' ? '/' : '/dashboard';
   const items = [
@@ -25,7 +27,7 @@ const Sidebar = ({ open, onClose }) => {
     <>
       <div className={`fixed inset-0 z-30 bg-slate-900/30 lg:hidden ${open ? 'block' : 'hidden'}`} onClick={onClose} />
       <aside
-        className={`fixed inset-y-3 left-3 z-40 w-[min(17rem,calc(100vw-1.5rem))] transform overflow-hidden rounded-[1.75rem] bg-primary-600 text-white shadow-soft transition lg:fixed lg:left-8 lg:top-8 lg:h-[calc(100dvh-4rem)] lg:w-48 lg:translate-x-0 lg:overflow-y-auto ${
+        className={`fixed inset-y-3 left-3 z-40 w-[min(17rem,calc(100vw-1.5rem))] transform overflow-hidden rounded-[1.75rem] bg-primary-600 text-white shadow-soft transition dark:bg-slate-950 lg:fixed lg:left-8 lg:top-8 lg:h-[calc(100dvh-4rem)] lg:w-48 lg:translate-x-0 lg:overflow-y-auto ${
           open ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -56,12 +58,26 @@ const Sidebar = ({ open, onClose }) => {
           ))}
         </nav>
         <div className="mt-auto px-4 pb-5">
-          <div className="rounded-full bg-primary-700/55 p-1">
+          <div className="rounded-full bg-primary-700/55 p-1 dark:bg-slate-900">
             <div className="grid grid-cols-2 gap-1">
-              <button type="button" className="flex items-center justify-center gap-2 rounded-full bg-white/15 px-3 py-2 text-xs font-bold text-white">
+              <button
+                type="button"
+                onClick={() => setTheme('light')}
+                aria-pressed={theme === 'light'}
+                className={`flex items-center justify-center gap-2 rounded-full px-3 py-2 text-xs font-bold transition ${
+                  theme === 'light' ? 'bg-white/20 text-white shadow-sm' : 'text-sky-100 hover:bg-white/10'
+                }`}
+              >
                 <Sun size={14} /> Light
               </button>
-              <button type="button" className="flex items-center justify-center gap-2 rounded-full px-3 py-2 text-xs font-bold text-sky-100">
+              <button
+                type="button"
+                onClick={() => setTheme('dark')}
+                aria-pressed={theme === 'dark'}
+                className={`flex items-center justify-center gap-2 rounded-full px-3 py-2 text-xs font-bold transition ${
+                  theme === 'dark' ? 'bg-white/20 text-white shadow-sm' : 'text-sky-100 hover:bg-white/10'
+                }`}
+              >
                 <Moon size={14} /> Dark
               </button>
             </div>
