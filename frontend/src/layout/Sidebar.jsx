@@ -10,9 +10,10 @@ const Sidebar = ({ open, onClose }) => {
   const { t } = useLanguage();
   const { theme, setTheme } = useTheme();
   const role = user?.role;
-  const homePath = role === 'patient' ? '/' : '/dashboard';
+  const canViewDashboard = ['super_admin', 'admin'].includes(role);
+  const homePath = canViewDashboard ? '/dashboard' : '/';
   const items = [
-    { to: '/dashboard', label: t('nav.dashboard'), icon: LayoutGrid, show: role && role !== 'patient' },
+    { to: '/dashboard', label: t('nav.dashboard'), icon: LayoutGrid, show: canViewDashboard },
     { to: '/', label: t('nav.profile'), icon: UserCircle, show: Boolean(role) },
     { to: '/doctors', label: t('nav.doctors'), icon: Stethoscope, show: permissions.canViewDoctors(role) },
     { to: '/patients', label: t('nav.patients'), icon: UserRound, show: permissions.canViewPatients(role) },

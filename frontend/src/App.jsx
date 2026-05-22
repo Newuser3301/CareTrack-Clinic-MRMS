@@ -25,7 +25,7 @@ const App = () => (
     <Route element={<PrivateRoute />}>
       <Route element={<DashboardLayout />}>
         <Route index element={<Home />} />
-        <Route element={<RoleRoute allowedRoles={['super_admin', 'admin', 'doctor', 'clinician', 'receptionist']} />}>
+        <Route element={<RoleRoute allowedRoles={['super_admin', 'admin']} />}>
           <Route path="dashboard" element={<Dashboard />} />
         </Route>
         <Route element={<RoleRoute allowedRoles={['super_admin', 'admin', 'doctor', 'receptionist']} />}>

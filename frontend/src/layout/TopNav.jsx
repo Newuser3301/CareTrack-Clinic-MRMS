@@ -15,10 +15,11 @@ const TopNav = () => {
   const { user } = useAuth();
   const { t } = useLanguage();
   const role = user?.role;
+  const canViewDashboard = ['super_admin', 'admin'].includes(role);
 
   const items = [
     { to: '/', label: t('nav.profile'), icon: UserCircle, show: Boolean(role) },
-    { to: '/dashboard', label: t('nav.dashboard'), icon: LayoutGrid, show: role !== 'patient' },
+    { to: '/dashboard', label: t('nav.dashboard'), icon: LayoutGrid, show: canViewDashboard },
     { to: '/doctors', label: t('nav.doctors'), icon: Stethoscope, show: permissions.canViewDoctors(role) },
     { to: '/patients', label: t('nav.patients'), icon: UserRound, show: permissions.canViewPatients(role) },
     { to: '/diagnoses', label: t('nav.diagnoses'), icon: ClipboardList, show: permissions.canViewDiagnoses(role) },
