@@ -1,4 +1,4 @@
-import { Activity, ClipboardList, LogOut, Search, Stethoscope, UserCircle, UserRound, Users } from 'lucide-react';
+import { Activity, ClipboardList, LogOut, Stethoscope, UserCircle, UserRound, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
 import LanguageSwitcher from '../components/LanguageSwitcher';
@@ -35,12 +35,6 @@ const Navbar = () => {
             <p className="mt-1 hidden text-xs font-semibold text-slate-400 sm:block">{heading.subtitle}</p>
           </div>
         </button>
-      </div>
-      <div className="hidden min-w-0 flex-1 justify-center lg:flex">
-        <div className="relative w-full max-w-sm">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-primary-600" size={17} />
-          <input className="h-12 w-full rounded-full border border-sky-100 bg-sky-50/90 pl-11 pr-4 text-sm font-semibold outline-none placeholder:text-slate-400 focus:ring-2 focus:ring-primary-500" placeholder={t('common.search')} />
-        </div>
       </div>
       <div className="flex items-center gap-2">
         {quickActions.map(({ to, label, icon: Icon }) => (
