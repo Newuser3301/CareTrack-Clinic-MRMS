@@ -62,6 +62,6 @@ router.post(
   [body('password').custom(validatePassword).withMessage(passwordPolicyMessage)],
   resetPassword
 );
-router.get('/me', protect, getMe);
+router.get('/me', getSession);
 
 module.exports = router;
