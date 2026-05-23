@@ -12,7 +12,6 @@ const ReferralForm = ({ patients = [], doctors = [], initialData, onSubmit, load
   const [form, setForm] = useState({
     patient: '',
     toDoctor: '',
-    toDepartment: '',
     institutionName: defaultInstitutionName,
     referralNumber: '',
     validityPeriod: '',
@@ -28,7 +27,6 @@ const ReferralForm = ({ patients = [], doctors = [], initialData, onSubmit, load
       setForm({
         patient: patients[0]?._id || '',
         toDoctor: '',
-        toDepartment: '',
         institutionName: defaultInstitutionName,
         referralNumber: '',
         validityPeriod: '',
@@ -43,7 +41,6 @@ const ReferralForm = ({ patients = [], doctors = [], initialData, onSubmit, load
     setForm({
       patient: initialData.patient?._id || '',
       toDoctor: initialData.toDoctor?._id || '',
-      toDepartment: initialData.toDepartment || '',
       institutionName: initialData.institutionName || defaultInstitutionName,
       referralNumber: initialData.referralNumber || '',
       validityPeriod: initialData.validityPeriod || '',
@@ -68,7 +65,6 @@ const ReferralForm = ({ patients = [], doctors = [], initialData, onSubmit, load
     event.preventDefault();
     const payload = {
       patient: form.patient,
-      toDepartment: form.toDepartment || '',
       institutionName: form.institutionName || defaultInstitutionName,
       referralNumber: form.referralNumber || '',
       validityPeriod: form.validityPeriod || '',
@@ -110,12 +106,6 @@ const ReferralForm = ({ patients = [], doctors = [], initialData, onSubmit, load
           value={form.referralNumber}
           onChange={(event) => setForm((s) => ({ ...s, referralNumber: event.target.value }))}
           placeholder="MRMS-001"
-        />
-        <Input
-          label={t('forms.department', "Bo'lim")}
-          value={form.toDepartment}
-          onChange={(event) => setForm((s) => ({ ...s, toDepartment: event.target.value }))}
-          placeholder={t('placeholders.departmentExample')}
         />
         <Input
           label={t('referrals.validityPeriod', "Yo'llanma muddati")}
