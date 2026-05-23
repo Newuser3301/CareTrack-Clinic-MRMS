@@ -1,5 +1,5 @@
 import { Activity, ClipboardList, LogOut, Stethoscope, UserCircle, UserRound, Users } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 import { useAuth } from '../context/AuthContext';
@@ -10,6 +10,7 @@ const Navbar = () => {
   const { user, logout } = useAuth();
   const { t } = useLanguage();
   const navigate = useNavigate();
+  const location = useLocation();
   const role = user?.role;
   const canViewDashboard = ['super_admin', 'admin'].includes(role);
   const homePath = canViewDashboard ? '/dashboard' : '/';
@@ -20,9 +21,21 @@ const Navbar = () => {
     { to: '/diagnoses', label: t('nav.diagnoses'), icon: ClipboardList, show: permissions.canViewDiagnoses(role) },
     { to: '/users', label: t('nav.users'), icon: Users, show: permissions.canManageUsers(role) }
   ].filter((item) => item.show).slice(0, 4);
-  const heading = role === 'patient'
-    ? { label: t('nav.profile'), title: t('nav.profile'), subtitle: t('profile.subtitle') }
-    : { label: t('nav.dashboardLabel'), title: t('nav.mainMenu'), subtitle: t('nav.subtitle') };
+  const headingMap = [
+    { match: /^\/dashboard/, title: t('nav.dashboard'), subtitle: t('nav.subtitle') },
+    { match: /^\/doctors/, title: t('pages.doctorsTitle'), subtitle: t('pages.doctorsSubtitle') },
+    { match: /^\/patients/, title: t('pages.patientsTitle'), subtitle: t('pages.patientsSubtitle') },
+    { match: /^\/diagnoses/, title: t('pages.diagnosesTitle'), subtitle: t('pages.diagnosesSubtitle') },
+    { match: /^\/referrals/, title: t('nav.referrals'), subtitle: t('referrals.subtitle') },
+    { match: /^\/registrations/, title: t('nav.registrations'), subtitle: t('registrations.subtitle') },
+    { match: /^\/emergencies/, title: t('nav.emergencies'), subtitle: t('emergencies.subtitle') },
+    { match: /^\/users/, title: t('pages.usersTitle'), subtitle: t('pages.usersSubtitle') }
+  ];
+  const heading =
+    headingMap.find((item) => item.match.test(location.pathname)) ||
+    (role === 'patient'
+      ? { title: t('nav.profile'), subtitle: t('profile.subtitle') }
+      : { title: t('nav.mainMenu'), subtitle: t('nav.subtitle') });
 
   return (
     <header className="sticky top-0 z-20 flex min-h-20 items-center justify-between gap-4 rounded-[1.45rem] bg-white/88 px-4 py-3 shadow-sm backdrop-blur lg:mx-1 lg:mt-1 lg:px-5">

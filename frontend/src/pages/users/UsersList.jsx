@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Pencil, Plus, Trash2 } from 'lucide-react';
+import { CalendarDays, Mail, Pencil, Plus, ShieldCheck, Trash2, UsersRound } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import api from '../../api/axios';
 import Badge from '../../components/Badge';
@@ -13,6 +13,47 @@ import { useLanguage } from '../../context/LanguageContext';
 import { roleLabel } from '../../utils/permissions';
 
 const roleOrder = ['super_admin', 'admin', 'doctor', 'clinician', 'receptionist', 'patient'];
+const roleStyles = {
+  super_admin: {
+    accent: 'from-rose-500 to-pink-500',
+    icon: 'bg-rose-100 text-rose-700',
+    panel: 'bg-rose-50/70'
+  },
+  admin: {
+    accent: 'from-sky-500 to-cyan-500',
+    icon: 'bg-sky-100 text-sky-700',
+    panel: 'bg-sky-50/70'
+  },
+  doctor: {
+    accent: 'from-emerald-500 to-teal-500',
+    icon: 'bg-emerald-100 text-emerald-700',
+    panel: 'bg-emerald-50/70'
+  },
+  clinician: {
+    accent: 'from-violet-500 to-indigo-500',
+    icon: 'bg-violet-100 text-violet-700',
+    panel: 'bg-violet-50/70'
+  },
+  receptionist: {
+    accent: 'from-amber-500 to-orange-500',
+    icon: 'bg-amber-100 text-amber-700',
+    panel: 'bg-amber-50/70'
+  },
+  patient: {
+    accent: 'from-slate-500 to-slate-700',
+    icon: 'bg-slate-100 text-slate-700',
+    panel: 'bg-slate-50/80'
+  }
+};
+
+const initials = (name = '') =>
+  name
+    .split(' ')
+    .filter(Boolean)
+    .map((part) => part[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase() || 'U';
 
 const UsersList = () => {
   const { user: currentUser } = useAuth();
@@ -54,6 +95,9 @@ const UsersList = () => {
         users: grouped[role].sort((a, b) => a.name.localeCompare(b.name))
       }));
   }, [users]);
+
+  const totalManagers = users.filter((user) => ['super_admin', 'admin'].includes(user.role)).length;
+  const totalCareTeam = users.filter((user) => ['doctor', 'clinician', 'receptionist'].includes(user.role)).length;
 
   const saveUser = async (payload) => {
     setSaving(true);
@@ -99,45 +143,87 @@ const UsersList = () => {
               {t('common.noRecords')}
             </div>
           ) : (
-            roleSections.map(({ role, users: sectionUsers }) => (
-              <section key={role} className="clinic-card overflow-hidden backdrop-blur">
-                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-sky-100 bg-sky-50/85 px-5 py-4">
-                  <div className="flex items-center gap-3">
-                    <Badge tone={role}>{t(`roles.${role}`, roleLabel(role))}</Badge>
-                    <span className="text-sm font-extrabold text-slate-500">{sectionUsers.length}</span>
+            <>
+              <div className="grid gap-3 md:grid-cols-3">
+                <div className="clinic-card flex items-center gap-4 p-4">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-sky-100 text-primary-700">
+                    <UsersRound size={22} />
+                  </div>
+                  <div>
+                    <p className="text-xs font-extrabold uppercase text-slate-500">{t('pages.usersTitle')}</p>
+                    <p className="text-2xl font-black text-slate-950">{users.length}</p>
                   </div>
                 </div>
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-sky-50">
-                    <thead>
-                      <tr>
-                        <th className="px-3 py-3 text-left text-[11px] font-extrabold uppercase tracking-wide text-slate-500 sm:px-5 sm:text-xs">{t('common.name')}</th>
-                        <th className="px-3 py-3 text-left text-[11px] font-extrabold uppercase tracking-wide text-slate-500 sm:px-5 sm:text-xs">{t('common.email')}</th>
-                        <th className="px-3 py-3 text-left text-[11px] font-extrabold uppercase tracking-wide text-slate-500 sm:px-5 sm:text-xs">{t('common.created')}</th>
-                        <th className="px-3 py-3 text-right text-[11px] font-extrabold uppercase tracking-wide text-slate-500 sm:px-5 sm:text-xs">{t('common.actions')}</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-sky-50">
-                      {sectionUsers.map((user) => (
-                        <tr key={user._id} className="hover:bg-sky-50/70">
-                          <td className="whitespace-nowrap px-3 py-4 text-sm font-semibold sm:px-5">
-                            <Link to={`/users/${user._id}`} className="text-primary-700 hover:underline">{user.name}</Link>
-                          </td>
-                          <td className="whitespace-nowrap px-3 py-4 text-sm font-semibold text-slate-700 sm:px-5">{user.email}</td>
-                          <td className="whitespace-nowrap px-3 py-4 text-sm font-semibold text-slate-700 sm:px-5">{new Date(user.createdAt).toLocaleDateString()}</td>
-                          <td className="px-3 py-4 text-right sm:px-5">
-                            <div className="flex justify-end gap-2">
-                              <Button variant="secondary" className="h-9 w-9 px-0" onClick={() => setModal({ open: true, user })} aria-label={t('actions.edit')}><Pencil size={16} /></Button>
-                              <Button variant="danger" className="h-9 w-9 px-0" onClick={() => setConfirm(user)} aria-label={t('actions.delete')}><Trash2 size={16} /></Button>
+                <div className="clinic-card flex items-center gap-4 p-4">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-100 text-rose-700">
+                    <ShieldCheck size={22} />
+                  </div>
+                  <div>
+                    <p className="text-xs font-extrabold uppercase text-slate-500">{t('common.role')}</p>
+                    <p className="text-2xl font-black text-slate-950">{totalManagers}</p>
+                  </div>
+                </div>
+                <div className="clinic-card flex items-center gap-4 p-4">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700">
+                    <UsersRound size={22} />
+                  </div>
+                  <div>
+                    <p className="text-xs font-extrabold uppercase text-slate-500">{t('dashboard.activeProviders')}</p>
+                    <p className="text-2xl font-black text-slate-950">{totalCareTeam}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid gap-4 xl:grid-cols-2">
+                {roleSections.map(({ role, users: sectionUsers }) => {
+                  const style = roleStyles[role] || roleStyles.patient;
+                  return (
+              <section key={role} className="clinic-card overflow-hidden backdrop-blur">
+                <div className={`h-1.5 bg-gradient-to-r ${style.accent}`} />
+                <div className={`flex flex-wrap items-center justify-between gap-3 border-b border-sky-100 px-5 py-4 ${style.panel}`}>
+                  <div className="flex items-center gap-3">
+                    <div className={`flex h-10 w-10 items-center justify-center rounded-2xl ${style.icon}`}>
+                      <ShieldCheck size={20} />
+                    </div>
+                    <div>
+                    <Badge tone={role}>{t(`roles.${role}`, roleLabel(role))}</Badge>
+                      <p className="mt-1 text-xs font-bold text-slate-500">{sectionUsers.length} account</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="divide-y divide-sky-50">
+                  {sectionUsers.map((user) => (
+                    <div key={user._id} className="grid gap-3 px-5 py-4 transition hover:bg-sky-50/65 sm:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_auto] sm:items-center">
+                      <div className="flex min-w-0 items-center gap-3">
+                        <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-sm font-black ${style.icon}`}>
+                          {initials(user.name)}
+                        </div>
+                        <div className="min-w-0">
+                          <Link to={`/users/${user._id}`} className="block truncate text-sm font-black text-primary-700 hover:underline">
+                            {user.name}
+                          </Link>
+                          <div className="mt-1 flex items-center gap-1.5 text-xs font-semibold text-slate-500">
+                            <CalendarDays size={13} />
+                            {new Date(user.createdAt).toLocaleDateString()}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex min-w-0 items-center gap-2 text-sm font-semibold text-slate-700">
+                        <Mail size={16} className="shrink-0 text-slate-400" />
+                        <span className="truncate">{user.email}</span>
+                      </div>
+                      <div className="flex justify-end gap-2">
+                        <Button variant="secondary" className="h-10 w-10 px-0" onClick={() => setModal({ open: true, user })} aria-label={t('actions.edit')}><Pencil size={16} /></Button>
+                        <Button variant="danger" className="h-10 w-10 px-0" onClick={() => setConfirm(user)} aria-label={t('actions.delete')}><Trash2 size={16} /></Button>
                             </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                    </div>
+                  ))}
                 </div>
               </section>
-            ))
+                  );
+                })}
+              </div>
+            </>
           )}
         </div>
       )}
