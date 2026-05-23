@@ -21,6 +21,36 @@ const referralSchema = new mongoose.Schema(
       trim: true,
       maxlength: 120
     },
+    institutionName: {
+      type: String,
+      trim: true,
+      maxlength: 160,
+      default: 'CareTrack Clinic'
+    },
+    referralNumber: {
+      type: String,
+      trim: true,
+      maxlength: 60,
+      default: ''
+    },
+    validityPeriod: {
+      type: String,
+      trim: true,
+      maxlength: 120,
+      default: ''
+    },
+    responsibleDoctorName: {
+      type: String,
+      trim: true,
+      maxlength: 120,
+      default: ''
+    },
+    receptionistName: {
+      type: String,
+      trim: true,
+      maxlength: 120,
+      default: ''
+    },
     reason: {
       type: String,
       required: [true, 'Reason is required'],
@@ -66,4 +96,3 @@ referralSchema.index({ toDoctor: 1, status: 1 });
 referralSchema.index({ toDepartment: 1, status: 1 });
 
 module.exports = mongoose.model('Referral', referralSchema);
-

@@ -25,6 +25,7 @@ const ReferralsList = () => {
   const [error, setError] = useState('');
   const [modal, setModal] = useState({ open: false, referral: null });
   const [confirm, setConfirm] = useState(null);
+  const defaultInstitutionName = 'CareTrack Clinic';
 
   const canCreate = permissions.canCreateReferral(role);
   const canEdit = permissions.canEditReferral(role);
@@ -206,6 +207,10 @@ const ReferralsList = () => {
     const patient = referral.patient || {};
     const date = referral.createdAt ? new Date(referral.createdAt).toLocaleDateString() : new Date().toLocaleDateString();
     const birthDate = patient.dateOfBirth ? new Date(patient.dateOfBirth).toLocaleDateString() : '-';
+    const institutionName = referral.institutionName || defaultInstitutionName;
+    const referralNumber = referral.referralNumber || referral._id?.slice(-8)?.toUpperCase() || '-';
+    const responsibleDoctor = referral.responsibleDoctorName || referral.fromDoctor?.fullName || referral.toDoctor?.fullName || '-';
+    const receptionist = referral.receptionistName || referral.createdBy?.name || '-';
     const commands = [
       strokeColorCmd(0.08, 0.28, 0.45),
       rectCmd(36, 36, 540, 720),
@@ -218,10 +223,11 @@ const ReferralsList = () => {
       textCmd(labels.form, 390, 716, 10),
       fillColorCmd(0, 0, 0),
       textCmd(labels.ministry, 62, 675, 11),
+      textCmd(institutionName, 62, 656, 11, true),
       lineCmd(62, 650, 285, 650),
       textCmd(labels.institution, 102, 636, 9),
       textCmd(`${labels.date}: ${date}`, 392, 675, 10),
-      textCmd('No: ________', 392, 658, 10),
+      textCmd(`No: ${referralNumber}`, 392, 658, 10),
       textCmd(labels.title, 202, 602, 18, true),
       lineCmd(185, 594, 428, 594),
       textCmd(`(${labels.subtitle})`, 224, 580, 10, true),
@@ -251,14 +257,17 @@ const ReferralsList = () => {
       commands.push(textCmd(`${index + 1}. ${line}`, 75, 365 - index * 23, 11));
     });
     commands.push(
-      textCmd(labels.validity, 120, 172, 10),
+      textCmd(`${labels.validity}:`, 120, 172, 10),
+      textCmd(referral.validityPeriod || '-', 250, 172, 10),
       lineCmd(250, 170, 455, 170),
       rectCmd(70, 78, 105, 65),
       textCmd(labels.stamp, 92, 108, 10),
       textCmd(labels.responsible, 230, 126, 10),
+      textCmd(responsibleDoctor, 360, 136, 9),
       lineCmd(360, 124, 535, 124),
       textCmd(`(${labels.signature})`, 420, 110, 9),
       textCmd(labels.receptionist, 230, 86, 10),
+      textCmd(receptionist, 340, 96, 9),
       lineCmd(340, 84, 535, 84),
       textCmd(`(${labels.signature})`, 420, 70, 9)
     );

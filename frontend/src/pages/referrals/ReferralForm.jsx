@@ -5,6 +5,7 @@ import Select from '../../components/Select';
 import { useLanguage } from '../../context/LanguageContext';
 
 const priorities = ['low', 'normal', 'high', 'urgent'];
+const defaultInstitutionName = 'CareTrack Clinic';
 
 const ReferralForm = ({ patients = [], doctors = [], initialData, onSubmit, loading, onCancel }) => {
   const { t } = useLanguage();
@@ -12,6 +13,11 @@ const ReferralForm = ({ patients = [], doctors = [], initialData, onSubmit, load
     patient: '',
     toDoctor: '',
     toDepartment: '',
+    institutionName: defaultInstitutionName,
+    referralNumber: '',
+    validityPeriod: '',
+    responsibleDoctorName: '',
+    receptionistName: '',
     reason: '',
     notes: '',
     priority: 'normal'
@@ -23,6 +29,11 @@ const ReferralForm = ({ patients = [], doctors = [], initialData, onSubmit, load
         patient: patients[0]?._id || '',
         toDoctor: '',
         toDepartment: '',
+        institutionName: defaultInstitutionName,
+        referralNumber: '',
+        validityPeriod: '',
+        responsibleDoctorName: '',
+        receptionistName: '',
         reason: '',
         notes: '',
         priority: 'normal'
@@ -33,6 +44,11 @@ const ReferralForm = ({ patients = [], doctors = [], initialData, onSubmit, load
       patient: initialData.patient?._id || '',
       toDoctor: initialData.toDoctor?._id || '',
       toDepartment: initialData.toDepartment || '',
+      institutionName: initialData.institutionName || defaultInstitutionName,
+      referralNumber: initialData.referralNumber || '',
+      validityPeriod: initialData.validityPeriod || '',
+      responsibleDoctorName: initialData.responsibleDoctorName || '',
+      receptionistName: initialData.receptionistName || '',
       reason: initialData.reason || '',
       notes: '',
       priority: initialData.priority || 'normal'
@@ -53,6 +69,11 @@ const ReferralForm = ({ patients = [], doctors = [], initialData, onSubmit, load
     const payload = {
       patient: form.patient,
       toDepartment: form.toDepartment || '',
+      institutionName: form.institutionName || defaultInstitutionName,
+      referralNumber: form.referralNumber || '',
+      validityPeriod: form.validityPeriod || '',
+      responsibleDoctorName: form.responsibleDoctorName || '',
+      receptionistName: form.receptionistName || '',
       reason: form.reason,
       notes: '',
       priority: form.priority
@@ -77,12 +98,44 @@ const ReferralForm = ({ patients = [], doctors = [], initialData, onSubmit, load
         onChange={(event) => setForm((s) => ({ ...s, toDoctor: event.target.value }))}
         options={doctorOptions}
       />
-      <Input
-        label={t('forms.department', "Bo'lim")}
-        value={form.toDepartment}
-        onChange={(event) => setForm((s) => ({ ...s, toDepartment: event.target.value }))}
-        placeholder={t('placeholders.departmentExample')}
-      />
+      <div className="grid gap-3 sm:grid-cols-2">
+        <Input
+          label={t('referrals.institutionName', 'Muassasa nomi')}
+          value={form.institutionName}
+          onChange={(event) => setForm((s) => ({ ...s, institutionName: event.target.value }))}
+          placeholder={defaultInstitutionName}
+        />
+        <Input
+          label={t('referrals.referralNumber', "Yo'llanma raqami")}
+          value={form.referralNumber}
+          onChange={(event) => setForm((s) => ({ ...s, referralNumber: event.target.value }))}
+          placeholder="MRMS-001"
+        />
+        <Input
+          label={t('forms.department', "Bo'lim")}
+          value={form.toDepartment}
+          onChange={(event) => setForm((s) => ({ ...s, toDepartment: event.target.value }))}
+          placeholder={t('placeholders.departmentExample')}
+        />
+        <Input
+          label={t('referrals.validityPeriod', "Yo'llanma muddati")}
+          value={form.validityPeriod}
+          onChange={(event) => setForm((s) => ({ ...s, validityPeriod: event.target.value }))}
+          placeholder="30 kun"
+        />
+        <Input
+          label={t('referrals.responsibleDoctor', "Mas'ul shifokor")}
+          value={form.responsibleDoctorName}
+          onChange={(event) => setForm((s) => ({ ...s, responsibleDoctorName: event.target.value }))}
+          placeholder="Dr. Amina Karimova"
+        />
+        <Input
+          label={t('referrals.receptionist', 'Qabul xodimi')}
+          value={form.receptionistName}
+          onChange={(event) => setForm((s) => ({ ...s, receptionistName: event.target.value }))}
+          placeholder="Qabul xodimi F.I.Sh."
+        />
+      </div>
       <label className="block">
         <span className="mb-2 block text-sm font-extrabold text-slate-600">{t('common.description', 'Tavsif')}</span>
         <textarea

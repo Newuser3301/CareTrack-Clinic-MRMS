@@ -113,6 +113,11 @@ const createReferral = async (req, res, next) => {
       fromDoctor,
       toDoctor: req.body.toDoctor || undefined,
       toDepartment: req.body.toDepartment || '',
+      institutionName: req.body.institutionName || 'CareTrack Clinic',
+      referralNumber: req.body.referralNumber || '',
+      validityPeriod: req.body.validityPeriod || '',
+      responsibleDoctorName: req.body.responsibleDoctorName || '',
+      receptionistName: req.body.receptionistName || '',
       reason: req.body.reason,
       notes: req.body.notes || '',
       priority: req.body.priority || 'normal',
@@ -154,7 +159,19 @@ const updateReferral = async (req, res, next) => {
       }
     }
 
-    const allowed = ['toDoctor', 'toDepartment', 'reason', 'notes', 'priority', 'status'];
+    const allowed = [
+      'toDoctor',
+      'toDepartment',
+      'institutionName',
+      'referralNumber',
+      'validityPeriod',
+      'responsibleDoctorName',
+      'receptionistName',
+      'reason',
+      'notes',
+      'priority',
+      'status'
+    ];
     allowed.forEach((key) => {
       if (req.body[key] !== undefined) existing[key] = req.body[key];
     });
