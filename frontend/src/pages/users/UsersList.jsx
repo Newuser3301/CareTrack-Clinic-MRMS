@@ -174,7 +174,7 @@ const UsersList = () => {
                 </div>
               </div>
 
-              <div className="grid gap-4 xl:grid-cols-2">
+              <div className="grid items-start gap-4 xl:grid-cols-2">
                 {roleSections.map(({ role, users: sectionUsers }) => {
                   const style = roleStyles[role] || roleStyles.patient;
                   return (
