@@ -20,14 +20,13 @@ const DoctorForm = ({ initialData, onSubmit, onCancel, loading }) => {
 
   const submit = (event) => {
     event.preventDefault();
-    onSubmit(form);
+    onSubmit({ ...form, department: form.department || form.specialty });
   };
 
   return (
     <form className="grid gap-4 md:grid-cols-2" onSubmit={submit}>
       <Input label={t('forms.fullName')} value={form.fullName} onChange={(event) => update('fullName', event.target.value)} required />
       <Input label={t('forms.specialty')} value={form.specialty} onChange={(event) => update('specialty', event.target.value)} required />
-      <Input label={t('forms.department')} value={form.department} onChange={(event) => update('department', event.target.value)} required />
       <Input label={t('common.phone')} value={form.phone} onChange={(event) => update('phone', event.target.value)} required />
       <Input label={t('common.email')} type="email" value={form.email} onChange={(event) => update('email', event.target.value)} required />
       <Input label={t('forms.availability')} value={form.availability} onChange={(event) => update('availability', event.target.value)} required />

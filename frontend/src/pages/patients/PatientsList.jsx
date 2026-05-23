@@ -11,6 +11,7 @@ import Select from '../../components/Select';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { permissions } from '../../utils/permissions';
+import { toI18nKey } from '../../utils/i18nKeys';
 import PatientForm from './PatientForm';
 
 const initials = (name = '') =>
@@ -53,6 +54,10 @@ const PatientsList = () => {
   const [error, setError] = useState('');
   const [modal, setModal] = useState({ open: false, patient: null });
   const [confirm, setConfirm] = useState(null);
+  const doctorLabel = (doctor) => {
+    const specialty = doctor.specialty ? t(`specialties.${toI18nKey(doctor.specialty)}`, doctor.specialty) : '';
+    return `${doctor.fullName}${specialty ? ` · ${specialty}` : ''}`;
+  };
 
   const loadData = async () => {
     setLoading(true);
@@ -120,7 +125,7 @@ const PatientsList = () => {
                 onChange={(event) => setAssignedDoctor(event.target.value)}
                 placeholder={t('patients.allAssignedDoctors')}
                 className="sm:min-w-64"
-                options={doctors.map((doctor) => ({ value: doctor._id, label: `${doctor.fullName} · ${doctor.specialty}` }))}
+                options={doctors.map((doctor) => ({ value: doctor._id, label: doctorLabel(doctor) }))}
               />
             )}
             {permissions.canCreatePatient(role) && (

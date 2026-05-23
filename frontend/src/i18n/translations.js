@@ -102,7 +102,7 @@ export const translations = {
     },
     placeholders: {
       specialtyExample: 'Kardiolog',
-      departmentExample: 'Kardiologiya',
+      departmentExample: 'Yurak markazi',
       availabilityExample: 'Dush, 09:00'
     },
     specialties: {
@@ -120,18 +120,18 @@ export const translations = {
       endocrinology: 'Endokrinolog'
     },
     departments: {
-      heart_care: 'Kardiologiya',
-      internal_medicine: 'Endokrinologiya',
-      family_health: 'Pediatriya',
-      neuroscience: 'Nevrologiya',
-      skin_health: 'Dermatologiya',
-      respiratory_care: 'Pulmonologiya',
-      women_health: 'Ginekologiya',
-      bone_and_joint: 'Travmatologiya',
-      vision_center: 'Oftalmologiya',
-      digestive_health: 'Gastroenterologiya',
-      kidney_care: 'Nefrologiya',
-      primary_care: 'Umumiy amaliyot'
+      heart_care: 'Yurak markazi',
+      internal_medicine: 'Ichki kasalliklar bo‘limi',
+      family_health: 'Oilaviy salomatlik bo‘limi',
+      neuroscience: 'Asab tizimi markazi',
+      skin_health: 'Teri salomatligi bo‘limi',
+      respiratory_care: 'Nafas yo‘llari bo‘limi',
+      women_health: 'Ayollar salomatligi bo‘limi',
+      bone_and_joint: 'Suyak va bo‘g‘im bo‘limi',
+      vision_center: 'Ko‘z salomatligi markazi',
+      digestive_health: 'Hazm tizimi bo‘limi',
+      kidney_care: 'Buyrak salomatligi bo‘limi',
+      primary_care: 'Birlamchi yordam bo‘limi'
     },
     roles: {
       super_admin: 'Super Admin',
@@ -411,7 +411,7 @@ export const translations = {
         diastolic: 'Diastolic BP'
       }
     },
-    placeholders: { specialtyExample: 'Cardiologist', departmentExample: 'Cardiology', availabilityExample: 'Mon, 09:00' },
+    placeholders: { specialtyExample: 'Cardiologist', departmentExample: 'Heart Care Center', availabilityExample: 'Mon, 09:00' },
     specialties: {
       cardiology: 'Cardiologist',
       orthopedics: 'Orthopedist',
@@ -427,18 +427,18 @@ export const translations = {
       endocrinology: 'Endocrinologist'
     },
     departments: {
-      heart_care: 'Cardiology',
-      internal_medicine: 'Endocrinology',
-      family_health: 'Pediatrics',
-      neuroscience: 'Neurology',
-      skin_health: 'Dermatology',
-      respiratory_care: 'Pulmonology',
-      women_health: 'Gynecology',
-      bone_and_joint: 'Traumatology',
-      vision_center: 'Ophthalmology',
-      digestive_health: 'Gastroenterology',
-      kidney_care: 'Nephrology',
-      primary_care: 'General Practice'
+      heart_care: 'Heart Care Center',
+      internal_medicine: 'Internal Medicine Unit',
+      family_health: 'Family Health Unit',
+      neuroscience: 'Neuroscience Center',
+      skin_health: 'Skin Health Unit',
+      respiratory_care: 'Respiratory Care Unit',
+      women_health: 'Women’s Health Unit',
+      bone_and_joint: 'Bone and Joint Unit',
+      vision_center: 'Vision Care Center',
+      digestive_health: 'Digestive Health Unit',
+      kidney_care: 'Kidney Care Unit',
+      primary_care: 'Primary Care Unit'
     },
     login: {
       title: 'CareTrack Clinic',
@@ -680,7 +680,7 @@ export const translations = {
         diastolic: 'Диастолическое АД'
       }
     },
-    placeholders: { specialtyExample: 'Кардиолог', departmentExample: 'Кардиология', availabilityExample: 'Пн, 09:00' },
+    placeholders: { specialtyExample: 'Кардиолог', departmentExample: 'Центр кардиологической помощи', availabilityExample: 'Пн, 09:00' },
     specialties: {
       cardiology: 'Кардиолог',
       orthopedics: 'Ортопед',
@@ -696,18 +696,18 @@ export const translations = {
       endocrinology: 'Эндокринолог'
     },
     departments: {
-      heart_care: 'Кардиология',
-      internal_medicine: 'Эндокринология',
-      family_health: 'Педиатрия',
-      neuroscience: 'Неврология',
-      skin_health: 'Дерматология',
-      respiratory_care: 'Пульмонология',
-      women_health: 'Гинекология',
-      bone_and_joint: 'Травматология',
-      vision_center: 'Офтальмология',
-      digestive_health: 'Гастроэнтерология',
-      kidney_care: 'Нефрология',
-      primary_care: 'Общая практика'
+      heart_care: 'Центр кардиологической помощи',
+      internal_medicine: 'Отделение внутренних болезней',
+      family_health: 'Отделение семейного здоровья',
+      neuroscience: 'Нейроцентр',
+      skin_health: 'Отделение здоровья кожи',
+      respiratory_care: 'Респираторное отделение',
+      women_health: 'Отделение женского здоровья',
+      bone_and_joint: 'Отделение костей и суставов',
+      vision_center: 'Центр зрения',
+      digestive_health: 'Отделение пищеварительного здоровья',
+      kidney_care: 'Отделение здоровья почек',
+      primary_care: 'Отделение первичной помощи'
     },
     login: {
       title: 'CareTrack Clinic',

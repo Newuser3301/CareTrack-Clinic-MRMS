@@ -158,7 +158,6 @@ const DoctorDetails = () => {
 
   const patients = doctor?.patients || [];
   const specialty = doctor ? t(`specialties.${toI18nKey(doctor.specialty)}`, doctor.specialty) : '';
-  const department = doctor ? t(`departments.${toI18nKey(doctor.department)}`, doctor.department) : '';
   const patientBreakdown = useMemo(() => {
     const counts = patients.reduce(
       (acc, patient) => {
@@ -186,7 +185,7 @@ const DoctorDetails = () => {
             <div className="min-w-0">
               <p className="text-sm font-black uppercase text-primary-600">CareTrack Provider</p>
               <h1 className="mt-2 text-3xl font-black leading-tight text-slate-950 sm:text-4xl">{doctor.fullName}</h1>
-              <p className="mt-2 text-base font-bold text-slate-500">{specialty} - {department}</p>
+              <p className="mt-2 text-base font-bold text-slate-500">{specialty}</p>
               <div className="mt-4 flex flex-wrap gap-2">
                 <span className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1.5 text-xs font-black text-emerald-700">
                   <ShieldCheck size={15} /> Active
@@ -239,13 +238,12 @@ const DoctorDetails = () => {
           <div className="flex items-center justify-between gap-3">
             <div>
               <h2 className="text-xl font-black text-slate-950">Professional Profile</h2>
-              <p className="mt-1 text-sm font-semibold text-slate-500">Department, specialty and access account.</p>
+              <p className="mt-1 text-sm font-semibold text-slate-500">{t('forms.specialty')} · {t('common.role')}</p>
             </div>
             <Stethoscope className="text-primary-600" size={24} />
           </div>
           <div className="mt-5 space-y-3">
             <InfoRow label={t('forms.specialty')} value={specialty} icon={BriefcaseMedical} />
-            <InfoRow label={t('forms.department')} value={department} icon={ShieldCheck} />
             <InfoRow label={t('common.email')} value={doctor.user?.email || doctor.email} icon={Mail} />
             <InfoRow label={t('common.role')} value={t(`roles.${doctor.user?.role}`, doctor.user?.role || 'doctor')} icon={UserRound} />
           </div>

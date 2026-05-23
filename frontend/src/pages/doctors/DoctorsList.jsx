@@ -30,20 +30,6 @@ const canonicalFilterValues = {
     ophthalmology: 'Ophthalmology',
     pulmonology: 'Pulmonology',
     endocrinology: 'Endocrinology'
-  },
-  departments: {
-    heart_care: 'Heart Care',
-    internal_medicine: 'Internal Medicine',
-    family_health: 'Family Health',
-    neuroscience: 'Neuroscience',
-    skin_health: 'Skin Health',
-    respiratory_care: 'Respiratory Care',
-    women_health: 'Women Health',
-    bone_and_joint: 'Bone and Joint',
-    vision_center: 'Vision Center',
-    digestive_health: 'Digestive Health',
-    kidney_care: 'Kidney Care',
-    primary_care: 'Primary Care'
   }
 };
 

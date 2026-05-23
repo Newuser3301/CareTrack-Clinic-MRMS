@@ -454,8 +454,6 @@ const PatientProfile = ({ patientId, selfView = false }) => {
               </div>
               <div className="text-xs text-slate-500 dark:text-slate-400">
                 {patient.assignedDoctor?.specialty ? t(`specialties.${toI18nKey(patient.assignedDoctor.specialty)}`, patient.assignedDoctor.specialty) : '-'}
-                {' • '}
-                {patient.assignedDoctor?.department ? t(`departments.${toI18nKey(patient.assignedDoctor.department)}`, patient.assignedDoctor.department) : '-'}
               </div>
             </div>
           </Card>

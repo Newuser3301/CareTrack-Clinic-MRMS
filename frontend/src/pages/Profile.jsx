@@ -7,7 +7,6 @@ import {
   HeartPulse,
   MapPin,
   Phone,
-  ShieldCheck,
   Stethoscope,
   UserRound,
   Users
@@ -18,6 +17,7 @@ import Loader from '../components/Loader';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { permissions, roleLabel } from '../utils/permissions';
+import { toI18nKey } from '../utils/i18nKeys';
 
 const StatCard = ({ label, value, helper, icon: Icon, tone }) => (
   <div className="profile-card rounded-[1.35rem] border border-white/70 bg-white/80 p-5 shadow-panel">
@@ -100,6 +100,7 @@ const Profile = () => {
   if (!data.stats) return <Loader />;
 
   const profileTitle = patientRecord?.fullName || doctorRecord?.fullName || user?.name;
+  const doctorSpecialty = doctorRecord?.specialty ? t(`specialties.${toI18nKey(doctorRecord.specialty)}`, doctorRecord.specialty) : '';
   const summaryStats = user?.role === 'patient'
     ? [
         { label: t('dashboard.diagnoses'), value: data.stats.totalDiagnoses, helper: t('profile.careSummary'), icon: ClipboardList, tone: 'bg-cyan-50 text-cyan-700' },
@@ -134,7 +135,7 @@ const Profile = () => {
             <InfoRow icon={Activity} label={t('common.role')} value={t(`roles.${user?.role}`, roleLabel(user?.role))} />
             <InfoRow icon={Phone} label={t('common.email')} value={user?.email} />
             {(doctorRecord?.phone || patientRecord?.phone) && <InfoRow icon={Phone} label={t('common.phone')} value={doctorRecord?.phone || patientRecord?.phone} />}
-            {doctorRecord?.department && <InfoRow icon={ShieldCheck} label={t('profile.department')} value={doctorRecord.department} />}
+            {doctorRecord?.specialty && <InfoRow icon={Stethoscope} label={t('profile.specialty')} value={doctorSpecialty} />}
             {doctorRecord?.availability && <InfoRow icon={CalendarDays} label={t('forms.availability')} value={doctorRecord.availability} />}
             {patientRecord?.assignedDoctor?.fullName && <InfoRow icon={Stethoscope} label={t('profile.primaryDoctor')} value={patientRecord.assignedDoctor.fullName} />}
             {patientRecord?.address && <InfoRow icon={MapPin} label={t('common.address')} value={patientRecord.address} />}
@@ -234,13 +235,13 @@ const Profile = () => {
               <h2 className="text-lg font-bold text-slate-950">{t('profile.systemHealth')}</h2>
               <p className="text-sm text-slate-500">{t('profile.careSummary')}</p>
             </div>
-            <ShieldCheck className="text-green-600" size={20} />
+            <Stethoscope className="text-green-600" size={20} />
           </div>
           <div className="mt-5 grid gap-4 md:grid-cols-2">
             <InfoRow icon={HeartPulse} label={t('dashboard.monthlyDiagnoses')} value={`${data.stats.diagnosesThisMonth}`} />
             <InfoRow icon={CalendarDays} label={t('dashboard.todayDiagnoses')} value={`${data.stats.diagnosesToday}`} />
             <InfoRow icon={AlertTriangle} label={t('dashboard.highCritical')} value={`${data.stats.severeDiagnoses}`} />
-            <InfoRow icon={ShieldCheck} label={t('dashboard.diagnosisCoverage')} value={`${data.stats.diagnosedPatients}/${data.stats.totalPatients}`} />
+            <InfoRow icon={Stethoscope} label={t('dashboard.diagnosisCoverage')} value={`${data.stats.diagnosedPatients}/${data.stats.totalPatients}`} />
           </div>
         </div>
       </section>

@@ -6,6 +6,7 @@ import Button from '../../components/Button';
 import Loader from '../../components/Loader';
 import Table from '../../components/Table';
 import { useLanguage } from '../../context/LanguageContext';
+import { toI18nKey } from '../../utils/i18nKeys';
 
 const formatDate = (value) => {
   if (!value) return '-';
@@ -32,6 +33,7 @@ const DiagnosisReport = () => {
   const patient = report.patient;
   const doctor = patient?.assignedDoctor;
   const diagnoses = report.diagnoses || [];
+  const doctorSpecialty = doctor?.specialty ? t(`specialties.${toI18nKey(doctor.specialty)}`, doctor.specialty) : '';
 
   return (
     <div className="space-y-5">
@@ -60,7 +62,7 @@ const DiagnosisReport = () => {
         <h2 className="text-sm font-semibold text-slate-900">{t('reports.assignedDoctor', 'Biriktirilgan shifokor')}</h2>
         <div className="mt-2 text-sm text-slate-700">
           <div>{doctor?.fullName || '-'}</div>
-          <div className="text-slate-500">{doctor?.specialty || ''}{doctor?.department ? ` • ${doctor.department}` : ''}</div>
+          <div className="text-slate-500">{doctorSpecialty || ''}</div>
         </div>
       </section>
 
@@ -81,4 +83,3 @@ const DiagnosisReport = () => {
 };
 
 export default DiagnosisReport;
-

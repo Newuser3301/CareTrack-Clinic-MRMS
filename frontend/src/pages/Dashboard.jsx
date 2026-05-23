@@ -4,6 +4,7 @@ import api from '../api/axios';
 import Badge from '../components/Badge';
 import Loader from '../components/Loader';
 import { useLanguage } from '../context/LanguageContext';
+import { toI18nKey } from '../utils/i18nKeys';
 
 const StatCard = ({ label, value, helper, icon: Icon, tone }) => (
   <div className="rounded-[1.5rem] border border-white/70 bg-white/80 p-5 shadow-panel">
@@ -55,12 +56,12 @@ const Dashboard = () => {
 
   const monthLabel = (item) =>
     new Date(item._id.year, item._id.month - 1).toLocaleDateString(undefined, { month: 'short', year: 'numeric' });
+  const specialtyLabel = (value) => (value ? t(`specialties.${toI18nKey(value)}`, value) : t('dashboard.unassigned'));
 
   if (error) return <div className="rounded-md bg-red-50 p-4 text-red-700">{error}</div>;
   if (!stats) return <Loader />;
 
   const maxSeverity = Math.max(...stats.severityBreakdown.map((item) => item.count), 1);
-  const maxDepartment = Math.max(...stats.departmentLoad.map((item) => item.count), 1);
   const maxDoctorLoad = Math.max(...stats.doctorLoad.map((item) => item.count), 1);
   const maxMonthlyTrend = Math.max(...stats.monthlyDiagnosisTrend.map((item) => item.count), 1);
 
@@ -154,7 +155,7 @@ const Dashboard = () => {
         </section>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-3">
+      <div className="grid gap-6 xl:grid-cols-2">
         <section className="rounded-[1.5rem] border border-white/70 bg-white/80 p-5 shadow-panel">
           <h2 className="font-semibold text-slate-950">{t('dashboard.diagnosisTrend')}</h2>
           <p className="text-sm text-slate-500">{t('dashboard.trendSubtitle')}</p>
@@ -167,22 +168,13 @@ const Dashboard = () => {
         </section>
 
         <section className="rounded-[1.5rem] border border-white/70 bg-white/80 p-5 shadow-panel">
-          <h2 className="font-semibold text-slate-950">{t('dashboard.departmentWorkload')}</h2>
-          <div className="mt-5 space-y-4">
-            {stats.departmentLoad.map((item) => (
-              <ProgressRow key={item._id} label={item._id} value={item.count} max={maxDepartment} helper={`${item.count} patients`} />
-            ))}
-          </div>
-        </section>
-
-        <section className="rounded-[1.5rem] border border-white/70 bg-white/80 p-5 shadow-panel">
           <h2 className="font-semibold text-slate-950">{t('dashboard.doctorPatientLoad')}</h2>
           <p className="text-sm text-slate-500">
             {t('dashboard.averageDiagnosesPerPatientPrefix')} {stats.averageDiagnosesPerPatient} {t('dashboard.averageDiagnosesPerPatientSuffix')}
           </p>
           <div className="mt-5 space-y-4">
             {stats.doctorLoad.map((item) => (
-              <ProgressRow key={item._id} label={item._id} value={item.count} max={maxDoctorLoad} helper={`${item.count} · ${item.specialty}`} tone="bg-green-600" />
+              <ProgressRow key={item._id} label={item._id} value={item.count} max={maxDoctorLoad} helper={`${item.count} · ${specialtyLabel(item.specialty)}`} tone="bg-green-600" />
             ))}
           </div>
         </section>
@@ -197,7 +189,8 @@ const Dashboard = () => {
                 <div>
                   <p className="font-medium text-slate-950">{patient.fullName}</p>
                   <p className="text-sm text-slate-500">
-                    {patient.assignedDoctor?.fullName || t('dashboard.noDoctorAssigned')} · {patient.assignedDoctor?.department || t('dashboard.unassigned')}
+                    {patient.assignedDoctor?.fullName || t('dashboard.noDoctorAssigned')}
+                    {patient.assignedDoctor?.specialty ? ` · ${specialtyLabel(patient.assignedDoctor.specialty)}` : ''}
                   </p>
                 </div>
                 <span className="text-sm text-slate-500">{new Date(patient.createdAt).toLocaleDateString()}</span>

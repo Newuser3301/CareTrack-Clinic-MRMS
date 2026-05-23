@@ -3,6 +3,7 @@ import Button from '../../components/Button';
 import Input from '../../components/Input';
 import Select from '../../components/Select';
 import { useLanguage } from '../../context/LanguageContext';
+import { toI18nKey } from '../../utils/i18nKeys';
 
 const RegistrationForm = ({ doctors = [], onSubmit, loading, onCancel }) => {
   const { t } = useLanguage();
@@ -18,8 +19,12 @@ const RegistrationForm = ({ doctors = [], onSubmit, loading, onCancel }) => {
   });
 
   const doctorOptions = useMemo(
-    () => doctors.map((d) => ({ value: d._id, label: `${d.fullName} • ${d.specialty || ''}` })),
-    [doctors]
+    () =>
+      doctors.map((d) => ({
+        value: d._id,
+        label: `${d.fullName}${d.specialty ? ` • ${t(`specialties.${toI18nKey(d.specialty)}`, d.specialty)}` : ''}`
+      })),
+    [doctors, t]
   );
 
   const submit = (event) => {
@@ -59,4 +64,3 @@ const RegistrationForm = ({ doctors = [], onSubmit, loading, onCancel }) => {
 };
 
 export default RegistrationForm;
-

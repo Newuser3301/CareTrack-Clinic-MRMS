@@ -7,6 +7,7 @@ import Button from '../../components/Button';
 import Loader from '../../components/Loader';
 import { useLanguage } from '../../context/LanguageContext';
 import { roleLabel } from '../../utils/permissions';
+import { toI18nKey } from '../../utils/i18nKeys';
 
 const Info = ({ label, value }) => (
   <div className="rounded-2xl bg-slate-50 px-4 py-3">
@@ -29,6 +30,10 @@ const UserDetails = () => {
   if (!data) return <Loader />;
 
   const { user, profile } = data;
+  const specialty = profile?.specialty ? t(`specialties.${toI18nKey(profile.specialty)}`, profile.specialty) : '';
+  const assignedDoctorSpecialty = profile?.assignedDoctor?.specialty
+    ? t(`specialties.${toI18nKey(profile.assignedDoctor.specialty)}`, profile.assignedDoctor.specialty)
+    : '';
 
   return (
     <div className="space-y-6">
@@ -57,14 +62,13 @@ const UserDetails = () => {
           <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             {'fullName' in profile && <Info label={t('forms.fullName')} value={profile.fullName} />}
             {'phone' in profile && <Info label={t('common.phone')} value={profile.phone} />}
-            {'specialty' in profile && <Info label={t('forms.specialty')} value={profile.specialty} />}
-            {'department' in profile && <Info label={t('forms.department')} value={profile.department} />}
+            {'specialty' in profile && <Info label={t('forms.specialty')} value={specialty} />}
             {'availability' in profile && <Info label={t('forms.availability')} value={profile.availability} />}
             {'dateOfBirth' in profile && <Info label={t('forms.dateOfBirth')} value={new Date(profile.dateOfBirth).toLocaleDateString()} />}
             {'gender' in profile && <Info label={t('common.gender')} value={profile.gender} />}
             {'address' in profile && <Info label={t('common.address')} value={profile.address} />}
             {'emergencyContact' in profile && <Info label={t('forms.emergencyContact')} value={profile.emergencyContact} />}
-            {profile.assignedDoctor?.fullName && <Info label={t('profile.primaryDoctor')} value={`${profile.assignedDoctor.fullName} · ${profile.assignedDoctor.specialty || ''}`} />}
+            {profile.assignedDoctor?.fullName && <Info label={t('profile.primaryDoctor')} value={`${profile.assignedDoctor.fullName}${assignedDoctorSpecialty ? ` · ${assignedDoctorSpecialty}` : ''}`} />}
           </div>
         </section>
       )}

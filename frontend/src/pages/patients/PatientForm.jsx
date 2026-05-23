@@ -4,6 +4,7 @@ import Button from '../../components/Button';
 import Input from '../../components/Input';
 import Select from '../../components/Select';
 import { useLanguage } from '../../context/LanguageContext';
+import { toI18nKey } from '../../utils/i18nKeys';
 import { generateStrongPassword } from '../../utils/passwords';
 
 const emptyPatient = {
@@ -34,6 +35,10 @@ const PatientForm = ({ initialData, doctors, canChangeDoctor = true, onSubmit, o
 
   const update = (field, value) => setForm((current) => ({ ...current, [field]: value }));
   const suggestPassword = () => update('password', generateStrongPassword());
+  const doctorLabel = (doctor) => {
+    const specialty = doctor.specialty ? t(`specialties.${toI18nKey(doctor.specialty)}`, doctor.specialty) : '';
+    return `${doctor.fullName}${specialty ? ` · ${specialty}` : ''}`;
+  };
 
   return (
     <form className="grid gap-4 md:grid-cols-2" onSubmit={(event) => { event.preventDefault(); onSubmit(form); }}>
@@ -52,7 +57,7 @@ const PatientForm = ({ initialData, doctors, canChangeDoctor = true, onSubmit, o
         value={form.assignedDoctor}
         onChange={(event) => update('assignedDoctor', event.target.value)}
         placeholder={t('forms.selectDoctor')}
-        options={doctors.map((doctor) => ({ value: doctor._id, label: `${doctor.fullName} · ${doctor.specialty}` }))}
+        options={doctors.map((doctor) => ({ value: doctor._id, label: doctorLabel(doctor) }))}
         disabled={!canChangeDoctor}
         required
       />
