@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { CalendarDays, ChevronDown, Mail, Pencil, Plus, ShieldCheck, Trash2 } from 'lucide-react';
+import { CalendarDays, Mail, Pencil, Plus, ShieldCheck, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import api from '../../api/axios';
 import Badge from '../../components/Badge';
@@ -64,7 +64,7 @@ const UsersList = () => {
   const [error, setError] = useState('');
   const [modal, setModal] = useState({ open: false, user: null });
   const [confirm, setConfirm] = useState(null);
-  const [expandedRoles, setExpandedRoles] = useState({});
+  const [selectedRole, setSelectedRole] = useState('');
 
   const loadUsers = async () => {
     setLoading(true);
@@ -99,15 +99,12 @@ const UsersList = () => {
 
   useEffect(() => {
     if (!roleSections.length) return;
-    setExpandedRoles((current) => {
-      if (Object.keys(current).length) return current;
-      return { [roleSections[0].role]: true };
-    });
-  }, [roleSections]);
+    if (!selectedRole || !roleSections.some((section) => section.role === selectedRole)) {
+      setSelectedRole(roleSections[0].role);
+    }
+  }, [roleSections, selectedRole]);
 
-  const toggleRole = (role) => {
-    setExpandedRoles((current) => ({ ...current, [role]: !current[role] }));
-  };
+  const activeSection = roleSections.find((section) => section.role === selectedRole) || roleSections[0];
 
   const saveUser = async (payload) => {
     setSaving(true);
@@ -160,8 +157,12 @@ const UsersList = () => {
                   <button
                     key={role}
                     type="button"
-                    onClick={() => toggleRole(role)}
-                    className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-black shadow-sm transition hover:-translate-y-0.5 ${roleStyles[role]?.icon || roleStyles.patient.icon}`}
+                    onClick={() => setSelectedRole(role)}
+                    className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-black shadow-sm transition hover:-translate-y-0.5 ${
+                      selectedRole === role
+                        ? `${roleStyles[role]?.icon || roleStyles.patient.icon} ring-2 ring-primary-500/30`
+                        : 'bg-white/80 text-slate-600 hover:bg-white'
+                    }`}
                   >
                     {t(`roles.${role}`, roleLabel(role))}
                     <span className="rounded-full bg-white/70 px-2 py-0.5 text-[11px] text-slate-700">{sectionUsers.length}</span>
@@ -170,63 +171,53 @@ const UsersList = () => {
                 <span className="ml-auto rounded-full bg-primary-700 px-3 py-2 text-xs font-black text-white">{users.length}</span>
               </div>
 
-              <div className="space-y-3">
-                {roleSections.map(({ role, users: sectionUsers }) => {
-                  const style = roleStyles[role] || roleStyles.patient;
-                  const isOpen = Boolean(expandedRoles[role]);
-                  return (
-                    <section key={role} className="clinic-card overflow-hidden backdrop-blur">
-                      <button
-                        type="button"
-                        onClick={() => toggleRole(role)}
-                        className="flex w-full items-center gap-3 px-4 py-3 text-left transition hover:bg-sky-50/70 sm:px-5"
-                      >
-                        <div className={`h-9 w-1.5 rounded-full bg-gradient-to-b ${style.accent}`} />
-                        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl ${style.icon}`}>
-                          <ShieldCheck size={20} />
+              {activeSection && (() => {
+                const style = roleStyles[activeSection.role] || roleStyles.patient;
+                return (
+                  <section className="clinic-card overflow-hidden backdrop-blur">
+                    <div className="flex w-full items-center gap-3 px-4 py-3 text-left sm:px-5">
+                      <div className={`h-9 w-1.5 rounded-full bg-gradient-to-b ${style.accent}`} />
+                      <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl ${style.icon}`}>
+                        <ShieldCheck size={20} />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <Badge tone={activeSection.role}>{t(`roles.${activeSection.role}`, roleLabel(activeSection.role))}</Badge>
+                          <span className="text-xs font-extrabold text-slate-500">{activeSection.users.length} account</span>
                         </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <Badge tone={role}>{t(`roles.${role}`, roleLabel(role))}</Badge>
-                            <span className="text-xs font-extrabold text-slate-500">{sectionUsers.length} account</span>
-                          </div>
-                        </div>
-                        <ChevronDown className={`text-slate-400 transition ${isOpen ? 'rotate-180' : ''}`} size={20} />
-                      </button>
-                      {isOpen && (
-                        <div className="divide-y divide-sky-50 border-t border-sky-100">
-                          {sectionUsers.map((user) => (
-                            <div key={user._id} className="grid gap-3 px-5 py-4 transition hover:bg-sky-50/65 sm:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)_auto] sm:items-center">
-                              <div className="flex min-w-0 items-center gap-3">
-                                <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-sm font-black ${style.icon}`}>
-                                  {initials(user.name)}
-                                </div>
-                                <div className="min-w-0">
-                                  <Link to={`/users/${user._id}`} className="block truncate text-sm font-black text-primary-700 hover:underline">
-                                    {user.name}
-                                  </Link>
-                                  <div className="mt-1 flex items-center gap-1.5 text-xs font-semibold text-slate-500">
-                                    <CalendarDays size={13} />
-                                    {new Date(user.createdAt).toLocaleDateString()}
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="flex min-w-0 items-center gap-2 text-sm font-semibold text-slate-700">
-                                <Mail size={16} className="shrink-0 text-slate-400" />
-                                <span className="truncate">{user.email}</span>
-                              </div>
-                              <div className="flex justify-end gap-2">
-                                <Button variant="secondary" className="h-10 w-10 px-0" onClick={() => setModal({ open: true, user })} aria-label={t('actions.edit')}><Pencil size={16} /></Button>
-                                <Button variant="danger" className="h-10 w-10 px-0" onClick={() => setConfirm(user)} aria-label={t('actions.delete')}><Trash2 size={16} /></Button>
+                      </div>
+                    </div>
+                    <div className="divide-y divide-sky-50 border-t border-sky-100">
+                      {activeSection.users.map((user) => (
+                        <div key={user._id} className="grid gap-3 px-5 py-4 transition hover:bg-sky-50/65 sm:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)_auto] sm:items-center">
+                          <div className="flex min-w-0 items-center gap-3">
+                            <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-sm font-black ${style.icon}`}>
+                              {initials(user.name)}
+                            </div>
+                            <div className="min-w-0">
+                              <Link to={`/users/${user._id}`} className="block truncate text-sm font-black text-primary-700 hover:underline">
+                                {user.name}
+                              </Link>
+                              <div className="mt-1 flex items-center gap-1.5 text-xs font-semibold text-slate-500">
+                                <CalendarDays size={13} />
+                                {new Date(user.createdAt).toLocaleDateString()}
                               </div>
                             </div>
-                          ))}
+                          </div>
+                          <div className="flex min-w-0 items-center gap-2 text-sm font-semibold text-slate-700">
+                            <Mail size={16} className="shrink-0 text-slate-400" />
+                            <span className="truncate">{user.email}</span>
+                          </div>
+                          <div className="flex justify-end gap-2">
+                            <Button variant="secondary" className="h-10 w-10 px-0" onClick={() => setModal({ open: true, user })} aria-label={t('actions.edit')}><Pencil size={16} /></Button>
+                            <Button variant="danger" className="h-10 w-10 px-0" onClick={() => setConfirm(user)} aria-label={t('actions.delete')}><Trash2 size={16} /></Button>
+                          </div>
                         </div>
-                      )}
-                    </section>
-                  );
-                })}
-              </div>
+                      ))}
+                    </div>
+                  </section>
+                );
+              })()}
             </>
           )}
         </div>
