@@ -17,6 +17,20 @@ import { toI18nKey } from '../../utils/i18nKeys';
 import DoctorForm from './DoctorForm';
 
 const canonicalFilterValues = {
+  specialties: {
+    cardiology: 'Cardiology',
+    orthopedics: 'Orthopedics',
+    gastroenterology: 'Gastroenterology',
+    general_practice: 'General Practice',
+    pediatrics: 'Pediatrics',
+    dermatology: 'Dermatology',
+    nephrology: 'Nephrology',
+    gynecology: 'Gynecology',
+    neurology: 'Neurology',
+    ophthalmology: 'Ophthalmology',
+    pulmonology: 'Pulmonology',
+    endocrinology: 'Endocrinology'
+  },
   departments: {
     heart_care: 'Heart Care',
     internal_medicine: 'Internal Medicine',
@@ -39,7 +53,7 @@ const DoctorsList = () => {
   const role = user?.role;
   const [doctors, setDoctors] = useState([]);
   const [search, setSearch] = useState('');
-  const [department, setDepartment] = useState('');
+  const [specialty, setSpecialty] = useState('');
   const [availability, setAvailability] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -74,7 +88,7 @@ const DoctorsList = () => {
       const { data } = await api.get('/doctors', {
         params: {
           search: search || undefined,
-          department: canonicalizeFilter('departments', department),
+          specialty: canonicalizeFilter('specialties', specialty),
           availability: availability || undefined
         }
       });
@@ -89,7 +103,7 @@ const DoctorsList = () => {
   useEffect(() => {
     const timer = setTimeout(loadDoctors, 250);
     return () => clearTimeout(timer);
-  }, [search, department, availability]);
+  }, [search, specialty, availability]);
 
   const saveDoctor = async (payload) => {
     setSaving(true);
@@ -120,7 +134,7 @@ const DoctorsList = () => {
 
   const columns = [
     { key: 'fullName', label: t('doctors.table.doctor', 'Shifokor') },
-    { key: 'department', label: t('forms.department'), render: (row) => t(`departments.${toI18nKey(row.department)}`, row.department) },
+    { key: 'specialty', label: t('forms.specialty'), render: (row) => t(`specialties.${toI18nKey(row.specialty)}`, row.specialty) },
     { key: 'phone', label: t('common.phone') },
     { key: 'availability', label: t('forms.availability') }
   ];
@@ -139,7 +153,7 @@ const DoctorsList = () => {
         <div className="md:col-span-2">
           <SearchBar value={search} onChange={setSearch} placeholder={`${t('common.search')}...`} />
         </div>
-        <Input label={t('forms.department')} value={department} onChange={(event) => setDepartment(event.target.value)} placeholder={t('placeholders.departmentExample')} />
+        <Input label={t('forms.specialty')} value={specialty} onChange={(event) => setSpecialty(event.target.value)} placeholder={t('placeholders.specialtyExample')} />
         <div>
           <Input label={t('forms.availability')} value={availability} onChange={(event) => setAvailability(event.target.value)} placeholder={t('placeholders.availabilityExample')} />
         </div>
