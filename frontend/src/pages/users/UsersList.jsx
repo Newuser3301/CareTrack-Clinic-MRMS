@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { CalendarDays, Mail, Pencil, Plus, ShieldCheck, Trash2, UsersRound } from 'lucide-react';
+import { CalendarDays, ChevronDown, Mail, Pencil, Plus, ShieldCheck, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import api from '../../api/axios';
 import Badge from '../../components/Badge';
@@ -64,6 +64,7 @@ const UsersList = () => {
   const [error, setError] = useState('');
   const [modal, setModal] = useState({ open: false, user: null });
   const [confirm, setConfirm] = useState(null);
+  const [expandedRoles, setExpandedRoles] = useState({});
 
   const loadUsers = async () => {
     setLoading(true);
@@ -96,8 +97,17 @@ const UsersList = () => {
       }));
   }, [users]);
 
-  const totalManagers = users.filter((user) => ['super_admin', 'admin'].includes(user.role)).length;
-  const totalCareTeam = users.filter((user) => ['doctor', 'clinician', 'receptionist'].includes(user.role)).length;
+  useEffect(() => {
+    if (!roleSections.length) return;
+    setExpandedRoles((current) => {
+      if (Object.keys(current).length) return current;
+      return { [roleSections[0].role]: true };
+    });
+  }, [roleSections]);
+
+  const toggleRole = (role) => {
+    setExpandedRoles((current) => ({ ...current, [role]: !current[role] }));
+  };
 
   const saveUser = async (payload) => {
     setSaving(true);
@@ -144,82 +154,76 @@ const UsersList = () => {
             </div>
           ) : (
             <>
-              <div className="grid gap-3 md:grid-cols-3">
-                <div className="clinic-card flex items-center gap-4 p-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-sky-100 text-primary-700">
-                    <UsersRound size={22} />
-                  </div>
-                  <div>
-                    <p className="text-xs font-extrabold uppercase text-slate-500">{t('pages.usersTitle')}</p>
-                    <p className="text-2xl font-black text-slate-950">{users.length}</p>
-                  </div>
-                </div>
-                <div className="clinic-card flex items-center gap-4 p-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-100 text-rose-700">
-                    <ShieldCheck size={22} />
-                  </div>
-                  <div>
-                    <p className="text-xs font-extrabold uppercase text-slate-500">{t('common.role')}</p>
-                    <p className="text-2xl font-black text-slate-950">{totalManagers}</p>
-                  </div>
-                </div>
-                <div className="clinic-card flex items-center gap-4 p-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700">
-                    <UsersRound size={22} />
-                  </div>
-                  <div>
-                    <p className="text-xs font-extrabold uppercase text-slate-500">{t('dashboard.activeProviders')}</p>
-                    <p className="text-2xl font-black text-slate-950">{totalCareTeam}</p>
-                  </div>
-                </div>
+              <div className="clinic-card flex flex-wrap items-center gap-2 px-4 py-3 backdrop-blur">
+                <span className="mr-2 text-xs font-extrabold uppercase text-slate-500">{t('common.role')}</span>
+                {roleSections.map(({ role, users: sectionUsers }) => (
+                  <button
+                    key={role}
+                    type="button"
+                    onClick={() => toggleRole(role)}
+                    className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-black shadow-sm transition hover:-translate-y-0.5 ${roleStyles[role]?.icon || roleStyles.patient.icon}`}
+                  >
+                    {t(`roles.${role}`, roleLabel(role))}
+                    <span className="rounded-full bg-white/70 px-2 py-0.5 text-[11px] text-slate-700">{sectionUsers.length}</span>
+                  </button>
+                ))}
+                <span className="ml-auto rounded-full bg-primary-700 px-3 py-2 text-xs font-black text-white">{users.length}</span>
               </div>
 
-              <div className="grid items-start gap-4 xl:grid-cols-2">
+              <div className="space-y-3">
                 {roleSections.map(({ role, users: sectionUsers }) => {
                   const style = roleStyles[role] || roleStyles.patient;
+                  const isOpen = Boolean(expandedRoles[role]);
                   return (
-              <section key={role} className="clinic-card overflow-hidden backdrop-blur">
-                <div className={`h-1.5 bg-gradient-to-r ${style.accent}`} />
-                <div className={`flex flex-wrap items-center justify-between gap-3 border-b border-sky-100 px-5 py-4 ${style.panel}`}>
-                  <div className="flex items-center gap-3">
-                    <div className={`flex h-10 w-10 items-center justify-center rounded-2xl ${style.icon}`}>
-                      <ShieldCheck size={20} />
-                    </div>
-                    <div>
-                    <Badge tone={role}>{t(`roles.${role}`, roleLabel(role))}</Badge>
-                      <p className="mt-1 text-xs font-bold text-slate-500">{sectionUsers.length} account</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="divide-y divide-sky-50">
-                  {sectionUsers.map((user) => (
-                    <div key={user._id} className="grid gap-3 px-5 py-4 transition hover:bg-sky-50/65 sm:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_auto] sm:items-center">
-                      <div className="flex min-w-0 items-center gap-3">
-                        <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-sm font-black ${style.icon}`}>
-                          {initials(user.name)}
+                    <section key={role} className="clinic-card overflow-hidden backdrop-blur">
+                      <button
+                        type="button"
+                        onClick={() => toggleRole(role)}
+                        className="flex w-full items-center gap-3 px-4 py-3 text-left transition hover:bg-sky-50/70 sm:px-5"
+                      >
+                        <div className={`h-9 w-1.5 rounded-full bg-gradient-to-b ${style.accent}`} />
+                        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl ${style.icon}`}>
+                          <ShieldCheck size={20} />
                         </div>
-                        <div className="min-w-0">
-                          <Link to={`/users/${user._id}`} className="block truncate text-sm font-black text-primary-700 hover:underline">
-                            {user.name}
-                          </Link>
-                          <div className="mt-1 flex items-center gap-1.5 text-xs font-semibold text-slate-500">
-                            <CalendarDays size={13} />
-                            {new Date(user.createdAt).toLocaleDateString()}
+                        <div className="min-w-0 flex-1">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <Badge tone={role}>{t(`roles.${role}`, roleLabel(role))}</Badge>
+                            <span className="text-xs font-extrabold text-slate-500">{sectionUsers.length} account</span>
                           </div>
                         </div>
-                      </div>
-                      <div className="flex min-w-0 items-center gap-2 text-sm font-semibold text-slate-700">
-                        <Mail size={16} className="shrink-0 text-slate-400" />
-                        <span className="truncate">{user.email}</span>
-                      </div>
-                      <div className="flex justify-end gap-2">
-                        <Button variant="secondary" className="h-10 w-10 px-0" onClick={() => setModal({ open: true, user })} aria-label={t('actions.edit')}><Pencil size={16} /></Button>
-                        <Button variant="danger" className="h-10 w-10 px-0" onClick={() => setConfirm(user)} aria-label={t('actions.delete')}><Trash2 size={16} /></Button>
+                        <ChevronDown className={`text-slate-400 transition ${isOpen ? 'rotate-180' : ''}`} size={20} />
+                      </button>
+                      {isOpen && (
+                        <div className="divide-y divide-sky-50 border-t border-sky-100">
+                          {sectionUsers.map((user) => (
+                            <div key={user._id} className="grid gap-3 px-5 py-4 transition hover:bg-sky-50/65 sm:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)_auto] sm:items-center">
+                              <div className="flex min-w-0 items-center gap-3">
+                                <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-sm font-black ${style.icon}`}>
+                                  {initials(user.name)}
+                                </div>
+                                <div className="min-w-0">
+                                  <Link to={`/users/${user._id}`} className="block truncate text-sm font-black text-primary-700 hover:underline">
+                                    {user.name}
+                                  </Link>
+                                  <div className="mt-1 flex items-center gap-1.5 text-xs font-semibold text-slate-500">
+                                    <CalendarDays size={13} />
+                                    {new Date(user.createdAt).toLocaleDateString()}
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="flex min-w-0 items-center gap-2 text-sm font-semibold text-slate-700">
+                                <Mail size={16} className="shrink-0 text-slate-400" />
+                                <span className="truncate">{user.email}</span>
+                              </div>
+                              <div className="flex justify-end gap-2">
+                                <Button variant="secondary" className="h-10 w-10 px-0" onClick={() => setModal({ open: true, user })} aria-label={t('actions.edit')}><Pencil size={16} /></Button>
+                                <Button variant="danger" className="h-10 w-10 px-0" onClick={() => setConfirm(user)} aria-label={t('actions.delete')}><Trash2 size={16} /></Button>
+                              </div>
                             </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
+                          ))}
+                        </div>
+                      )}
+                    </section>
                   );
                 })}
               </div>
