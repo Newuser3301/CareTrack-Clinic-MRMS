@@ -50,7 +50,9 @@ const Sidebar = ({ open, onClose }) => {
               onClick={onClose}
               className={({ isActive }) =>
                 `flex items-center gap-3 rounded-full px-4 py-3 text-sm font-bold ${
-                  isActive ? 'bg-white text-primary-700 shadow-panel' : 'text-sky-100 hover:bg-white/10 hover:text-white'
+                  isActive
+                    ? 'bg-white text-primary-700 shadow-panel dark:bg-slate-800/95 dark:text-sky-100 dark:ring-1 dark:ring-sky-400/20'
+                    : 'text-sky-100 hover:bg-white/10 hover:text-white dark:text-slate-200 dark:hover:bg-slate-800/80'
                 }`
               }
             >
