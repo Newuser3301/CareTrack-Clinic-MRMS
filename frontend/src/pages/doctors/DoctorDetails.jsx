@@ -16,10 +16,12 @@ import {
 import api from '../../api/axios';
 import Button from '../../components/Button';
 import Loader from '../../components/Loader';
+import Modal from '../../components/Modal';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { permissions } from '../../utils/permissions';
 import { toI18nKey } from '../../utils/i18nKeys';
+import DoctorForm from './DoctorForm';
 
 const initials = (name = '') =>
   name
@@ -148,13 +150,38 @@ const DoctorDetails = () => {
   const { t } = useLanguage();
   const [doctor, setDoctor] = useState(null);
   const [error, setError] = useState('');
+  const [saveError, setSaveError] = useState('');
+  const [editOpen, setEditOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  const loadDoctor = async () => {
+    try {
+      const { data } = await api.get(`/doctors/${id}`);
+      setDoctor(data);
+      setError('');
+    } catch (err) {
+      setError(err.response?.data?.message || t('common.loadingError'));
+    }
+  };
 
   useEffect(() => {
-    api
-      .get(`/doctors/${id}`)
-      .then(({ data }) => setDoctor(data))
-      .catch((err) => setError(err.response?.data?.message || t('common.loadingError')));
+    loadDoctor();
   }, [id, t]);
+
+  const saveDoctor = async (payload) => {
+    setSaving(true);
+    setSaveError('');
+    try {
+      const { data } = await api.put(`/doctors/${id}`, payload);
+      setDoctor((current) => ({ ...current, ...data, patients: current?.patients || [] }));
+      setEditOpen(false);
+      await loadDoctor();
+    } catch (err) {
+      setSaveError(err.response?.data?.message || t('common.unableToSave'));
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const patients = doctor?.patients || [];
   const specialty = doctor ? t(`specialties.${toI18nKey(doctor.specialty)}`, doctor.specialty) : '';
@@ -208,12 +235,10 @@ const DoctorDetails = () => {
             </div>
             <div className="flex flex-wrap justify-end gap-2">
               {permissions.canEditDoctor(user?.role) && (
-                <Link to="/doctors">
-                  <Button variant="secondary">
-                    <Pencil size={16} />
-                    {t('actions.edit')}
-                  </Button>
-                </Link>
+                <Button variant="secondary" onClick={() => setEditOpen(true)}>
+                  <Pencil size={16} />
+                  {t('actions.edit')}
+                </Button>
               )}
               <Link to="/doctors">
                 <Button variant="secondary">
@@ -293,6 +318,10 @@ const DoctorDetails = () => {
           </div>
         )}
       </section>
+      <Modal open={editOpen} title={t('pages.doctorsTitle')} onClose={() => setEditOpen(false)}>
+        {saveError && <div className="mb-4 rounded-[1rem] bg-rose-50 p-3 text-sm font-semibold text-rose-700">{saveError}</div>}
+        <DoctorForm initialData={doctor} onSubmit={saveDoctor} loading={saving} onCancel={() => setEditOpen(false)} />
+      </Modal>
     </div>
   );
 };
