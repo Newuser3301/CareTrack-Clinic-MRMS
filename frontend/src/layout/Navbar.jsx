@@ -38,19 +38,19 @@ const Navbar = () => {
       : { title: t('nav.mainMenu'), subtitle: t('nav.subtitle') });
 
   return (
-    <header className="sticky top-0 z-20 flex min-h-20 items-center justify-between gap-4 rounded-[1.45rem] bg-white/88 px-4 py-3 shadow-sm backdrop-blur lg:mx-1 lg:mt-1 lg:px-5">
-      <div className="flex items-center gap-3">
-        <button type="button" onClick={() => navigate(homePath)} className="flex items-center gap-3 text-left">
+    <header className="sticky top-0 z-20 flex min-h-20 items-center justify-between gap-2 rounded-[1.45rem] bg-white/88 px-4 py-3 shadow-sm backdrop-blur lg:mx-1 lg:mt-1 lg:gap-4 lg:px-5">
+      <div className="flex min-w-0 flex-1 items-center gap-3">
+        <button type="button" onClick={() => navigate(homePath)} className="flex min-w-0 items-center gap-3 text-left">
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary-600 text-white shadow-panel">
             <Activity size={23} />
           </div>
           <div className="min-w-0">
-            <p className="truncate text-2xl font-black leading-none text-slate-950">{heading.title}</p>
+            <p className="truncate text-xl font-black leading-none text-slate-950 sm:text-2xl">{heading.title}</p>
             <p className="mt-1 hidden text-xs font-semibold text-slate-400 sm:block">{heading.subtitle}</p>
           </div>
         </button>
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex shrink-0 items-center gap-2">
         {quickActions.map(({ to, label, icon: Icon }) => (
           <button
             key={to}
