@@ -120,7 +120,7 @@ const updateUser = async (req, res, next) => {
 
 const deleteUser = async (req, res, next) => {
   try {
-    if (req.params.id === req.user._id.toString()) {
+    if (req.user._id.equals(req.params.id)) {
       res.status(400);
       throw new Error('You cannot delete your own account');
     }

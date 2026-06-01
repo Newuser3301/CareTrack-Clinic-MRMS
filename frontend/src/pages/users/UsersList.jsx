@@ -56,6 +56,7 @@ const initials = (name = '') =>
     .toUpperCase() || 'U';
 
 const userDisplayName = (user) => user?.name || user?.email || 'Unnamed user';
+const isSameUser = (user, currentUser) => Boolean(user?._id && currentUser?._id && String(user._id) === String(currentUser._id));
 
 const UsersList = () => {
   const { user: currentUser } = useAuth();
@@ -123,6 +124,12 @@ const UsersList = () => {
   };
 
   const deleteUser = async () => {
+    if (isSameUser(confirm, currentUser)) {
+      setConfirm(null);
+      setError('You cannot delete your own account');
+      return;
+    }
+
     setSaving(true);
     try {
       await api.delete(`/users/${confirm._id}`);
@@ -190,32 +197,36 @@ const UsersList = () => {
                       </div>
                     </div>
                     <div className="divide-y divide-sky-50 border-t border-sky-100">
-                      {activeSection.users.map((user) => (
-                        <div key={user._id} className="grid gap-3 px-5 py-4 transition hover:bg-sky-50/65 sm:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)_auto] sm:items-center">
-                          <div className="flex min-w-0 items-center gap-3">
-                            <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-sm font-black ${style.icon}`}>
-                              {initials(userDisplayName(user))}
-                            </div>
-                            <div className="min-w-0">
-                              <Link to={`/users/${user._id}`} className="block truncate text-sm font-black text-primary-700 hover:underline">
-                                {userDisplayName(user)}
-                              </Link>
-                              <div className="mt-1 flex items-center gap-1.5 text-xs font-semibold text-slate-500">
-                                <CalendarDays size={13} />
-                                {new Date(user.createdAt).toLocaleDateString()}
+                      {activeSection.users.map((user) => {
+                        const isCurrentUser = isSameUser(user, currentUser);
+
+                        return (
+                          <div key={user._id} className="grid gap-3 px-5 py-4 transition hover:bg-sky-50/65 sm:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)_auto] sm:items-center">
+                            <div className="flex min-w-0 items-center gap-3">
+                              <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-sm font-black ${style.icon}`}>
+                                {initials(userDisplayName(user))}
+                              </div>
+                              <div className="min-w-0">
+                                <Link to={`/users/${user._id}`} className="block truncate text-sm font-black text-primary-700 hover:underline">
+                                  {userDisplayName(user)}
+                                </Link>
+                                <div className="mt-1 flex items-center gap-1.5 text-xs font-semibold text-slate-500">
+                                  <CalendarDays size={13} />
+                                  {new Date(user.createdAt).toLocaleDateString()}
+                                </div>
                               </div>
                             </div>
+                            <div className="flex min-w-0 items-center gap-2 text-sm font-semibold text-slate-700">
+                              <Mail size={16} className="shrink-0 text-slate-400" />
+                              <span className="truncate">{user.email}</span>
+                            </div>
+                            <div className="flex justify-end gap-2">
+                              <Button variant="secondary" className="h-10 w-10 px-0" onClick={() => setModal({ open: true, user })} aria-label={t('actions.edit')}><Pencil size={16} /></Button>
+                              <Button variant="danger" className="h-10 w-10 px-0" onClick={() => setConfirm(user)} disabled={isCurrentUser} aria-label={t('actions.delete')}><Trash2 size={16} /></Button>
+                            </div>
                           </div>
-                          <div className="flex min-w-0 items-center gap-2 text-sm font-semibold text-slate-700">
-                            <Mail size={16} className="shrink-0 text-slate-400" />
-                            <span className="truncate">{user.email}</span>
-                          </div>
-                          <div className="flex justify-end gap-2">
-                            <Button variant="secondary" className="h-10 w-10 px-0" onClick={() => setModal({ open: true, user })} aria-label={t('actions.edit')}><Pencil size={16} /></Button>
-                            <Button variant="danger" className="h-10 w-10 px-0" onClick={() => setConfirm(user)} aria-label={t('actions.delete')}><Trash2 size={16} /></Button>
-                          </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </section>
                 );
