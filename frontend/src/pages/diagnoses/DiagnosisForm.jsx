@@ -134,7 +134,7 @@ const DiagnosisForm = ({ initialData, patients, defaultPatient, onSubmit, onCanc
         {icdLoading && <span className="mt-1 block text-sm text-slate-500">ICD-10-CM qidirilmoqda...</span>}
       </label>
       <label className="block md:col-span-2">
-        <span className="mb-2 block text-sm font-extrabold text-slate-600">MKB-10 nomi (O'zbekcha)</span>
+        <span className="mb-2 block text-sm font-extrabold text-slate-600">MKB-10 nomi</span>
         <input
           list="mkb10-name-options"
           className="focus-ring w-full rounded-[1.15rem] border border-sky-100 bg-white/95 px-4 py-3 text-sm font-semibold text-slate-900 shadow-sm placeholder:text-slate-400"
