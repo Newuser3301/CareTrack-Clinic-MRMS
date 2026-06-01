@@ -55,6 +55,8 @@ const initials = (name = '') =>
     .slice(0, 2)
     .toUpperCase() || 'U';
 
+const userDisplayName = (user = {}) => user.name || user.email || 'Unnamed user';
+
 const UsersList = () => {
   const { user: currentUser } = useAuth();
   const { t } = useLanguage();
@@ -93,7 +95,7 @@ const UsersList = () => {
       .filter((role) => grouped[role]?.length)
       .map((role) => ({
         role,
-        users: grouped[role].sort((a, b) => a.name.localeCompare(b.name))
+        users: grouped[role].sort((a, b) => userDisplayName(a).localeCompare(userDisplayName(b)))
       }));
   }, [users]);
 
@@ -192,11 +194,11 @@ const UsersList = () => {
                         <div key={user._id} className="grid gap-3 px-5 py-4 transition hover:bg-sky-50/65 sm:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)_auto] sm:items-center">
                           <div className="flex min-w-0 items-center gap-3">
                             <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-sm font-black ${style.icon}`}>
-                              {initials(user.name)}
+                              {initials(userDisplayName(user))}
                             </div>
                             <div className="min-w-0">
                               <Link to={`/users/${user._id}`} className="block truncate text-sm font-black text-primary-700 hover:underline">
-                                {user.name}
+                                {userDisplayName(user)}
                               </Link>
                               <div className="mt-1 flex items-center gap-1.5 text-xs font-semibold text-slate-500">
                                 <CalendarDays size={13} />
@@ -231,7 +233,7 @@ const UsersList = () => {
           onCancel={() => setModal({ open: false, user: null })}
         />
       </Modal>
-      <ConfirmDialog open={!!confirm} message={`${t('common.delete')} ${confirm?.name}?`} onCancel={() => setConfirm(null)} onConfirm={deleteUser} loading={saving} />
+      <ConfirmDialog open={!!confirm} message={`${t('common.delete')} ${userDisplayName(confirm)}?`} onCancel={() => setConfirm(null)} onConfirm={deleteUser} loading={saving} />
     </div>
   );
 };
