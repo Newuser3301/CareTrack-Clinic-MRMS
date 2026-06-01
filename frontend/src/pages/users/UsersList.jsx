@@ -239,6 +239,7 @@ const UsersList = () => {
         <UserForm
           initialData={modal.user}
           currentRole={currentUser?.role}
+          roleLocked={isSameUser(modal.user, currentUser)}
           onSubmit={saveUser}
           loading={saving}
           onCancel={() => setModal({ open: false, user: null })}

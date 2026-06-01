@@ -109,6 +109,11 @@ const updateUser = async (req, res, next) => {
       throw new Error('Only Super Admin can manage super_admin accounts');
     }
 
+    if (req.user._id.equals(user._id) && update.role && update.role !== user.role) {
+      res.status(400);
+      throw new Error('You cannot change your own role');
+    }
+
     if (update.role === 'super_admin' && update.role !== user.role && !canPromoteToSuperAdmin(user)) {
       res.status(403);
       throw new Error('Only admin accounts can be promoted to super admin');

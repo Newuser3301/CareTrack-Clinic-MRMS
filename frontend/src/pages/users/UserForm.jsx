@@ -16,7 +16,7 @@ const baseRoleOptions = (t) => [
 ];
 const staffRoleOptions = (t) => baseRoleOptions(t).filter((option) => option.value !== 'admin');
 
-const UserForm = ({ initialData, currentRole, onSubmit, onCancel, loading }) => {
+const UserForm = ({ initialData, currentRole, roleLocked = false, onSubmit, onCancel, loading }) => {
   const [form, setForm] = useState(emptyUser);
   const { t } = useLanguage();
   const canSelectSuperAdmin = currentRole === 'super_admin' && ['admin', 'super_admin'].includes(initialData?.role);
@@ -57,6 +57,7 @@ const UserForm = ({ initialData, currentRole, onSubmit, onCancel, loading }) => 
         value={form.role}
         onChange={(event) => update('role', event.target.value)}
         options={roleOptions}
+        disabled={roleLocked}
         required
       />
       <div className="sticky bottom-0 flex justify-end gap-3 bg-sky-50/95 pt-4 md:col-span-2">
