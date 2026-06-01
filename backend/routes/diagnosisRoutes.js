@@ -7,7 +7,8 @@ const {
   updateDiagnosis,
   deleteDiagnosis,
   getDiagnosesByPatient,
-  searchIcd10Codes
+  searchIcd10Codes,
+  searchMkb10Codes
 } = require('../controllers/diagnosisController');
 const { protect } = require('../middleware/authMiddleware');
 const { authorize } = require('../middleware/roleMiddleware');
@@ -28,6 +29,7 @@ router.use(protect, authorize('super_admin', 'admin', 'doctor', 'clinician', 'pa
 
 router.route('/').get(getDiagnoses).post(authorize('super_admin', 'admin', 'doctor'), diagnosisValidation, createDiagnosis);
 router.get('/icd10/search', authorize('super_admin', 'admin', 'doctor', 'clinician'), searchIcd10Codes);
+router.get('/mkb10/search', authorize('super_admin', 'admin', 'doctor', 'clinician'), searchMkb10Codes);
 router.get('/patient/:patientId', getDiagnosesByPatient);
 router
   .route('/:id')

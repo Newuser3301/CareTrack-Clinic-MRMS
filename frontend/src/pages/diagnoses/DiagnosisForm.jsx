@@ -12,7 +12,10 @@ const toDateInput = (value) => (value ? new Date(value).toISOString().slice(0, 1
 const DiagnosisForm = ({ initialData, patients, defaultPatient, onSubmit, onCancel, loading }) => {
   const [form, setForm] = useState(emptyDiagnosis);
   const [icdCodeOptions, setIcdCodeOptions] = useState([]);
+  const [mkb10Query, setMkb10Query] = useState('');
+  const [mkb10Options, setMkb10Options] = useState([]);
   const [icdLoading, setIcdLoading] = useState(false);
+  const [mkb10Loading, setMkb10Loading] = useState(false);
   const { t } = useLanguage();
 
   useEffect(() => {
@@ -21,6 +24,7 @@ const DiagnosisForm = ({ initialData, patients, defaultPatient, onSubmit, onCanc
         ? { ...initialData, patient: initialData.patient?._id || initialData.patient, diagnosedDate: toDateInput(initialData.diagnosedDate) }
         : { ...emptyDiagnosis, patient: defaultPatient || '' }
     );
+    setMkb10Query('');
   }, [initialData, defaultPatient]);
 
   useEffect(() => {
@@ -52,6 +56,35 @@ const DiagnosisForm = ({ initialData, patients, defaultPatient, onSubmit, onCanc
     };
   }, [form.icdCode]);
 
+  useEffect(() => {
+    const query = mkb10Query.trim();
+    if (query.length < 2) {
+      setMkb10Options([]);
+      setMkb10Loading(false);
+      return undefined;
+    }
+
+    let cancelled = false;
+    const timer = setTimeout(async () => {
+      try {
+        setMkb10Loading(true);
+        const { data } = await api.get('/diagnoses/mkb10/search', {
+          params: { terms: query, count: 10 }
+        });
+        if (!cancelled) setMkb10Options(Array.isArray(data) ? data : []);
+      } catch {
+        if (!cancelled) setMkb10Options([]);
+      } finally {
+        if (!cancelled) setMkb10Loading(false);
+      }
+    }, 250);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [mkb10Query]);
+
   const update = (field, value) => setForm((current) => ({ ...current, [field]: value }));
   const updateIcdCode = (value) => {
     const selected = icdCodeOptions.find((option) => option.code.toLowerCase() === value.trim().toLowerCase());
@@ -60,6 +93,17 @@ const DiagnosisForm = ({ initialData, patients, defaultPatient, onSubmit, onCanc
       icdCode: value.toUpperCase(),
       description: selected ? selected.name : current.description
     }));
+  };
+  const updateMkb10Query = (value) => {
+    const selected = mkb10Options.find((option) => option.name.toLowerCase() === value.trim().toLowerCase());
+    setMkb10Query(value);
+    if (selected) {
+      setForm((current) => ({
+        ...current,
+        icdCode: selected.code,
+        description: selected.description || selected.name
+      }));
+    }
   };
 
   return (
@@ -88,6 +132,22 @@ const DiagnosisForm = ({ initialData, patients, defaultPatient, onSubmit, onCanc
           ))}
         </datalist>
         {icdLoading && <span className="mt-1 block text-sm text-slate-500">ICD-10-CM qidirilmoqda...</span>}
+      </label>
+      <label className="block md:col-span-2">
+        <span className="mb-2 block text-sm font-extrabold text-slate-600">MKB-10 nomi (O'zbekcha)</span>
+        <input
+          list="mkb10-name-options"
+          className="focus-ring w-full rounded-[1.15rem] border border-sky-100 bg-white/95 px-4 py-3 text-sm font-semibold text-slate-900 shadow-sm placeholder:text-slate-400"
+          value={mkb10Query}
+          onChange={(event) => updateMkb10Query(event.target.value)}
+          placeholder="Kasallik nomini yozing"
+        />
+        <datalist id="mkb10-name-options">
+          {mkb10Options.map((option) => (
+            <option key={`${option.code}-${option.name}`} value={option.name} label={`${option.code} - ${option.name}`} />
+          ))}
+        </datalist>
+        {mkb10Loading && <span className="mt-1 block text-sm text-slate-500">MKB-10 qidirilmoqda...</span>}
       </label>
       <Select
         label={t('common.severity')}

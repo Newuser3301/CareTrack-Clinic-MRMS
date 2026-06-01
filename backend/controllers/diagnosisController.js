@@ -3,6 +3,7 @@ const Diagnosis = require('../models/Diagnosis');
 const Patient = require('../models/Patient');
 const { ensureDiagnosisAccess, ensurePatientAccess, getVisiblePatientFilter, isSystemManager } = require('../utils/rbac');
 const { searchIcd10cm } = require('../utils/icd10cmApi');
+const { searchMkb10 } = require('../utils/mkb10Catalog');
 
 const handleValidation = (req, res, next) => {
   const errors = validationResult(req);
@@ -166,6 +167,16 @@ const searchIcd10Codes = async (req, res, next) => {
   }
 };
 
+const searchMkb10Codes = async (req, res, next) => {
+  try {
+    const results = searchMkb10(req.query.terms, { count: req.query.count });
+    res.json(results);
+  } catch (error) {
+    res.status(500);
+    next(new Error(`Unable to search MKB-10 codes: ${error.message}`));
+  }
+};
+
 module.exports = {
   getDiagnoses,
   getDiagnosisById,
@@ -173,5 +184,6 @@ module.exports = {
   updateDiagnosis,
   deleteDiagnosis,
   getDiagnosesByPatient,
-  searchIcd10Codes
+  searchIcd10Codes,
+  searchMkb10Codes
 };
