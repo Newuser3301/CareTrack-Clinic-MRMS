@@ -55,7 +55,7 @@ const initials = (name = '') =>
     .slice(0, 2)
     .toUpperCase() || 'U';
 
-const userDisplayName = (user = {}) => user.name || user.email || 'Unnamed user';
+const userDisplayName = (user) => user?.name || user?.email || 'Unnamed user';
 
 const UsersList = () => {
   const { user: currentUser } = useAuth();
