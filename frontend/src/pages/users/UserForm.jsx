@@ -7,10 +7,25 @@ import { useLanguage } from '../../context/LanguageContext';
 import { generateStrongPassword } from '../../utils/passwords';
 
 const emptyUser = { name: '', email: '', password: '', role: 'patient' };
+const baseRoleOptions = (t) => [
+  { value: 'admin', label: t('roles.admin') },
+  { value: 'doctor', label: t('roles.doctor') },
+  { value: 'clinician', label: t('roles.clinician') },
+  { value: 'receptionist', label: t('roles.receptionist') },
+  { value: 'patient', label: t('roles.patient') }
+];
+const staffRoleOptions = (t) => baseRoleOptions(t).filter((option) => option.value !== 'admin');
 
 const UserForm = ({ initialData, currentRole, onSubmit, onCancel, loading }) => {
   const [form, setForm] = useState(emptyUser);
   const { t } = useLanguage();
+  const canSelectSuperAdmin = currentRole === 'super_admin' && ['admin', 'super_admin'].includes(initialData?.role);
+  const roleOptions = currentRole === 'super_admin'
+    ? [
+        ...(canSelectSuperAdmin ? [{ value: 'super_admin', label: t('roles.super_admin') }] : []),
+        ...baseRoleOptions(t)
+      ]
+    : staffRoleOptions(t);
 
   useEffect(() => {
     setForm(initialData ? { ...initialData, password: '' } : { ...emptyUser, password: generateStrongPassword() });
@@ -41,21 +56,7 @@ const UserForm = ({ initialData, currentRole, onSubmit, onCancel, loading }) => 
         label={t('common.role')}
         value={form.role}
         onChange={(event) => update('role', event.target.value)}
-        options={(currentRole === 'super_admin'
-          ? [
-              { value: 'super_admin', label: t('roles.super_admin') },
-              { value: 'admin', label: t('roles.admin') },
-              { value: 'doctor', label: t('roles.doctor') },
-              { value: 'clinician', label: t('roles.clinician') },
-              { value: 'receptionist', label: t('roles.receptionist') },
-              { value: 'patient', label: t('roles.patient') }
-            ]
-          : [
-              { value: 'doctor', label: t('roles.doctor') },
-              { value: 'clinician', label: t('roles.clinician') },
-              { value: 'receptionist', label: t('roles.receptionist') },
-              { value: 'patient', label: t('roles.patient') }
-            ])}
+        options={roleOptions}
         required
       />
       <div className="sticky bottom-0 flex justify-end gap-3 bg-sky-50/95 pt-4 md:col-span-2">

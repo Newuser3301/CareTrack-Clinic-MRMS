@@ -4,7 +4,7 @@ const Doctor = require('../models/Doctor');
 const Patient = require('../models/Patient');
 const Diagnosis = require('../models/Diagnosis');
 const RefreshSession = require('../models/RefreshSession');
-const { isSuperAdmin, isAdmin } = require('../utils/rbac');
+const { isSuperAdmin, isAdmin, canPromoteToSuperAdmin } = require('../utils/rbac');
 
 const handleValidation = (req, res, next) => {
   const errors = validationResult(req);
@@ -68,6 +68,11 @@ const createUser = async (req, res, next) => {
       throw new Error('Admins can only create doctor, clinician, receptionist and patient accounts');
     }
 
+    if (req.body.role === 'super_admin') {
+      res.status(403);
+      throw new Error('Only existing admin accounts can be promoted to super admin');
+    }
+
     const user = await User.create(req.body);
     res.status(201).json(user);
   } catch (error) {
@@ -102,6 +107,11 @@ const updateUser = async (req, res, next) => {
     if (!isSuperAdmin(req.user) && (user.role === 'super_admin' || update.role === 'super_admin')) {
       res.status(403);
       throw new Error('Only Super Admin can manage super_admin accounts');
+    }
+
+    if (update.role === 'super_admin' && update.role !== user.role && !canPromoteToSuperAdmin(user)) {
+      res.status(403);
+      throw new Error('Only admin accounts can be promoted to super admin');
     }
 
     const shouldRevokeSessions = Boolean(update.password || (update.role && update.role !== user.role));

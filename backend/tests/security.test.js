@@ -1,7 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { validatePassword } = require('../utils/passwordPolicy');
-const { isSuperAdmin, isAdmin, isSystemManager } = require('../utils/rbac');
+const { isSuperAdmin, isAdmin, isSystemManager, canPromoteToSuperAdmin } = require('../utils/rbac');
 const validateEnv = require('../config/validateEnv');
 const { resolveSuperAdminConfig } = require('../utils/bootstrapSuperAdmin');
 
@@ -16,6 +16,15 @@ test('RBAC system manager helpers identify privileged roles only', () => {
   assert.equal(isAdmin({ role: 'admin' }), true);
   assert.equal(isSystemManager({ role: 'doctor' }), false);
   assert.equal(isSystemManager({ role: 'patient' }), false);
+});
+
+test('super admin promotion is limited to existing admin accounts', () => {
+  assert.equal(canPromoteToSuperAdmin({ role: 'admin' }), true);
+  assert.equal(canPromoteToSuperAdmin({ role: 'doctor' }), false);
+  assert.equal(canPromoteToSuperAdmin({ role: 'clinician' }), false);
+  assert.equal(canPromoteToSuperAdmin({ role: 'receptionist' }), false);
+  assert.equal(canPromoteToSuperAdmin({ role: 'patient' }), false);
+  assert.equal(canPromoteToSuperAdmin(null), false);
 });
 
 test('production env validation rejects insecure frontend origins', () => {

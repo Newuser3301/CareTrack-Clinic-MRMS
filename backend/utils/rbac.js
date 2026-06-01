@@ -8,6 +8,7 @@ const isAdmin = (user) => user?.role === 'admin';
 const isSystemManager = (user) => SYSTEM_ROLES.includes(user?.role);
 const isClinician = (user) => user?.role === 'clinician';
 const isReceptionist = (user) => user?.role === 'receptionist';
+const canPromoteToSuperAdmin = (user) => user?.role === 'admin';
 
 const forbid = (res, message = 'Forbidden: insufficient permissions') => {
   res.status(403);
@@ -80,6 +81,7 @@ module.exports = {
   isClinician,
   isReceptionist,
   isSystemManager,
+  canPromoteToSuperAdmin,
   forbid,
   getDoctorProfile,
   getPatientProfile,

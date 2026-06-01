@@ -74,6 +74,11 @@ const register = async (req, res, next) => {
 
   try {
     const { name, email, password, role } = req.body;
+    if (role === 'super_admin') {
+      res.status(403);
+      throw new Error('Only existing admin accounts can be promoted to super admin');
+    }
+
     const userExists = await User.findOne({ email });
 
     if (userExists) {
